@@ -20,7 +20,7 @@ lint: pretty
     npm run lint
     npm run tsc
 
-lintfix:
+lintfix: prettyfix
     npm run lint:fix
 
 prettyfix:
