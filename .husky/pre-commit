@@ -1,5 +1,5 @@
 
-set -ex
+set -e
 
 echo "Running pre-commit hook from huskey pre-commit...."
 
