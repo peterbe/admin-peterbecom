@@ -75,7 +75,8 @@ export function List() {
           search={search}
           updateSearch={(s: string) => {
             const sp = new URLSearchParams(searchString);
-            if (s.trim()) {
+
+            if (s.trim() && s !== sp.get("search")) {
               sp.set("search", s);
             } else {
               sp.delete("search");

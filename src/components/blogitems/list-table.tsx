@@ -41,7 +41,14 @@ export function ListTable({
             </Table.Td>
             <Table.Th>
               {search && (
-                <Button onClick={() => updateSearch("")}>Clear</Button>
+                <Button
+                  onClick={() => {
+                    setValue("");
+                    updateSearch("");
+                  }}
+                >
+                  Clear
+                </Button>
               )}
             </Table.Th>
           </Table.Tr>
@@ -52,7 +59,9 @@ export function ListTable({
               <Table.Td>
                 <Link href={`/plog/${item.oid}`}>
                   {search ? (
-                    <Highlight highlight={search}>{item.title}</Highlight>
+                    <Highlight highlight={search} component="span">
+                      {item.title}
+                    </Highlight>
                   ) : (
                     item.title
                   )}
@@ -66,9 +75,11 @@ export function ListTable({
                     ml={5}
                     style={{ textTransform: "none", pointer: "cursor" }}
                     onClick={() => {
-                      if (/\s/.test(category.name))
-                        updateSearch(`category:"${category.name}"`);
-                      else updateSearch(`category:${category.name}`);
+                      const newSearch = /\s/.test(category.name)
+                        ? `category:"${category.name}"`
+                        : `category:${category.name}`;
+                      setValue(newSearch);
+                      updateSearch(newSearch);
                     }}
                   >
                     {category.name}
