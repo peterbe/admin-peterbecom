@@ -1,8 +1,6 @@
 
 set -e
 
-echo "Running pre-commit hook from huskey pre-commit...."
-
 # Validate
 npm run --silent tsc
 
