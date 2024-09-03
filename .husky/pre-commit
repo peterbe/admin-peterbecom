@@ -3,6 +3,10 @@ set -e
 
 echo "Running pre-commit hook from huskey pre-commit...."
 
+# Validate
+npm run tsc
+
+# Validate *and* fix
 npm run pretty:fix
 npm run lint:fix
 
