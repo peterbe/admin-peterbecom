@@ -1,4 +1,7 @@
+
 set -ex
+
+echo "Running pre-commit hook from huskey pre-commit...."
 
 npm run pretty:fix
 npm run lint:fix
