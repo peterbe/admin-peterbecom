@@ -1,34 +1,37 @@
-import { Alert, LoadingOverlay, Table } from "@mantine/core";
+import { Alert, LoadingOverlay } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 
+import { useLocation, useSearch } from "wouter";
 import { API_BASE } from "../../config";
-import { Link } from "wouter";
+import type { BlogitemsServerData } from "../../types";
+import { ListTable } from "./list-table";
+// import * as v from "valibot";
+// import { validateSchemaToData } from "../../validate-schema";
 
-type CategoryT = {
-  id: number;
-  name: string;
-};
-type BlogitemT = {
-  id: number;
-  oid: string;
-  title: string;
-  pub_date: string;
-  _is_published: boolean;
-  modify_date: string;
-  categories: CategoryT[];
-  keywords: string[];
-  summary: string;
-  archived: null;
-};
-type ServerData = {
-  blogitems: BlogitemT[];
-  count: number;
-};
+// const BlogitemSchema = v.object({
+//   id: v.number(),
+//   oid: v.string(),
+//   pub_date: v.string(),
+//   _is_published: v.boolean(),
+//   modify_date: v.string(),
+//   categories: v.array(v.object({ id: v.number(), name: v.string() })),
+//   keywords: v.array(v.string()),
+//   summary: v.string(),
+//   archived: v.nullable(v.string()),
+// });
+
+// const ServerDataSchema = v.object({
+//   blogitems: v.array(BlogitemSchema),
+//   count: v.number(),
+// });
 
 export function List() {
-  const [search, setSearch] = useState("");
-  const { data, error, isPending } = useQuery<ServerData>({
+  // const [search, setSearch] = useState("");
+  const [location, navigate] = useLocation();
+  const searchString = useSearch();
+  const searchParams = new URLSearchParams(searchString);
+  const search = searchParams.get("search") || "";
+  const { data, error, isPending } = useQuery<BlogitemsServerData>({
     queryKey: ["blogitems", search],
     queryFn: async () => {
       //admin.peterbe.com/api/v0/plog/?search=react
@@ -41,6 +44,23 @@ export function List() {
     },
   });
 
+  // if (data) {
+  //   validateSchemaToData<ServerData>(ServerDataSchema, data);
+  //   try {
+  //     v.parse(ServerDataSchema, data);
+  //   } catch (error) {
+  //     if (v.isValiError(error)) {
+  //       console.error(
+  //         "**** Client-side expectations do not match what the server returned ****"
+  //       );
+  //       console.error("Server data:", data);
+  //       console.error("Expected schema:", ServerDataSchema);
+  //       console.log("Study the error to see what's different", error);
+  //     }
+  //     throw error;
+  //   }
+  // }
+
   return (
     <div>
       {isPending && <LoadingOverlay />}
@@ -49,30 +69,21 @@ export function List() {
         <Alert color="red">Failed to load blogitems: {error.message}</Alert>
       )}
 
-      {data && <ListTable data={data} />}
+      {data && (
+        <ListTable
+          data={data}
+          search={search}
+          updateSearch={(s: string) => {
+            const sp = new URLSearchParams(searchString);
+            if (s.trim()) {
+              sp.set("search", s);
+            } else {
+              sp.delete("search");
+            }
+            navigate(sp.toString() ? `?${sp.toString()}` : location);
+          }}
+        />
+      )}
     </div>
-  );
-}
-
-function ListTable({ data }: { data: ServerData }) {
-  return (
-    <Table>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th>Title</Table.Th>
-          <Table.Th>Modified</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {data.blogitems.map((item) => (
-          <Table.Tr key={item.id}>
-            <Table.Td>
-              <Link href={`/plog/${item.oid}`}>{item.title}</Link>
-            </Table.Td>
-            <Table.Td>{item.modify_date}</Table.Td>
-          </Table.Tr>
-        ))}
-      </Table.Tbody>
-    </Table>
   );
 }

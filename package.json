@@ -17,9 +17,11 @@
     "@mantine/core": "^7.12.2",
     "@mantine/form": "^7.12.2",
     "@mantine/hooks": "^7.12.2",
+    "@tabler/icons-react": "^3.14.0",
     "@tanstack/react-query": "^5.53.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "valibot": "^0.41.0",
     "wouter": "^3.3.5"
   },
   "devDependencies": {

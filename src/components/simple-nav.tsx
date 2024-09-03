@@ -1,4 +1,4 @@
-import { Avatar, Group, Box } from "@mantine/core";
+import { Avatar, Box, Group } from "@mantine/core";
 import { Link } from "wouter";
 
 import { useUserData } from "../hooks/use-userdata";

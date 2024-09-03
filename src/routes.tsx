@@ -29,9 +29,9 @@ export function Routes() {
           <Route path="/:oid" component={Blogitem} />
           <Route path="/" component={Blogitems} />
         </Route> */}
-        <Route path="/plog" component={Blogitems} nest>
-          <Route path="/add" component={Blogitem} />
-          <Route path="/:oid" component={Blogitem} />
+        <Route path="/plog/add" component={Blogitem} />
+        <Route path="/plog/:oid" component={Blogitem} />
+        <Route path="/plog" component={Blogitems}>
           {/* <Route path="/" /> */}
         </Route>
 
