@@ -9,8 +9,7 @@ export function Authenticate() {
   const { userData } = useUserData();
 
   return (
-  
-  <Container size={420} my={35}>
+    <Container size={420} my={35}>
       {userData?.user && (
         <Alert>
           You&apos;re already signed in! <b>{userData.user.username}</b>

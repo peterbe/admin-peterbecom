@@ -2,3 +2,5 @@ set -ex
 
 npm run pretty:fix
 npm run lint:fix
+
+git update-index -g
