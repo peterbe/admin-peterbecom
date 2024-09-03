@@ -4,10 +4,10 @@ set -e
 echo "Running pre-commit hook from huskey pre-commit...."
 
 # Validate
-npm run tsc
+npm run --silent tsc
 
 # Validate *and* fix
-npm run pretty:fix
-npm run lint:fix
+npm run --silent pretty:fix
+npm run --silent lint:fix
 
 git update-index -g
