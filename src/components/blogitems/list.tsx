@@ -76,7 +76,11 @@ export function List() {
           updateSearch={(s: string) => {
             const sp = new URLSearchParams(searchString);
 
-            if (s.trim() && s !== sp.get("search")) {
+            const existing = sp.get("search");
+            if (s.trim() && s !== existing) {
+              // if (existing?.includes(s)) {
+              //   console.log("TOGGLE?", { s, existing });
+              // }
               sp.set("search", s);
             } else {
               sp.delete("search");

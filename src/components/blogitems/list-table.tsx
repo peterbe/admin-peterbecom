@@ -1,5 +1,7 @@
 import { Badge, Button, Highlight, Table, TextInput } from "@mantine/core";
+import type { BadgeProps } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
+import { formatDistance, isBefore, parseISO } from "date-fns";
 import { useState } from "react";
 
 import { Link } from "wouter";
@@ -15,6 +17,20 @@ export function ListTable({
   updateSearch: (s: string) => void;
 }) {
   const [value, setValue] = useState(search);
+
+  function toggleCategory(name: string) {
+    const newSearch = /\s/.test(name)
+      ? `category:"${name}"`
+      : `category:${name}`;
+
+    if (search.includes(newSearch)) {
+      setValue((v) => v.replace(newSearch, ""));
+      updateSearch(search.replace(newSearch, ""));
+    } else {
+      setValue((v) => `${v} ${newSearch}`.trim());
+      updateSearch(`${search} ${newSearch}`.trim());
+    }
+  }
   return (
     <form
       onSubmit={(e) => {
@@ -75,11 +91,7 @@ export function ListTable({
                     ml={5}
                     style={{ textTransform: "none", pointer: "cursor" }}
                     onClick={() => {
-                      const newSearch = /\s/.test(category.name)
-                        ? `category:"${category.name}"`
-                        : `category:${category.name}`;
-                      setValue(newSearch);
-                      updateSearch(newSearch);
+                      toggleCategory(category.name);
                     }}
                   >
                     {category.name}
@@ -87,20 +99,24 @@ export function ListTable({
                 ))}
 
                 {!item.summary && (
-                  <Badge
+                  <CustomBadge
                     variant="default"
                     ml={15}
                     style={{ textTransform: "none" }}
                   >
                     No summary
-                  </Badge>
+                  </CustomBadge>
                 )}
 
                 {item.archived && (
-                  <Badge ml={15} color="red" style={{ textTransform: "none" }}>
-                    Archived
-                  </Badge>
+                  <CustomBadge color="red">Archived</CustomBadge>
                 )}
+
+                {!item._is_published ? (
+                  <CustomBadge color="orange">
+                    Published <DisplayDate date={item.pub_date} />
+                  </CustomBadge>
+                ) : null}
               </Table.Td>
               <Table.Td>{item.modify_date}</Table.Td>
             </Table.Tr>
@@ -108,5 +124,38 @@ export function ListTable({
         </Table.Tbody>
       </Table>
     </form>
+  );
+}
+
+function CustomBadge(props: BadgeProps) {
+  return <Badge ml={15} style={{ textTransform: "none" }} {...props} />;
+}
+
+export function DisplayDate({
+  date,
+  now,
+  prefix,
+}: {
+  date: string;
+  now?: string;
+  prefix?: string;
+}) {
+  prefix = prefix || "in";
+  if (date === null) {
+    throw new Error("date is null");
+  }
+  const dateObj = typeof date === "string" ? parseISO(date) : date;
+  const nowObj = now ? parseISO(now) : new Date();
+  if (isBefore(dateObj, nowObj)) {
+    return (
+      <span title={dateObj.toString()}>
+        {formatDistance(dateObj, nowObj)} ago
+      </span>
+    );
+  }
+  return (
+    <span title={dateObj.toString()}>
+      {prefix} {formatDistance(dateObj, nowObj)}
+    </span>
   );
 }
