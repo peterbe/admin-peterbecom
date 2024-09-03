@@ -31,12 +31,15 @@ export function List() {
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);
   const search = searchParams.get("search") || "";
+  const orderBy = searchParams.get("orderBy") || "pub_date";
+
+  const sp = new URLSearchParams({ search, order: orderBy });
+  const apiUrl = `${API_BASE}/plog/?${sp}`;
+
   const { data, error, isPending } = useQuery<BlogitemsServerData>({
-    queryKey: ["blogitems", search],
+    queryKey: ["blogitems", apiUrl],
     queryFn: async () => {
-      //admin.peterbe.com/api/v0/plog/?search=react
-      const sp = new URLSearchParams({ search });
-      const response = await fetch(`${API_BASE}/plog/?${sp}`);
+      const response = await fetch(apiUrl);
       if (!response.ok) {
         throw new Error(`${response.status} on ${response.url}`);
       }
@@ -72,6 +75,7 @@ export function List() {
       {data && (
         <ListTable
           data={data}
+          orderBy={orderBy}
           search={search}
           updateSearch={(s: string) => {
             const sp = new URLSearchParams(searchString);

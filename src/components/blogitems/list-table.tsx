@@ -4,15 +4,17 @@ import { IconSearch } from "@tabler/icons-react";
 import { formatDistance, isBefore, parseISO } from "date-fns";
 import { useState } from "react";
 
-import { Link } from "wouter";
+import { Link, useSearch } from "wouter";
 import type { BlogitemsServerData } from "../../types";
 
 export function ListTable({
   search,
+  orderBy,
   data,
   updateSearch,
 }: {
   search: string;
+  orderBy: string;
   data: BlogitemsServerData;
   updateSearch: (s: string) => void;
 }) {
@@ -31,6 +33,17 @@ export function ListTable({
       updateSearch(`${search} ${newSearch}`.trim());
     }
   }
+
+  const searchString = useSearch();
+
+  function addQueryString(params: Record<string, string>) {
+    const searchParams = new URLSearchParams(searchString);
+    for (const [key, value] of Object.entries(params)) {
+      searchParams.set(key, value);
+    }
+    return `?${searchParams}`;
+  }
+
   return (
     <form
       onSubmit={(e) => {
@@ -42,7 +55,18 @@ export function ListTable({
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Title</Table.Th>
-            <Table.Th>Modified</Table.Th>
+            <Table.Th>
+              {orderBy === "pub_date" && (
+                <Link href={addQueryString({ orderBy: "modify_date" })}>
+                  Published
+                </Link>
+              )}
+              {orderBy === "modify_date" && (
+                <Link href={addQueryString({ orderBy: "pub_date" })}>
+                  Modified
+                </Link>
+              )}
+            </Table.Th>
           </Table.Tr>
           <Table.Tr>
             <Table.Td>
@@ -118,7 +142,13 @@ export function ListTable({
                   </CustomBadge>
                 ) : null}
               </Table.Td>
-              <Table.Td>{item.modify_date}</Table.Td>
+              <Table.Td>
+                <DisplayDate
+                  date={
+                    orderBy === "pub_date" ? item.pub_date : item.modify_date
+                  }
+                />
+              </Table.Td>
             </Table.Tr>
           ))}
         </Table.Tbody>
