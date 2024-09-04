@@ -11,7 +11,8 @@ export function Nav() {
       <Group justify="space-between">
         <Group>
           ADMIN - <Link href="/">Home</Link> -{" "}
-          <Link href="/plog">Blogitems</Link>
+          <Link href="/plog">Blogitems</Link> -{" "}
+          <Link href="/plog/add">Add blogitem</Link>
         </Group>
 
         <Group>

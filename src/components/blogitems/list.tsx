@@ -26,7 +26,6 @@ import { ListTable } from "./list-table";
 // });
 
 export function List() {
-  // const [search, setSearch] = useState("");
   const [location, navigate] = useLocation();
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);

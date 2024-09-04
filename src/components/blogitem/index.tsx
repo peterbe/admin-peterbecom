@@ -4,8 +4,9 @@ import { useParams } from "wouter";
 
 import { Alert, LoadingOverlay } from "@mantine/core";
 import { API_BASE } from "../../config";
-import type { EditBlogitemT } from "../../types";
+import type { BlogitemT, EditBlogitemT } from "../../types";
 import { SignedIn } from "../signed-in";
+import { Form } from "./edit-form";
 
 export default function Blogitem() {
   const params = useParams();
@@ -51,9 +52,10 @@ function Edit({ oid }: { oid: string | null }) {
 }
 
 function Add() {
-  return <div>Add</div>;
-}
-
-function Form({ blogitem }: { blogitem: EditBlogitemT }) {
-  return <div>Form {blogitem.title}</div>;
+  const blogitem: BlogitemT = {
+    id: 0,
+    oid: "",
+    title: "",
+  };
+  return <Form blogitem={blogitem} />;
 }
