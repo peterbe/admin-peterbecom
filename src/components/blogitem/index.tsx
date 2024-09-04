@@ -4,7 +4,7 @@ import { useParams } from "wouter";
 
 import { Alert, LoadingOverlay } from "@mantine/core";
 import { API_BASE } from "../../config";
-import type { BlogitemT, EditBlogitemT } from "../../types";
+import type { EditBlogitemT } from "../../types";
 import { SignedIn } from "../signed-in";
 import { Form } from "./edit-form";
 
@@ -52,10 +52,23 @@ function Edit({ oid }: { oid: string | null }) {
 }
 
 function Add() {
-  const blogitem: BlogitemT = {
+  const blogitem: EditBlogitemT = {
     id: 0,
     oid: "",
     title: "",
+    summary: "",
+    text: "",
+    pub_date: new Date().toISOString(),
+    categories: [],
+    keywords: ["foo", "bar"],
+    url: "",
+    display_format: "markdown",
+    codesyntax: "",
+    hide_comments: false,
+    disallow_comments: true,
+    open_graph_image: "",
+    archived: null,
   };
+
   return <Form blogitem={blogitem} />;
 }
