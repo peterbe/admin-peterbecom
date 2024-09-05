@@ -17,6 +17,7 @@ import { API_BASE } from "../../config";
 import { useCategories } from "../../hooks/use-categories";
 import type { EditBlogitemT } from "../../types";
 import "./highlight.js.css"; // for the preview
+import { notifications } from "@mantine/notifications";
 import classes from "./edit-form.module.css";
 
 function list2string(list: string[]) {
@@ -47,8 +48,6 @@ type PreviewData = {
     errors?: Record<string, string[]>;
   };
 };
-
-class ValidationError extends Error {}
 
 export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
   const { categories, error: categoriesError } = useCategories();
@@ -120,9 +119,22 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
       if (response.status === 400) {
         const json = (await response.json()) as PostedError;
         console.log("VALIDATION ERRORS", json);
-        throw new ValidationError("Validation error");
+        notifications.show({
+          title: "Validation errors",
+          message: "Look for red",
+          color: "red",
+        });
+        for (const [field, errors] of Object.entries(json.errors)) {
+          form.setFieldError(field, errors.join(", "));
+        }
+
+        // throw new ValidationError("Validation error");
       }
       if (response.status === 201) {
+        notifications.show({
+          message: "Blogitem created",
+          color: "green",
+        });
         const json = (await response.json()) as PostedSuccess;
         // console.log("VALIDATION ERRORS", json);
         if (json.blogitem.oid !== blogitem.oid) {
@@ -132,6 +144,10 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         }
         console.log("CREATED!", json.blogitem);
       } else if (response.status === 200) {
+        notifications.show({
+          message: "Blogitem updated",
+          color: "green",
+        });
         const json = (await response.json()) as { blogitem: EditBlogitemT };
         // console.log("VALIDATION ERRORS", json);
         if (json.blogitem.oid !== blogitem.oid) {
