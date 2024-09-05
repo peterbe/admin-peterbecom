@@ -1,16 +1,22 @@
 import {
   Alert,
+  Box,
   Button,
   Group,
+  LoadingOverlay,
   MultiSelect,
+  Paper,
   TextInput,
   Textarea,
+  Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { API_BASE } from "../../config";
 import { useCategories } from "../../hooks/use-categories";
 import type { EditBlogitemT } from "../../types";
+import "./highlight.js.css"; // for the preview
 import classes from "./edit-form.module.css";
 
 function list2string(list: string[]) {
@@ -34,7 +40,15 @@ type PostedSuccess = {
 type PostedError = {
   errors: Record<string, string[]>;
 };
-// type Posted = PostedSuccess | PostedError;
+
+type PreviewData = {
+  blogitem: {
+    html?: string;
+    errors?: Record<string, string[]>;
+  };
+};
+
+class ValidationError extends Error {}
 
 export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
   const { categories, error: categoriesError } = useCategories();
@@ -75,9 +89,6 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
       }
     },
   });
-  // const [submittedValues, setSubmittedValues] = useState<
-  //   typeof form.values | null
-  // >(null);
 
   function suggestSummary() {
     const text = form.getValues().text;
@@ -109,7 +120,9 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
       if (response.status === 400) {
         const json = (await response.json()) as PostedError;
         console.log("VALIDATION ERRORS", json);
-      } else if (response.status === 201) {
+        throw new ValidationError("Validation error");
+      }
+      if (response.status === 201) {
         const json = (await response.json()) as PostedSuccess;
         // console.log("VALIDATION ERRORS", json);
         if (json.blogitem.oid !== blogitem.oid) {
@@ -137,106 +150,190 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     },
   });
 
-  // useEffect(() => {
-  //   if (submittedValues === null) return;
-  //   mutation.mutate(submittedValues);
-  // }, [submittedValues]);
+  const [previewText, setPreviewText] = useState("");
+
+  const preview = useQuery<PreviewData>({
+    queryKey: ["preview", previewText],
+    // retry: (failureCount, error) => {
+    //   console.log("IN RETRY FUNCTION", error);
+    //   if (error instanceof ValidationError) {
+    //     // Don't retry on validation errors
+    //     return false;
+    //   }
+    //   console.log({ failureCount });
+    //   return failureCount < 3;
+    // },
+    queryFn: async () => {
+      if (!previewText) return Promise.resolve(null);
+      const response = await fetch(`${API_BASE}/plog/preview/`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: previewText,
+          title: form.getValues().title,
+          categories: form.getValues().categories,
+          display_format: form.getValues().display_format,
+        }),
+      });
+
+      if (response.ok || response.status === 400) {
+        return response.json();
+      }
+      throw new Error(`${response.status} on ${response.url}`);
+    },
+  });
 
   return (
-    <form
-      // onSubmit={(event) => event.preventDefault()}
-      onSubmit={form.onSubmit((data) => {
-        if (data !== null) mutation.mutate(data);
-      })}
-    >
-      <TextInput
-        withAsterisk
-        label="Title"
-        placeholder="Title"
-        key={form.key("title")}
-        {...form.getInputProps("title")}
-      />
-      <TextInput
-        withAsterisk
-        label="OID"
-        placeholder="oid slug"
-        key={form.key("oid")}
-        {...form.getInputProps("oid")}
-      />
-      <Textarea
-        withAsterisk
-        label="Text"
-        key={form.key("text")}
-        {...form.getInputProps("text")}
-        autosize
-        minRows={20}
-        maxRows={35}
-        // styles={{ fontFamily: "monospace" }}
-        classNames={{ input: classes.input }}
-      />
-      <Textarea
-        label="Summary"
-        key={form.key("summary")}
-        {...form.getInputProps("summary")}
-        autosize
-        minRows={2}
-        maxRows={6}
-      />
-      {!form.getValues().summary && form.getValues().text && (
-        <Button size="xs" variant="subtle" onClick={suggestSummary}>
-          Suggest summary
-        </Button>
+    <div>
+      {mutation.isError && (
+        <Alert color="red" title="Failed to save changes">
+          {mutation.error.message}
+        </Alert>
       )}
-      <TextInput
-        label="URL"
-        type="url"
-        key={form.key("url")}
-        {...form.getInputProps("url")}
-      />
-      <TextInput
-        label="Pub date"
-        key={form.key("pub_date")}
-        {...form.getInputProps("pub_date")}
-      />
 
-      {categoriesError && <Alert color="red">Failed to load categories</Alert>}
-      <MultiSelect
-        label="Categories"
-        comboboxProps={{ shadow: "md" }}
-        disabled={categories.length === 0}
-        data={categories.map((category) => ({
-          value: `${category.id}`,
-          label: category.name,
-        }))}
-        {...form.getInputProps("categories")}
-      />
+      <form
+        // onSubmit={(event) => event.preventDefault()}
+        onSubmit={form.onSubmit((data) => {
+          if (data !== null) mutation.mutate(data);
+        })}
+      >
+        <TextInput
+          withAsterisk
+          label="Title"
+          placeholder="Title"
+          key={form.key("title")}
+          {...form.getInputProps("title")}
+        />
+        <TextInput
+          withAsterisk
+          label="OID"
+          placeholder="oid slug"
+          key={form.key("oid")}
+          {...form.getInputProps("oid")}
+        />
+        <Textarea
+          withAsterisk
+          label="Text"
+          key={form.key("text")}
+          {...form.getInputProps("text")}
+          onBlur={() => {
+            setPreviewText(form.getValues().text.trim());
+          }}
+          autosize
+          minRows={20}
+          maxRows={35}
+          classNames={{ input: classes.input }}
+        />
+        <Textarea
+          label="Summary"
+          key={form.key("summary")}
+          {...form.getInputProps("summary")}
+          autosize
+          minRows={2}
+          maxRows={6}
+        />
+        {!form.getValues().summary && form.getValues().text && (
+          <Button size="xs" variant="subtle" onClick={suggestSummary}>
+            Suggest summary
+          </Button>
+        )}
+        <TextInput
+          label="URL"
+          type="url"
+          key={form.key("url")}
+          {...form.getInputProps("url")}
+        />
+        <TextInput
+          label="Pub date"
+          key={form.key("pub_date")}
+          {...form.getInputProps("pub_date")}
+        />
 
-      <Textarea
-        label="Keywords"
-        key={form.key("keywords")}
-        {...form.getInputProps("keywords")}
-        autosize
-        minRows={3}
-        maxRows={6}
-      />
+        {categoriesError && (
+          <Alert color="red">Failed to load categories</Alert>
+        )}
+        <MultiSelect
+          label="Categories"
+          comboboxProps={{ shadow: "md" }}
+          disabled={categories.length === 0}
+          data={categories.map((category) => ({
+            value: `${category.id}`,
+            label: category.name,
+          }))}
+          {...form.getInputProps("categories")}
+        />
 
-      <TextInput
-        // withAsterisk
-        label="Display format"
-        key={form.key("display_format")}
-        {...form.getInputProps("display_format")}
-      />
+        <Textarea
+          label="Keywords"
+          key={form.key("keywords")}
+          {...form.getInputProps("keywords")}
+          autosize
+          minRows={3}
+          maxRows={6}
+        />
 
-      <Group justify="flex-end" mt="md">
-        <Button type="submit">Submit</Button>
-      </Group>
-    </form>
+        <TextInput
+          label="Display format"
+          key={form.key("display_format")}
+          {...form.getInputProps("display_format")}
+        />
+
+        <Group justify="flex-end" mt="md">
+          <Button type="submit">Submit</Button>
+        </Group>
+      </form>
+
+      <Preview
+        data={preview.data}
+        error={preview.error}
+        isPending={preview.isPending}
+      />
+    </div>
   );
 }
+
 function slugify(s: string) {
   return s
     .trim()
     .replace(/[#\s]+/g, "-")
     .replace(/[@/'?]/g, "")
     .toLowerCase();
+}
+
+function Preview({
+  data,
+  error,
+  isPending,
+}: {
+  data?: PreviewData;
+  error: Error | null;
+  isPending: boolean;
+}) {
+  return (
+    <Box pos="relative" mt={20}>
+      <Paper shadow="sm" withBorder p="xl">
+        <Title order={3}>Preview</Title>
+        <LoadingOverlay visible={isPending} />
+        {error && <Alert color="red">{error.message}</Alert>}
+        {data?.blogitem.errors && (
+          <Alert color="red" title="Failed to preview">
+            <pre>{JSON.stringify(data.blogitem.errors, undefined, 2)}</pre>
+          </Alert>
+        )}
+        {data?.blogitem.html && (
+          <Paper
+            bg="var(--mantine-color-gray-2)"
+            radius="sm"
+            pt={2}
+            pl={10}
+            pr={10}
+            dangerouslySetInnerHTML={{ __html: data.blogitem.html }}
+          />
+        )}
+      </Paper>
+    </Box>
+  );
 }
