@@ -5,7 +5,9 @@ import { useParams } from "wouter";
 import { Alert, LoadingOverlay } from "@mantine/core";
 import { API_BASE } from "../../config";
 import type { EditBlogitemT } from "../../types";
+import { DisplayDate } from "../blogitems/list-table";
 import { SignedIn } from "../signed-in";
+import { DangerZone } from "./danger-zone";
 import { Form } from "./edit-form";
 
 export default function Blogitem() {
@@ -46,7 +48,16 @@ function Edit({ oid }: { oid: string | null }) {
       {error && (
         <Alert color="red">Failed to load blogitem: {error.message}</Alert>
       )}
+      {data?.blogitem.archived && (
+        <Alert color="orange" title="Archived!">
+          This blogitem was archived on <b>{data.blogitem.archived}</b> (
+          <DisplayDate date={data.blogitem.archived} />)
+        </Alert>
+      )}
+
       {data && <Form blogitem={data.blogitem} />}
+
+      {data?.blogitem.id && <DangerZone blogitem={data.blogitem} />}
     </div>
   );
 }
@@ -60,7 +71,7 @@ function Add() {
     text: "",
     pub_date: new Date().toISOString(),
     categories: [],
-    keywords: ["foo", "bar"],
+    keywords: [],
     url: "",
     display_format: "markdown",
     codesyntax: "",

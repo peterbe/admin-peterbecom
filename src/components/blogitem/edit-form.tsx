@@ -2,26 +2,28 @@ import {
   Alert,
   Box,
   Button,
-  Group,
-  LoadingOverlay,
   MultiSelect,
-  Paper,
   TextInput,
   Textarea,
-  Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { API_BASE } from "../../config";
 import { useCategories } from "../../hooks/use-categories";
-import type { EditBlogitemT } from "../../types";
+import type { EditBlogitemT, PreviewData } from "../../types";
 import "./highlight.js.css"; // for the preview
 import { notifications } from "@mantine/notifications";
+import { useLocation } from "wouter";
 import classes from "./edit-form.module.css";
+import { postPreview } from "./post-preview";
+import { Preview } from "./preview";
 
 function list2string(list: string[]) {
-  return list.filter((s) => s.trim() !== "").join("\n");
+  return list
+    .filter((s) => s.trim() !== "")
+    .map((s) => s.trim())
+    .join("\n");
 }
 
 function required(v: string) {
@@ -40,13 +42,6 @@ type PostedSuccess = {
 };
 type PostedError = {
   errors: Record<string, string[]>;
-};
-
-type PreviewData = {
-  blogitem: {
-    html?: string;
-    errors?: Record<string, string[]>;
-  };
 };
 
 export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
@@ -77,8 +72,18 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         return "Invalid URL";
       },
     },
+    // transformValues: (values) => {
+    //   const { keywords } = values;
+    //   console.log("TRANSFORM BEFORE", { KEYWORDS: keywords });
+    //   values.keywords = list2string(keywords.split("\n"));
+    //   console.log("TRANSFORM AFTER", { KEYWORDS: values.keywords });
+    //   return values;
+    // },
+    // onSub
+
     onValuesChange: (values) => {
       const { title, oid } = values;
+
       // blogitem.id will be 0 when it's for adding a new one
       if (!blogitem.id && title) {
         if (!form.isTouched("oid") || !oid) {
@@ -101,10 +106,12 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     }
   }
 
+  const [, navigate] = useLocation();
+
+  const queryClient = useQueryClient();
+
   const mutation = useMutation({
     mutationFn: async (data: typeof form.values) => {
-      console.log("POST THIS:", data);
-      // return Promise.resolve(null);
       const url = `${API_BASE}/plog/${blogitem.id ? blogitem.oid : ""}`;
       const response = await fetch(url, {
         method: "POST",
@@ -129,8 +136,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         }
 
         // throw new ValidationError("Validation error");
-      }
-      if (response.status === 201) {
+      } else if (response.status === 201) {
         notifications.show({
           message: "Blogitem created",
           color: "green",
@@ -139,7 +145,9 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         // console.log("VALIDATION ERRORS", json);
         if (json.blogitem.oid !== blogitem.oid) {
           // redirect to the new oid
-          throw new Error(`redirect to:: ${json.blogitem.oid}`);
+          // throw new Error(`redirect to:: ${json.blogitem.oid}`);
+          navigate(`/plog/${json.blogitem.oid}`);
+          return;
           // return;
         }
         console.log("CREATED!", json.blogitem);
@@ -149,20 +157,19 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           color: "green",
         });
         const json = (await response.json()) as { blogitem: EditBlogitemT };
-        // console.log("VALIDATION ERRORS", json);
         if (json.blogitem.oid !== blogitem.oid) {
           // redirect to the new oid
-          throw new Error(`redirect to:: ${json.blogitem.oid}`);
-          // return;
+          navigate(`/plog/${json.blogitem.oid}`);
         }
-        console.log("UPDATED", json.blogitem);
       } else {
-        // if (!response.ok) {
         throw new Error(`${response.status} on ${response.url}`);
-        // }
       }
 
       // return axios.post('/todos', newTodo)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogitem", blogitem.oid] });
+      queryClient.invalidateQueries({ queryKey: ["blogitems"] });
     },
   });
 
@@ -170,35 +177,14 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
 
   const preview = useQuery<PreviewData>({
     queryKey: ["preview", previewText],
-    // retry: (failureCount, error) => {
-    //   console.log("IN RETRY FUNCTION", error);
-    //   if (error instanceof ValidationError) {
-    //     // Don't retry on validation errors
-    //     return false;
-    //   }
-    //   console.log({ failureCount });
-    //   return failureCount < 3;
-    // },
     queryFn: async () => {
       if (!previewText) return Promise.resolve(null);
-      const response = await fetch(`${API_BASE}/plog/preview/`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: previewText,
-          title: form.getValues().title,
-          categories: form.getValues().categories,
-          display_format: form.getValues().display_format,
-        }),
+      if (!form.getValues().categories || !form.getValues().categories.length)
+        return Promise.resolve(null);
+      return postPreview({
+        text: previewText,
+        displayFormat: form.getValues().display_format,
       });
-
-      if (response.ok || response.status === 400) {
-        return response.json();
-      }
-      throw new Error(`${response.status} on ${response.url}`);
     },
   });
 
@@ -211,9 +197,10 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
       )}
 
       <form
-        // onSubmit={(event) => event.preventDefault()}
         onSubmit={form.onSubmit((data) => {
-          if (data !== null) mutation.mutate(data);
+          if (data !== null) {
+            mutation.mutate(data);
+          }
         })}
       >
         <TextInput
@@ -286,6 +273,13 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           label="Keywords"
           key={form.key("keywords")}
           {...form.getInputProps("keywords")}
+          onBlur={() => {
+            const { keywords } = form.getValues();
+            const clean = list2string(keywords.split("\n"));
+            if (clean !== keywords) {
+              form.setFieldValue("keywords", clean);
+            }
+          }}
           autosize
           minRows={3}
           maxRows={6}
@@ -297,9 +291,16 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           {...form.getInputProps("display_format")}
         />
 
-        <Group justify="flex-end" mt="md">
-          <Button type="submit">Submit</Button>
-        </Group>
+        <Box mt={10}>
+          <Button
+            type="submit"
+            fullWidth
+            disabled={mutation.isPending}
+            loading={mutation.isPending}
+          >
+            Save
+          </Button>
+        </Box>
       </form>
 
       <Preview
@@ -317,39 +318,4 @@ function slugify(s: string) {
     .replace(/[#\s]+/g, "-")
     .replace(/[@/'?]/g, "")
     .toLowerCase();
-}
-
-function Preview({
-  data,
-  error,
-  isPending,
-}: {
-  data?: PreviewData;
-  error: Error | null;
-  isPending: boolean;
-}) {
-  return (
-    <Box pos="relative" mt={20}>
-      <Paper shadow="sm" withBorder p="xl">
-        <Title order={3}>Preview</Title>
-        <LoadingOverlay visible={isPending} />
-        {error && <Alert color="red">{error.message}</Alert>}
-        {data?.blogitem.errors && (
-          <Alert color="red" title="Failed to preview">
-            <pre>{JSON.stringify(data.blogitem.errors, undefined, 2)}</pre>
-          </Alert>
-        )}
-        {data?.blogitem.html && (
-          <Paper
-            bg="var(--mantine-color-gray-2)"
-            radius="sm"
-            pt={2}
-            pl={10}
-            pr={10}
-            dangerouslySetInnerHTML={{ __html: data.blogitem.html }}
-          />
-        )}
-      </Paper>
-    </Box>
-  );
 }

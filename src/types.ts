@@ -49,3 +49,10 @@ export type BlogitemsServerData = {
   blogitems: BlogitemT[];
   count: number;
 };
+
+export type PreviewData = {
+  blogitem: {
+    html?: string;
+    errors?: Record<string, string[]>;
+  };
+};

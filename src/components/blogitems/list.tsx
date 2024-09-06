@@ -30,7 +30,7 @@ export function List() {
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);
   const search = searchParams.get("search") || "";
-  const orderBy = searchParams.get("orderBy") || "pub_date";
+  const orderBy = searchParams.get("orderBy") || "modify_date";
 
   const sp = new URLSearchParams({ search, order: orderBy });
   const apiUrl = `${API_BASE}/plog/?${sp}`;
