@@ -12,7 +12,8 @@
     "pretty": "biome check src vite.config.ts",
     "pretty:fix": "biome check --write src vite.config.ts",
     "tsc": "tsc",
-    "prepare": "husky"
+    "prepare": "husky",
+    "serve": "serve dist"
   },
   "dependencies": {
     "@mantine/core": "^7.12.2",
@@ -25,6 +26,7 @@
     "date-fns": "^3.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "serve": "^14.2.3",
     "valibot": "^0.41.0",
     "wouter": "^3.3.5"
   },
