@@ -121,11 +121,8 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         },
         body: JSON.stringify(data),
       });
-      console.log("RESPONSE:", response);
-
       if (response.status === 400) {
         const json = (await response.json()) as PostedError;
-        console.log("VALIDATION ERRORS", json);
         notifications.show({
           title: "Validation errors",
           message: "Look for red",
@@ -134,23 +131,17 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         for (const [field, errors] of Object.entries(json.errors)) {
           form.setFieldError(field, errors.join(", "));
         }
-
-        // throw new ValidationError("Validation error");
       } else if (response.status === 201) {
         notifications.show({
           message: "Blogitem created",
           color: "green",
         });
         const json = (await response.json()) as PostedSuccess;
-        // console.log("VALIDATION ERRORS", json);
         if (json.blogitem.oid !== blogitem.oid) {
           // redirect to the new oid
-          // throw new Error(`redirect to:: ${json.blogitem.oid}`);
           navigate(`/plog/${json.blogitem.oid}`);
           return;
-          // return;
         }
-        console.log("CREATED!", json.blogitem);
       } else if (response.status === 200) {
         notifications.show({
           message: "Blogitem updated",
@@ -164,8 +155,6 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
       } else {
         throw new Error(`${response.status} on ${response.url}`);
       }
-
-      // return axios.post('/todos', newTodo)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogitem", blogitem.oid] });

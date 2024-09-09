@@ -23,7 +23,8 @@ export default function Blogitem() {
 }
 
 type ServerData = {
-  blogitem: EditBlogitemT;
+  blogitem?: EditBlogitemT;
+  notFound?: boolean;
 };
 
 function Edit({ oid }: { oid: string | null }) {
@@ -31,6 +32,9 @@ function Edit({ oid }: { oid: string | null }) {
     queryKey: ["blogitem", oid],
     queryFn: async () => {
       const response = await fetch(`${API_BASE}/plog/${oid}`);
+      if (response.status === 404) {
+        return { notFound: true };
+      }
       if (!response.ok) {
         throw new Error(`${response.status} on ${response.url}`);
       }
@@ -48,16 +52,22 @@ function Edit({ oid }: { oid: string | null }) {
       {error && (
         <Alert color="red">Failed to load blogitem: {error.message}</Alert>
       )}
-      {data?.blogitem.archived && (
+      {data?.blogitem?.archived && (
         <Alert color="orange" title="Archived!">
           This blogitem was archived on <b>{data.blogitem.archived}</b> (
           <DisplayDate date={data.blogitem.archived} />)
         </Alert>
       )}
 
-      {data && <Form blogitem={data.blogitem} />}
+      {data?.notFound && (
+        <Alert color="red" title="Blogitem not found">
+          No blogitem with oid <b>{oid}</b> found
+        </Alert>
+      )}
 
-      {data?.blogitem.id && <DangerZone blogitem={data.blogitem} />}
+      {data?.blogitem && <Form blogitem={data.blogitem} />}
+
+      {data?.blogitem?.id && <DangerZone blogitem={data.blogitem} />}
     </div>
   );
 }
