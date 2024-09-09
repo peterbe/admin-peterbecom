@@ -13,7 +13,8 @@
     "pretty:fix": "biome check --write src vite.config.ts",
     "tsc": "tsc",
     "prepare": "husky",
-    "serve": "serve dist"
+    "serve": "serve dist",
+    "test-manifest": "node script/test-manifest.mjs"
   },
   "dependencies": {
     "@mantine/core": "^7.12.2",
