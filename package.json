@@ -21,9 +21,9 @@
     "@mantine/form": "^7.12.2",
     "@mantine/hooks": "^7.12.2",
     "@mantine/notifications": "^7.12.2",
-    "@tabler/icons-react": "^3.14.0",
-    "@tanstack/react-query": "^5.53.1",
-    "@tanstack/react-query-devtools": "^5.55.0",
+    "@tabler/icons-react": "^3.15.0",
+    "@tanstack/react-query": "^5.55.4",
+    "@tanstack/react-query-devtools": "^5.55.4",
     "date-fns": "^3.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -33,7 +33,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
     "@eslint/js": "^9.9.0",
-    "@types/react": "^18.3.3",
+    "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^9.9.1",
@@ -42,8 +42,8 @@
     "globals": "^15.9.0",
     "husky": "^9.1.5",
     "serve": "^14.2.3",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^8.0.1",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.4.0",
     "vite": "^5.4.3"
   }
 }
