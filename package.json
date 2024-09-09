@@ -26,7 +26,6 @@
     "date-fns": "^3.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "serve": "^14.2.3",
     "valibot": "^0.41.0",
     "wouter": "^3.3.5"
   },
@@ -41,6 +40,7 @@
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "husky": "^9.1.5",
+    "serve": "^14.2.3",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"
