@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { API_BASE } from "../../config";
 import { useCategories } from "../../hooks/use-categories";
 import type { EditBlogitemT, PreviewData } from "../../types";
@@ -93,6 +93,19 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
       }
     },
   });
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      // I *think* this works
+      if (form.isDirty() && form.isTouched()) {
+        event.preventDefault();
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [form]);
 
   function suggestSummary() {
     const text = form.getValues().text;
