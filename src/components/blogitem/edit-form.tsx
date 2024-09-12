@@ -16,6 +16,7 @@ import "./highlight.js.css"; // for the preview
 import { notifications } from "@mantine/notifications";
 import { useLocation } from "wouter";
 import classes from "./edit-form.module.css";
+import { ImageThumbnails } from "./image-thumbnails";
 import { postPreview } from "./post-preview";
 import { Preview } from "./preview";
 
@@ -73,14 +74,6 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         return "Invalid URL";
       },
     },
-    // transformValues: (values) => {
-    //   const { keywords } = values;
-    //   console.log("TRANSFORM BEFORE", { KEYWORDS: keywords });
-    //   values.keywords = list2string(keywords.split("\n"));
-    //   console.log("TRANSFORM AFTER", { KEYWORDS: values.keywords });
-    //   return values;
-    // },
-    // onSub
 
     onValuesChange: (values) => {
       const { title, oid } = values;
@@ -198,6 +191,8 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           {mutation.error.message}
         </Alert>
       )}
+
+      <ImageThumbnails oid={blogitem.oid} />
 
       <form
         onSubmit={form.onSubmit((data) => {
