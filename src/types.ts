@@ -3,6 +3,7 @@ export type User = {
   email: string;
   is_superuser: boolean;
   picture_url: string;
+  csrfmiddlewaretoken: string;
 };
 
 export type CategoryT = {

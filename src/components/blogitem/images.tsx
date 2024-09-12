@@ -22,7 +22,7 @@ import {
 } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { useCsrf } from "../../hooks/use-csrf";
+import { useUserData } from "../../hooks/use-userdata";
 import { AbsoluteImage } from "./absolute-image";
 
 type ImageT = {
@@ -53,7 +53,8 @@ type ServerImages = {
 export default function OpenGraphImage() {
   const params = useParams();
   const oid = params.oid as string;
-  const csrfToken = useCsrf();
+  const { userData } = useUserData();
+  const csrfToken = userData?.user?.csrfmiddlewaretoken || "";
 
   const { data, error, isPending } = useQuery<ServerImages>({
     queryKey: ["images", oid],
@@ -65,8 +66,6 @@ export default function OpenGraphImage() {
       return response.json();
     },
   });
-
-  console.log({ csrfToken });
 
   useDocumentTitle(`Images ${oid}`);
 
