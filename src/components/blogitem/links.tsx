@@ -1,8 +1,12 @@
-import { Anchor, Box, Group } from "@mantine/core";
+import { Anchor, Box, Group, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
+import { useImages } from "../../hooks/use-images";
+import { useOpenGraphImages } from "../../hooks/use-open-graph-images";
 
 export function BlogitemLinks({ oid }: { oid: string }) {
+  const images = useImages(oid);
+  const openGraphImages = useOpenGraphImages(oid);
   return (
     <Box>
       <Group justify="right">
@@ -10,10 +14,15 @@ export function BlogitemLinks({ oid }: { oid: string }) {
           Edit
         </Anchor>
         <Anchor component={Link} href={`/plog/${oid}/images`}>
-          Images
+          Images {images.data && `(${images.data.images.length})`}
         </Anchor>
         <Anchor component={Link} href={`/plog/${oid}/open-graph-image`}>
-          Open Graph Image
+          Open Graph Image{" "}
+          {openGraphImages?.data?.images.some((img) => img.current) && (
+            <Text size="xs" span>
+              (picked)
+            </Text>
+          )}
         </Anchor>
         <PublicURL path={`/plog/${oid}`}>View</PublicURL>
       </Group>

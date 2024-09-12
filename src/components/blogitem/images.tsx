@@ -10,7 +10,7 @@ import {
   rem,
 } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { SignedIn } from "../signed-in";
 import { BlogitemLinks } from "./links";
@@ -22,50 +22,18 @@ import {
 } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
+import { type ImageT, useImages } from "../../hooks/use-images";
 import { useUserData } from "../../hooks/use-userdata";
+import { JSONPost } from "../json-post";
 import { AbsoluteImage } from "./absolute-image";
 
-type ImageT = {
-  full_url: string;
-  full_size: number[];
-  small: {
-    url: string;
-    alt: null | string;
-    width: number;
-    height: number;
-  };
-  big: {
-    url: string;
-    alt: null | string;
-    width: number;
-    height: number;
-  };
-  bigger: {
-    url: string;
-    alt: null | string;
-    width: number;
-    height: number;
-  };
-};
-type ServerImages = {
-  images: ImageT[];
-};
 export default function OpenGraphImage() {
   const params = useParams();
   const oid = params.oid as string;
   const { userData } = useUserData();
   const csrfToken = userData?.user?.csrfmiddlewaretoken || "";
 
-  const { data, error, isPending } = useQuery<ServerImages>({
-    queryKey: ["images", oid],
-    queryFn: async () => {
-      const response = await fetch(`/api/v0/plog/${oid}/images`);
-      if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
-      }
-      return response.json();
-    },
-  });
+  const { data, error, isPending } = useImages(oid);
 
   useDocumentTitle(`Images ${oid}`);
 
@@ -122,22 +90,16 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
 
   return (
     <Box pos="relative">
-      {/* <LoadingOverlay visible={mutation.isPending} /> */}
       {mutation.data && <Alert title="Uploaded" withCloseButton />}
 
       {mutation.error && <Alert title="Error">{mutation.error.message}</Alert>}
-      {/* {data && data.images.length === 0 && (
-        <Alert title="No images found">
-          <Link href={`/plog/${oid}/images`}>Upload some images</Link>
-        </Alert>
-      )} */}
+
       <Dropzone
         onDrop={(files) => uploadFiles(files)}
         onReject={(files) => console.log("rejected files", files)}
         maxSize={5 * 1024 ** 2}
         accept={IMAGE_MIME_TYPE}
         loading={mutation.isPending}
-        // {...props}
       >
         <Group
           justify="center"
@@ -188,20 +150,6 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
       </Dropzone>
     </Box>
   );
-}
-
-async function JSONPost(url: string, data: FormData, csrfToken: string) {
-  const body = data instanceof FormData ? data : JSON.stringify(data);
-
-  const method = "POST";
-  const headers = {
-    "X-CSRFToken": csrfToken,
-  };
-  return await fetch(url, {
-    method,
-    body,
-    headers,
-  });
 }
 
 type ImageSize = "small" | "big" | "bigger";
