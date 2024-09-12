@@ -58,6 +58,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     categories: blogitem.categories.map((category) => `${category.id}`),
     display_format: blogitem.display_format,
   };
+
   const form = useForm({
     // https://mantine.dev/form/uncontrolled/#uncontrolled-mode
     // Recommended mode.

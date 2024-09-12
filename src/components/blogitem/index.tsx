@@ -2,13 +2,14 @@ import { useDocumentTitle } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 
-import { Alert, LoadingOverlay } from "@mantine/core";
+import { Alert, Box, LoadingOverlay } from "@mantine/core";
 import { API_BASE } from "../../config";
 import type { EditBlogitemT } from "../../types";
 import { DisplayDate } from "../blogitems/list-table";
 import { SignedIn } from "../signed-in";
 import { DangerZone } from "./danger-zone";
 import { Form } from "./edit-form";
+import { BlogitemLinks } from "./links";
 
 export default function Blogitem() {
   const params = useParams();
@@ -42,13 +43,9 @@ function Edit({ oid }: { oid: string | null }) {
     },
   });
 
-  if (isPending) {
-    return <LoadingOverlay />;
-  }
-
   return (
-    <div>
-      {isPending && <LoadingOverlay />}
+    <Box pos="relative" style={{ minHeight: 400 }}>
+      <LoadingOverlay visible={isPending} />
       {error && (
         <Alert color="red">Failed to load blogitem: {error.message}</Alert>
       )}
@@ -58,17 +55,17 @@ function Edit({ oid }: { oid: string | null }) {
           <DisplayDate date={data.blogitem.archived} />)
         </Alert>
       )}
-
       {data?.notFound && (
         <Alert color="red" title="Blogitem not found">
           No blogitem with oid <b>{oid}</b> found
         </Alert>
       )}
 
-      {data?.blogitem && <Form blogitem={data.blogitem} />}
+      {data?.blogitem?.id && <BlogitemLinks oid={data.blogitem.oid} />}
 
+      {data?.blogitem && <Form blogitem={data.blogitem} />}
       {data?.blogitem?.id && <DangerZone blogitem={data.blogitem} />}
-    </div>
+    </Box>
   );
 }
 

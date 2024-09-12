@@ -1,4 +1,4 @@
-import { Alert, Button, LoadingOverlay } from "@mantine/core";
+import { Alert, Box, Button, LoadingOverlay } from "@mantine/core";
 import type { ReactNode } from "react";
 
 import { useUserData } from "../hooks/use-userdata";
@@ -35,5 +35,5 @@ export function SignedIn({ children }: { children: ReactNode }) {
     return <Authenticate />;
     // return null
   }
-  return <div>{children}</div>;
+  return <Box style={{ marginBottom: 100 }}>{children}</Box>;
 }
