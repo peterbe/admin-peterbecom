@@ -15,5 +15,8 @@
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
+  },
+  "files": {
+    "ignore": ["src/components/blogitem/highlight.js.css"]
   }
 }
