@@ -8,8 +8,12 @@ import {
   Text,
 } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "wouter";
+import {
+  type OpenGraphImageT,
+  useOpenGraphImages,
+} from "../../hooks/use-open-graph-images";
 import { SignedIn } from "../signed-in";
 import { AbsoluteImage } from "./absolute-image";
 import { BlogitemLinks } from "./links";
@@ -28,29 +32,8 @@ export default function OpenGraphImage() {
   );
 }
 
-type OpenGraphImage = {
-  label: string;
-  src: string;
-  size: [number, number];
-  current: null | boolean;
-  used_in_text: boolean;
-};
-
-type OpenGraphImages = {
-  images: OpenGraphImage[];
-};
-
 function Selection({ oid }: { oid: string }) {
-  const { data, error, isPending } = useQuery<OpenGraphImages>({
-    queryKey: ["open-graph-image", oid],
-    queryFn: async () => {
-      const response = await fetch(`/api/v0/plog/${oid}/open-graph-image`);
-      if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
-      }
-      return response.json();
-    },
-  });
+  const { data, error, isPending } = useOpenGraphImages(oid);
 
   const queryClient = useQueryClient();
 
@@ -107,7 +90,7 @@ function ImageChoice({
   image,
   onSelect,
 }: {
-  image: OpenGraphImage;
+  image: OpenGraphImageT;
   onSelect: (src: string) => void;
 }) {
   return (
