@@ -2,11 +2,14 @@ import {
   Alert,
   Anchor,
   Box,
+  Button,
   Group,
+  Image,
   LoadingOverlay,
   Paper,
   SegmentedControl,
   Text,
+  TextInput,
   rem,
 } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
@@ -20,6 +23,7 @@ import {
   type FileWithPath,
   IMAGE_MIME_TYPE,
 } from "@mantine/dropzone";
+import { useForm } from "@mantine/form";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { type ImageT, useImages } from "../../hooks/use-images";
@@ -61,12 +65,16 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationKey: ["images", oid],
-    mutationFn: async (files: FileWithPath[]) => {
-      console.log({ files });
+    mutationFn: async ({
+      file,
+      title,
+    }: {
+      file: FileWithPath;
+      title: string;
+    }) => {
       const formData = new FormData();
-      for (const file of files) {
-        formData.append("file", file);
-      }
+      formData.append("file", file);
+      formData.append("title", title);
 
       const response = await JSONPost(
         `/api/v0/plog/${oid}/images`,
@@ -81,11 +89,16 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["images", oid] });
+      setUploadedFile(null);
     },
   });
 
+  const [uploadedFile, setUploadedFile] = useState<FileWithPath | null>(null);
+
   function uploadFiles(files: FileWithPath[]) {
-    mutation.mutate(files);
+    if (files.length > 0) {
+      setUploadedFile(files[0]);
+    }
   }
 
   return (
@@ -94,12 +107,23 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
 
       {mutation.error && <Alert title="Error">{mutation.error.message}</Alert>}
 
+      {uploadedFile && <PreviewUploadedFile file={uploadedFile} />}
+
+      {uploadedFile && (
+        <TitleForm
+          onSubmitTitle={(title: string) => {
+            mutation.mutate({ file: uploadedFile, title });
+          }}
+        />
+      )}
+
       <Dropzone
         onDrop={(files) => uploadFiles(files)}
         onReject={(files) => console.log("rejected files", files)}
         maxSize={5 * 1024 ** 2}
         accept={IMAGE_MIME_TYPE}
         loading={mutation.isPending}
+        multiple={false}
       >
         <Group
           justify="center"
@@ -189,5 +213,74 @@ function Images({ images }: { images: ImageT[] }) {
         ]}
       />
     </Box>
+  );
+}
+
+function PreviewUploadedFile({ file }: { file: FileWithPath }) {
+  const [dataURI, setDataURI] = useState<string | ArrayBuffer | null>(null);
+
+  useEffect(() => {
+    const reader = new FileReader();
+    function listener() {
+      setDataURI(reader.result);
+    }
+    reader.addEventListener("load", listener, false);
+    reader.readAsDataURL(file);
+
+    return () => {
+      reader.removeEventListener("load", listener);
+    };
+  }, [file]);
+
+  if (!dataURI) {
+    return null;
+  }
+
+  return (
+    <Box>
+      <Text>Preview of uploaded image</Text>
+      <Image
+        radius="md"
+        w={400}
+        src={dataURI as string}
+        alt="preview of image"
+      />
+    </Box>
+  );
+}
+
+function TitleForm({
+  onSubmitTitle,
+}: {
+  onSubmitTitle: (title: string) => void;
+}) {
+  const form = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      title: "",
+    },
+    validate: {
+      title: (value: string) => (value.trim() ? null : "Required"),
+    },
+  });
+  return (
+    <form
+      onSubmit={form.onSubmit((values) => {
+        if (values.title?.trim()) {
+          onSubmitTitle(values.title.trim());
+        }
+      })}
+    >
+      <TextInput
+        withAsterisk
+        label="Title"
+        key={form.key("title")}
+        {...form.getInputProps("title")}
+      />
+
+      <Group justify="flex-end" mt="md">
+        <Button type="submit">Submit</Button>
+      </Group>
+    </form>
   );
 }
