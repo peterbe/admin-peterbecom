@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Card,
+  Container,
   Group,
   LoadingOverlay,
   Text,
@@ -26,8 +27,10 @@ export default function OpenGraphImage() {
 
   return (
     <SignedIn>
-      <BlogitemLinks oid={oid} />
-      <Selection oid={oid} />
+      <Container>
+        <BlogitemLinks oid={oid} />
+        <Selection oid={oid} />
+      </Container>
     </SignedIn>
   );
 }
@@ -35,17 +38,36 @@ export default function OpenGraphImage() {
 function Selection({ oid }: { oid: string }) {
   const { data, error, isPending } = useOpenGraphImages(oid);
 
+  return (
+    <Box pos="relative">
+      <LoadingOverlay visible={isPending} />
+      {error && <Alert title="Error">{error.message}</Alert>}
+      {data && data.images.length === 0 && (
+        <Alert title="No images found">
+          <Link href={`/plog/${oid}/images`}>Upload some images</Link>
+        </Alert>
+      )}
+      <Group>
+        {(data?.images || []).map((image) => {
+          return <ImageChoice image={image} key={image.src} oid={oid} />;
+        })}
+      </Group>
+    </Box>
+  );
+}
+
+function ImageChoice({ image, oid }: { image: OpenGraphImageT; oid: string }) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationKey: ["open-graph-image", oid],
-    mutationFn: async (src: string) => {
+    mutationFn: async () => {
       const response = await fetch(`/api/v0/plog/${oid}/open-graph-image`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ src }),
+        body: JSON.stringify({ src: image.src }),
       });
       if (!response.ok) {
         throw new Error(`${response.status} on ${response.url}`);
@@ -60,40 +82,6 @@ function Selection({ oid }: { oid: string }) {
   });
 
   return (
-    <Box pos="relative">
-      <LoadingOverlay visible={isPending} />
-      {error && <Alert title="Error">{error.message}</Alert>}
-      {data && data.images.length === 0 && (
-        <Alert title="No images found">
-          <Link href={`/plog/${oid}/images`}>Upload some images</Link>
-        </Alert>
-      )}
-      {mutation.error && <Alert title="Error">{mutation.error.message}</Alert>}
-      <Group>
-        {(data?.images || []).map((image) => {
-          return (
-            <ImageChoice
-              image={image}
-              key={image.src}
-              onSelect={(src: string) => {
-                mutation.mutate(src);
-              }}
-            />
-          );
-        })}
-      </Group>
-    </Box>
-  );
-}
-
-function ImageChoice({
-  image,
-  onSelect,
-}: {
-  image: OpenGraphImageT;
-  onSelect: (src: string) => void;
-}) {
-  return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <Card.Section>
         <AbsoluteImage src={image.src} alt={image.label || ""} w={400} />
@@ -103,10 +91,12 @@ function ImageChoice({
         {image.size[0]}x{image.size[1]}
       </Text>
 
+      {mutation.error && <Alert title="Error">{mutation.error.message}</Alert>}
+
       <Button
-        disabled={!!image.current}
+        disabled={!!image.current || mutation.isPending}
         onClick={() => {
-          onSelect(image.src);
+          mutation.mutate();
         }}
       >
         This one

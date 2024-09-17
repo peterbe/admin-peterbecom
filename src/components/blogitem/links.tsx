@@ -1,8 +1,8 @@
 import { Anchor, Box, Group, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
 import { useImages } from "../../hooks/use-images";
 import { useOpenGraphImages } from "../../hooks/use-open-graph-images";
+import { SmartAnchor } from "../smart-anchor";
 
 export function BlogitemLinks({ oid }: { oid: string }) {
   const images = useImages(oid);
@@ -10,20 +10,18 @@ export function BlogitemLinks({ oid }: { oid: string }) {
   return (
     <Box mt={10} mb={20}>
       <Group justify="right">
-        <Anchor component={Link} href={`/plog/${oid}`}>
-          Edit
-        </Anchor>
-        <Anchor component={Link} href={`/plog/${oid}/images`}>
+        <SmartAnchor href={`/plog/${oid}`}>Edit</SmartAnchor>
+        <SmartAnchor href={`/plog/${oid}/images`}>
           Images {images.data && `(${images.data.images.length})`}
-        </Anchor>
-        <Anchor component={Link} href={`/plog/${oid}/open-graph-image`}>
+        </SmartAnchor>
+        <SmartAnchor href={`/plog/${oid}/open-graph-image`}>
           Open Graph Image{" "}
           {openGraphImages?.data?.images.some((img) => img.current) && (
             <Text size="xs" span>
               (picked)
             </Text>
           )}
-        </Anchor>
+        </SmartAnchor>
         <PublicURL path={`/plog/${oid}`}>View</PublicURL>
       </Group>
     </Box>
@@ -46,7 +44,7 @@ function PublicURL({
   }, [path]);
 
   return (
-    <Anchor href={url.toString()} target="_blank">
+    <Anchor href={url.toString()} target="_blank" underline="always">
       {children}
     </Anchor>
   );

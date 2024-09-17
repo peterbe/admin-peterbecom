@@ -1,7 +1,7 @@
 import { Avatar, Box, Group } from "@mantine/core";
-import { Link } from "wouter";
 
 import { useUserData } from "../hooks/use-userdata";
+import { SmartAnchor } from "./smart-anchor";
 
 export function Nav() {
   const { userData } = useUserData();
@@ -10,9 +10,9 @@ export function Nav() {
     <header>
       <Group justify="space-between">
         <Group>
-          ADMIN - <Link href="/">Home</Link> -{" "}
-          <Link href="/plog">Blogitems</Link> -{" "}
-          <Link href="/plog/add">Add blogitem</Link>
+          ADMIN - <SmartAnchor href="/">Home</SmartAnchor> -{" "}
+          <SmartAnchor href="/plog">Blogitems</SmartAnchor> -{" "}
+          <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
         </Group>
 
         <Group>
