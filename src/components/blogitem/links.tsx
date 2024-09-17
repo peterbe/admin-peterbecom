@@ -8,7 +8,7 @@ export function BlogitemLinks({ oid }: { oid: string }) {
   const images = useImages(oid);
   const openGraphImages = useOpenGraphImages(oid);
   return (
-    <Box>
+    <Box mt={10} mb={20}>
       <Group justify="right">
         <Anchor component={Link} href={`/plog/${oid}`}>
           Edit

@@ -9,6 +9,9 @@
       "recommended": true,
       "security": {
         "noDangerouslySetInnerHtml": "off"
+      },
+      "correctness": {
+        "noUnusedImports": "error"
       }
     }
   },
