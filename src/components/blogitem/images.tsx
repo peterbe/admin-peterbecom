@@ -1,15 +1,14 @@
 import {
   Alert,
-  Anchor,
   Box,
   Button,
+  Container,
   Group,
   Image,
   LoadingOverlay,
-  Paper,
-  SegmentedControl,
   Text,
   TextInput,
+  Title,
   rem,
 } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
@@ -26,10 +25,10 @@ import {
 import { useForm } from "@mantine/form";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { type ImageT, useImages } from "../../hooks/use-images";
+import { useImages } from "../../hooks/use-images";
 import { useUserData } from "../../hooks/use-userdata";
 import { JSONPost } from "../json-post";
-import { AbsoluteImage } from "./absolute-image";
+import { UploadedImages } from "./uploaded-images";
 
 export default function OpenGraphImage() {
   const params = useParams();
@@ -43,20 +42,21 @@ export default function OpenGraphImage() {
 
   return (
     <SignedIn>
-      <Box pos="relative" style={{ minHeight: 200 }}>
-        <LoadingOverlay visible={isPending} />
+      <Container>
+        <Box pos="relative" style={{ minHeight: 200 }}>
+          <LoadingOverlay visible={isPending} />
 
-        <BlogitemLinks oid={oid} />
-        {error && <Alert title="Error">{error.message}</Alert>}
+          <BlogitemLinks oid={oid} />
+          {error && <Alert title="Error">{error.message}</Alert>}
 
-        {csrfToken && <Upload oid={oid} csrfToken={csrfToken} />}
+          {csrfToken && <Upload oid={oid} csrfToken={csrfToken} />}
 
-        {data && data.images.length === 0 && (
-          <Alert style={{ marginTop: 100 }} title="No images found" />
-        )}
-        {data?.images && <Paper>{data.images.length} images uploaded.</Paper>}
-        {data && <Images images={data.images} />}
-      </Box>
+          {data && data.images.length === 0 && (
+            <Alert style={{ marginTop: 100 }} title="No images found" />
+          )}
+          {data && <UploadedImages oid={oid} images={data.images} />}
+        </Box>
+      </Container>
     </SignedIn>
   );
 }
@@ -103,9 +103,11 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
 
   return (
     <Box pos="relative">
-      {mutation.data && <Alert title="Uploaded" withCloseButton />}
+      {mutation.data && <Alert title="Uploaded" />}
 
       {mutation.error && <Alert title="Error">{mutation.error.message}</Alert>}
+
+      <Title order={3}>Upload a new image</Title>
 
       {uploadedFile && <PreviewUploadedFile file={uploadedFile} />}
 
@@ -172,46 +174,6 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
           </div>
         </Group>
       </Dropzone>
-    </Box>
-  );
-}
-
-type ImageSize = "small" | "big" | "bigger";
-
-function Images({ images }: { images: ImageT[] }) {
-  const [imageBaseUrl, setImageBaseUrl] = useState("");
-  useEffect(() => {
-    if (window.location.hostname === "localhost") {
-      setImageBaseUrl("http://localhost:8000");
-    } else {
-      setImageBaseUrl("https://www.peterbe.com");
-    }
-  }, []);
-  const [size, setSize] = useState<ImageSize>("small");
-  return (
-    <Box style={{ marginBottom: 100 }}>
-      <Group>
-        {images.map((image) => {
-          return (
-            <Anchor
-              key={image.full_url}
-              href={imageBaseUrl + image.full_url}
-              target="_blank"
-            >
-              <AbsoluteImage src={image[size].url} />
-            </Anchor>
-          );
-        })}
-      </Group>
-      <SegmentedControl
-        value={size}
-        onChange={(value: string) => setSize(value as ImageSize)}
-        data={[
-          { label: "Smaller", value: "small" },
-          { label: "Big", value: "big" },
-          { label: "Bigger", value: "bigger" },
-        ]}
-      />
     </Box>
   );
 }

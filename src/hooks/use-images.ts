@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 export type ImageT = {
+  id: number;
   full_url: string;
   full_size: number[];
   small: {

@@ -17,21 +17,25 @@ export function ImageThumbnails({ oid }: { oid: string }) {
     if (show) {
       return (
         <Box>
-          <Button onClick={() => setShow(false)} size="xs">
-            Close
-          </Button>
-          <Group>
-            {images.data.images.map((image) => (
-              <ImageThumbnail key={image.full_url} image={image} />
-            ))}
+          <Group justify="right">
+            <Button onClick={() => setShow(false)} size="xs">
+              Close
+            </Button>
+            <Group>
+              {images.data.images.map((image) => (
+                <ImageThumbnail key={image.full_url} image={image} />
+              ))}
+            </Group>
           </Group>
         </Box>
       );
     }
     return (
-      <Button onClick={() => setShow(true)} size="xs">
-        Show image thumbnails ({images.data.images.length})
-      </Button>
+      <Group justify="right">
+        <Button onClick={() => setShow(true)} size="xs">
+          Show image thumbnails ({images.data.images.length})
+        </Button>
+      </Group>
     );
   }
   return null;
