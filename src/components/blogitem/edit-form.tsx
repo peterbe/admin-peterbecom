@@ -8,17 +8,16 @@ import {
   Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { API_BASE } from "../../config";
 import { useCategories } from "../../hooks/use-categories";
-import type { EditBlogitemT, PreviewData } from "../../types";
+import type { EditBlogitemT } from "../../types";
 import "./highlight.js.css"; // for the preview
 import { notifications } from "@mantine/notifications";
 import { useLocation } from "wouter";
 import classes from "./edit-form.module.css";
 import { ImageThumbnails } from "./image-thumbnails";
-import { postPreview } from "./post-preview";
 import { Preview } from "./preview";
 
 function list2string(list: string[]) {
@@ -172,19 +171,6 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
 
   const [previewText, setPreviewText] = useState(blogitem.text);
 
-  const preview = useQuery<PreviewData>({
-    queryKey: ["preview", previewText],
-    queryFn: async () => {
-      if (!previewText) return Promise.resolve(null);
-      if (!form.getValues().categories || !form.getValues().categories.length)
-        return Promise.resolve(null);
-      return postPreview({
-        text: previewText,
-        displayFormat: form.getValues().display_format,
-      });
-    },
-  });
-
   return (
     <div>
       {mutation.isError && (
@@ -234,10 +220,8 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           </Grid.Col>
           <Grid.Col span={6}>
             <Preview
-              data={preview.data}
-              error={preview.error}
-              isPending={preview.isPending}
-              isFetching={preview.isFetching}
+              previewText={previewText}
+              displayFormat={form.getValues().display_format}
             />
           </Grid.Col>
         </Grid>

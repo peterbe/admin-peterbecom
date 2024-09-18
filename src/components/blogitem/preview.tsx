@@ -1,6 +1,7 @@
 import {
   Alert,
   Box,
+  Group,
   Loader,
   LoadingOverlay,
   ScrollArea,
@@ -8,24 +9,34 @@ import {
 } from "@mantine/core";
 import type { PreviewData } from "../../types";
 import "./highlight.js.css"; // for the preview
+import { useQuery } from "@tanstack/react-query";
+import { postPreview } from "./post-preview";
 
 export function Preview({
-  data,
-  error,
-  isPending,
-  isFetching,
+  previewText,
+  displayFormat,
 }: {
-  data?: PreviewData;
-  error: Error | null;
-  isPending: boolean;
-  isFetching: boolean;
+  previewText: string;
+  displayFormat: string;
 }) {
-  if (!data && !error && !isPending) return null;
+  const { data, error, isFetching, isPending } = useQuery<PreviewData>({
+    queryKey: ["preview", previewText, displayFormat],
+    queryFn: async () => {
+      if (!previewText) return Promise.resolve(null);
+
+      return postPreview({
+        text: previewText,
+        displayFormat,
+      });
+    },
+  });
+
   return (
     <Box pos="relative" style={{ minHeight: 100 }}>
-      <Text>
-        Preview {isFetching && <Loader color="gray" size="xs" type="dots" />}
-      </Text>
+      <Group>
+        <Text>Preview</Text>
+        {isFetching && <Loader color="gray" size="xs" type="dots" />}
+      </Group>
       <LoadingOverlay visible={isPending} />
       {error && <Alert color="red">{error.message}</Alert>}
       {data?.blogitem.errors && (
