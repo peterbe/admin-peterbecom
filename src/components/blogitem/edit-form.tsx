@@ -2,22 +2,22 @@ import {
   Alert,
   Box,
   Button,
+  Grid,
   MultiSelect,
   TextInput,
   Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { API_BASE } from "../../config";
 import { useCategories } from "../../hooks/use-categories";
-import type { EditBlogitemT, PreviewData } from "../../types";
+import type { EditBlogitemT } from "../../types";
 import "./highlight.js.css"; // for the preview
 import { notifications } from "@mantine/notifications";
 import { useLocation } from "wouter";
 import classes from "./edit-form.module.css";
 import { ImageThumbnails } from "./image-thumbnails";
-import { postPreview } from "./post-preview";
 import { Preview } from "./preview";
 
 function list2string(list: string[]) {
@@ -169,20 +169,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     },
   });
 
-  const [previewText, setPreviewText] = useState("");
-
-  const preview = useQuery<PreviewData>({
-    queryKey: ["preview", previewText],
-    queryFn: async () => {
-      if (!previewText) return Promise.resolve(null);
-      if (!form.getValues().categories || !form.getValues().categories.length)
-        return Promise.resolve(null);
-      return postPreview({
-        text: previewText,
-        displayFormat: form.getValues().display_format,
-      });
-    },
-  });
+  const [previewText, setPreviewText] = useState(blogitem.text);
 
   return (
     <div>
@@ -215,19 +202,29 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           key={form.key("oid")}
           {...form.getInputProps("oid")}
         />
-        <Textarea
-          withAsterisk
-          label="Text"
-          key={form.key("text")}
-          {...form.getInputProps("text")}
-          onBlur={() => {
-            setPreviewText(form.getValues().text.trim());
-          }}
-          autosize
-          minRows={20}
-          maxRows={35}
-          classNames={{ input: classes.input }}
-        />
+        <Grid>
+          <Grid.Col span={6}>
+            <Textarea
+              withAsterisk
+              label="Text"
+              key={form.key("text")}
+              {...form.getInputProps("text")}
+              onBlur={() => {
+                setPreviewText(form.getValues().text.trim());
+              }}
+              autosize
+              minRows={20}
+              maxRows={35}
+              classNames={{ input: classes.input }}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Preview
+              previewText={previewText}
+              displayFormat={form.getValues().display_format}
+            />
+          </Grid.Col>
+        </Grid>
         <Textarea
           label="Summary"
           key={form.key("summary")}
@@ -300,12 +297,6 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           </Button>
         </Box>
       </form>
-
-      <Preview
-        data={preview.data}
-        error={preview.error}
-        isPending={preview.isPending}
-      />
     </div>
   );
 }
