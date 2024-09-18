@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "pretty": "biome check src vite.config.ts",
-    "pretty:fix": "biome check --write src vite.config.ts",
+    "pretty:fix": "biome check --write src vite.config.ts eslint.config.js",
     "tsc": "tsc",
     "prepare": "husky",
     "serve": "serve dist",
@@ -34,6 +34,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.0",
     "@eslint/js": "^9.10.0",
+    "@tanstack/eslint-plugin-query": "^5.56.1",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
