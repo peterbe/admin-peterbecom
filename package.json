@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "pretty": "biome check src vite.config.ts",
-    "pretty:fix": "biome check --write src vite.config.ts",
+    "pretty:fix": "biome check --write src vite.config.ts eslint.config.js",
     "tsc": "tsc",
     "prepare": "husky",
     "serve": "serve dist",
