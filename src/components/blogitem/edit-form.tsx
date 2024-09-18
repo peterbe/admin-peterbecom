@@ -2,6 +2,7 @@ import {
   Alert,
   Box,
   Button,
+  Grid,
   MultiSelect,
   TextInput,
   Textarea,
@@ -169,7 +170,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     },
   });
 
-  const [previewText, setPreviewText] = useState("");
+  const [previewText, setPreviewText] = useState(blogitem.text);
 
   const preview = useQuery<PreviewData>({
     queryKey: ["preview", previewText],
@@ -215,19 +216,31 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           key={form.key("oid")}
           {...form.getInputProps("oid")}
         />
-        <Textarea
-          withAsterisk
-          label="Text"
-          key={form.key("text")}
-          {...form.getInputProps("text")}
-          onBlur={() => {
-            setPreviewText(form.getValues().text.trim());
-          }}
-          autosize
-          minRows={20}
-          maxRows={35}
-          classNames={{ input: classes.input }}
-        />
+        <Grid>
+          <Grid.Col span={6}>
+            <Textarea
+              withAsterisk
+              label="Text"
+              key={form.key("text")}
+              {...form.getInputProps("text")}
+              onBlur={() => {
+                setPreviewText(form.getValues().text.trim());
+              }}
+              autosize
+              minRows={20}
+              maxRows={35}
+              classNames={{ input: classes.input }}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Preview
+              data={preview.data}
+              error={preview.error}
+              isPending={preview.isPending}
+              isFetching={preview.isFetching}
+            />
+          </Grid.Col>
+        </Grid>
         <Textarea
           label="Summary"
           key={form.key("summary")}
@@ -300,12 +313,6 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           </Button>
         </Box>
       </form>
-
-      <Preview
-        data={preview.data}
-        error={preview.error}
-        isPending={preview.isPending}
-      />
     </div>
   );
 }

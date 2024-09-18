@@ -1,4 +1,12 @@
-import { Alert, Badge, Box, Button, Card, Group, Text } from "@mantine/core";
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Container,
+  Group,
+  Text,
+} from "@mantine/core";
 import { useState } from "react";
 import { type ImageT, useImages } from "../../hooks/use-images";
 import { AbsoluteImage } from "./absolute-image";
@@ -8,15 +16,17 @@ export function ImageThumbnails({ oid }: { oid: string }) {
   const images = useImages(oid);
   if (images.error) {
     return (
-      <Alert color="red" title="Image thumbnails errors">
-        {images.error.message}
-      </Alert>
+      <Container>
+        <Alert color="red" title="Image thumbnails errors">
+          {images.error.message}
+        </Alert>
+      </Container>
     );
   }
   if (images.data) {
     if (show) {
       return (
-        <Box>
+        <Container>
           <Group justify="right">
             <Button onClick={() => setShow(false)} size="xs">
               Close
@@ -27,15 +37,17 @@ export function ImageThumbnails({ oid }: { oid: string }) {
               ))}
             </Group>
           </Group>
-        </Box>
+        </Container>
       );
     }
     return (
-      <Group justify="right">
-        <Button onClick={() => setShow(true)} size="xs">
-          Show image thumbnails ({images.data.images.length})
-        </Button>
-      </Group>
+      <Container>
+        <Group justify="right">
+          <Button onClick={() => setShow(true)} size="xs">
+            Show image thumbnails ({images.data.images.length})
+          </Button>
+        </Group>
+      </Container>
     );
   }
   return null;

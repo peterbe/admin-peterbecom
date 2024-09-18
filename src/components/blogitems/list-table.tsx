@@ -1,7 +1,7 @@
 import { Badge, Button, Highlight, Table, TextInput } from "@mantine/core";
 import type { BadgeProps } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
-import { formatDistance, isBefore, parseISO } from "date-fns";
+import { formatDistance, parseISO } from "date-fns";
 import { useState } from "react";
 
 import { Link, useSearch } from "wouter";
@@ -55,7 +55,10 @@ export function ListTable({
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Title</Table.Th>
-            <Table.Th>
+            <Table.Th
+              // For long date displays like "about 2 months ago"
+              style={{ minWidth: 170 }}
+            >
               {orderBy === "pub_date" && (
                 <Link href={addQueryString({ orderBy: "modify_date" })}>
                   Published
@@ -161,31 +164,15 @@ function CustomBadge(props: BadgeProps) {
   return <Badge ml={15} style={{ textTransform: "none" }} {...props} />;
 }
 
-export function DisplayDate({
-  date,
-  now,
-  prefix,
-}: {
-  date: string;
-  now?: string;
-  prefix?: string;
-}) {
-  prefix = prefix || "in";
+export function DisplayDate({ date, now }: { date: string; now?: string }) {
   if (date === null) {
     throw new Error("date is null");
   }
   const dateObj = typeof date === "string" ? parseISO(date) : date;
   const nowObj = now ? parseISO(now) : new Date();
-  if (isBefore(dateObj, nowObj)) {
-    return (
-      <span title={dateObj.toString()}>
-        {formatDistance(dateObj, nowObj)} ago
-      </span>
-    );
-  }
   return (
     <span title={dateObj.toString()}>
-      {prefix} {formatDistance(dateObj, nowObj)}
+      {formatDistance(dateObj, nowObj, { addSuffix: true })}
     </span>
   );
 }
