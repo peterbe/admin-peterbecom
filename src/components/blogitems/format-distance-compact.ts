@@ -2,7 +2,7 @@ import {
   type FormatDistanceFnOptions,
   formatDistanceToNowStrict,
 } from "date-fns";
-import locale from "date-fns/locale/en-US";
+import * as locales from "date-fns/locale";
 
 const formatDistanceLocale: Record<string, string> = {
   lessThanXSeconds: "{{count}}s",
@@ -47,7 +47,7 @@ export function formatDistanceCompact(date: string | Date) {
   return formatDistanceToNowStrict(date, {
     addSuffix: true,
     locale: {
-      ...locale,
+      ...locales.enUS,
       formatDistance,
     },
   });
