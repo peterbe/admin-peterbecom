@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Container,
+  CopyButton,
   Group,
   Text,
 } from "@mantine/core";
@@ -55,7 +56,19 @@ export function ImageThumbnails({ oid }: { oid: string }) {
 
 function ImageThumbnail({ image }: { image: ImageT }) {
   const sizes = ["small", "big", "bigger"] as const;
+
   return sizes.map((size) => {
+    const thumb = image[size];
+    const imageTagHtml = `
+    <img src="${thumb.url}" alt="${thumb.alt}" width="${thumb.width}" height="${thumb.height}">
+    `.trim();
+    const aTagHtml = `
+    <a href="${image.full_url}">${imageTagHtml.replace(
+      "width=",
+      'class="floatright" width=',
+    )}</a>
+    `.trim();
+
     return (
       <Card key={size} shadow="sm" padding="lg" radius="md" withBorder>
         <Card.Section>
@@ -78,16 +91,45 @@ function ImageThumbnail({ image }: { image: ImageT }) {
           </Text>
         )}
 
-        <Group>
-          <Button variant="default" size="xs">
-            URL
-          </Button>
-          <Button variant="default" size="xs">
-            Image tag
-          </Button>
-          <Button variant="default" size="xs">
-            Whole tag
-          </Button>
+        <Group gap="xs">
+          <CopyButton value={thumb.url}>
+            {({ copied, copy }) => (
+              <Button
+                variant={copied ? "filled" : "default"}
+                color={copied ? "green" : undefined}
+                size="xs"
+                onClick={copy}
+              >
+                {copied ? "Copied" : "URL"}
+              </Button>
+            )}
+          </CopyButton>
+
+          <CopyButton value={imageTagHtml}>
+            {({ copied, copy }) => (
+              <Button
+                variant={copied ? "filled" : "default"}
+                color={copied ? "green" : undefined}
+                size="xs"
+                onClick={copy}
+              >
+                {copied ? "Copied" : "Image tag"}
+              </Button>
+            )}
+          </CopyButton>
+
+          <CopyButton value={aTagHtml}>
+            {({ copied, copy }) => (
+              <Button
+                variant={copied ? "filled" : "default"}
+                color={copied ? "green" : undefined}
+                size="xs"
+                onClick={copy}
+              >
+                {copied ? "Copied" : "Whole tag"}
+              </Button>
+            )}
+          </CopyButton>
         </Group>
       </Card>
     );
