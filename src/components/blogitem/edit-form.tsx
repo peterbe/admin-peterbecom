@@ -2,8 +2,8 @@ import {
   Alert,
   Box,
   Button,
-  Grid,
   MultiSelect,
+  SimpleGrid,
   TextInput,
   Textarea,
 } from "@mantine/core";
@@ -14,6 +14,7 @@ import { API_BASE } from "../../config";
 import { useCategories } from "../../hooks/use-categories";
 import type { EditBlogitemT } from "../../types";
 import "./highlight.js.css"; // for the preview
+import { useDebouncedValue } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useLocation } from "wouter";
 import classes from "./edit-form.module.css";
@@ -60,6 +61,9 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     display_format: blogitem.display_format,
   };
 
+  const [previewText, setPreviewText] = useState(blogitem.text);
+  const [debouchedPreviewText] = useDebouncedValue(previewText, 1000);
+
   const form = useForm({
     // https://mantine.dev/form/uncontrolled/#uncontrolled-mode
     // Recommended mode.
@@ -76,7 +80,9 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     },
 
     onValuesChange: (values) => {
-      const { title, oid } = values;
+      const { title, oid, text } = values;
+
+      setPreviewText(text);
 
       // blogitem.id will be 0 when it's for adding a new one
       if (!blogitem.id && title) {
@@ -169,8 +175,6 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     },
   });
 
-  const [previewText, setPreviewText] = useState(blogitem.text);
-
   return (
     <div>
       {mutation.isError && (
@@ -202,29 +206,27 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           key={form.key("oid")}
           {...form.getInputProps("oid")}
         />
-        <Grid>
-          <Grid.Col span={6}>
-            <Textarea
-              withAsterisk
-              label="Text"
-              key={form.key("text")}
-              {...form.getInputProps("text")}
-              onBlur={() => {
-                setPreviewText(form.getValues().text.trim());
-              }}
-              autosize
-              minRows={20}
-              maxRows={35}
-              classNames={{ input: classes.input }}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <Preview
-              previewText={previewText}
-              displayFormat={form.getValues().display_format}
-            />
-          </Grid.Col>
-        </Grid>
+        <SimpleGrid cols={{ base: 1, lg: 2 }}>
+          <Textarea
+            withAsterisk
+            label="Text"
+            className="markdown-textarea"
+            key={form.key("text")}
+            {...form.getInputProps("text")}
+            onBlur={() => {
+              setPreviewText(form.getValues().text.trim());
+            }}
+            autosize
+            minRows={20}
+            maxRows={35}
+            classNames={{ input: classes.input }}
+          />
+          <Preview
+            previewText={debouchedPreviewText}
+            displayFormat={form.getValues().display_format}
+          />
+        </SimpleGrid>
+
         <Textarea
           label="Summary"
           key={form.key("summary")}

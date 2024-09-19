@@ -59,16 +59,18 @@ export function UploadedImages({
         ))}
       </Group>
 
-      <SegmentedControl
-        mt={40}
-        value={size}
-        onChange={(value: string) => setSize(value as ImageSize)}
-        data={[
-          { label: "Smaller", value: "small" },
-          { label: "Big", value: "big" },
-          { label: "Bigger", value: "bigger" },
-        ]}
-      />
+      {images.length > 0 && (
+        <SegmentedControl
+          mt={40}
+          value={size}
+          onChange={(value: string) => setSize(value as ImageSize)}
+          data={[
+            { label: "Smaller", value: "small" },
+            { label: "Big", value: "big" },
+            { label: "Bigger", value: "bigger" },
+          ]}
+        />
+      )}
     </Box>
   );
 }

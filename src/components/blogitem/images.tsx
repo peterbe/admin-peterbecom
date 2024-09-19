@@ -51,9 +51,6 @@ export default function OpenGraphImage() {
 
           {csrfToken && <Upload oid={oid} csrfToken={csrfToken} />}
 
-          {data && data.images.length === 0 && (
-            <Alert style={{ marginTop: 100 }} title="No images found" />
-          )}
           {data && <UploadedImages oid={oid} images={data.images} />}
         </Box>
       </Container>
