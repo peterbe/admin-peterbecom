@@ -4,8 +4,10 @@ import { IconSearch } from "@tabler/icons-react";
 import { formatDistance, parseISO } from "date-fns";
 import { useState } from "react";
 
+import { useMediaQuery } from "@mantine/hooks";
 import { Link, useSearch } from "wouter";
 import type { BlogitemsServerData } from "../../types";
+import { formatDistanceCompact } from "./format-distance-compact";
 
 export function ListTable({
   search,
@@ -44,6 +46,8 @@ export function ListTable({
     return `?${searchParams}`;
   }
 
+  const matchesMobile = useMediaQuery("(max-width: 500px)");
+
   return (
     <form
       onSubmit={(e) => {
@@ -57,7 +61,7 @@ export function ListTable({
             <Table.Th>Title</Table.Th>
             <Table.Th
               // For long date displays like "about 2 months ago"
-              style={{ minWidth: 170 }}
+              style={!matchesMobile ? { minWidth: 170 } : undefined}
             >
               {orderBy === "pub_date" && (
                 <Link href={addQueryString({ orderBy: "modify_date" })}>
@@ -141,7 +145,8 @@ export function ListTable({
 
                 {!item._is_published ? (
                   <CustomBadge color="orange">
-                    Published <DisplayDate date={item.pub_date} />
+                    Published{" "}
+                    <DisplayDate date={item.pub_date} compact={matchesMobile} />
                   </CustomBadge>
                 ) : null}
               </Table.Td>
@@ -150,6 +155,7 @@ export function ListTable({
                   date={
                     orderBy === "pub_date" ? item.pub_date : item.modify_date
                   }
+                  compact={matchesMobile}
                 />
               </Table.Td>
             </Table.Tr>
@@ -164,15 +170,26 @@ function CustomBadge(props: BadgeProps) {
   return <Badge ml={15} style={{ textTransform: "none" }} {...props} />;
 }
 
-export function DisplayDate({ date, now }: { date: string; now?: string }) {
+export function DisplayDate({
+  date,
+  now,
+  compact = false,
+}: {
+  date: string;
+  now?: string;
+  compact?: boolean;
+}) {
   if (date === null) {
     throw new Error("date is null");
   }
   const dateObj = typeof date === "string" ? parseISO(date) : date;
   const nowObj = now ? parseISO(now) : new Date();
+
   return (
     <span title={dateObj.toString()}>
-      {formatDistance(dateObj, nowObj, { addSuffix: true })}
+      {compact
+        ? formatDistanceCompact(dateObj)
+        : formatDistance(dateObj, nowObj, { addSuffix: true })}
     </span>
   );
 }
