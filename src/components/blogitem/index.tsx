@@ -77,6 +77,8 @@ function Add() {
     summary: "",
     text: "",
     pub_date: new Date().toISOString(),
+    modify_date: "",
+    _absolute_url: "",
     categories: [],
     keywords: [],
     url: "",
