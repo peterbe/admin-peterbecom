@@ -26,7 +26,26 @@ function SignIn() {
   const sp = new URLSearchParams({ next });
   return (
     <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-      <a href={`/oidc/authenticate/?${sp}`}>Sign in with OpenID Connect</a>
+      <a
+        href={`/oidc/authenticate/?${sp}`}
+        onClick={(event) => {
+          if (process.env.NODE_ENV === "test") {
+            event.preventDefault();
+            fetch(`/oidc/authenticate/?${sp}`, { method: "POST" }).then(
+              (response) => {
+                if (!response.ok) {
+                  throw new Error(`${response.status} on ${response.url}`);
+                }
+                // This is hacky and I don't like it.
+                document.cookie = "mocksessionid=mruser";
+                window.location.href = "/?redirected=true";
+              },
+            );
+          }
+        }}
+      >
+        Sign in with OpenID Connect
+      </a>
     </Paper>
   );
 }

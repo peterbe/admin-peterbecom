@@ -33,7 +33,6 @@ export function SignedIn({ children }: { children: ReactNode }) {
   }
   if (!userData.user) {
     return <Authenticate />;
-    // return null
   }
   return <Box style={{ marginBottom: 100 }}>{children}</Box>;
 }

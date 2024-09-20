@@ -29,9 +29,9 @@ export type EditBlogitemT = {
   oid: string;
   title: string;
   pub_date: string;
-  // _published: boolean;
+  _published?: boolean;
   text: string;
-  // modify_date: string;
+  modify_date: string;
   categories: CategoryT[];
   keywords: string[];
   summary: string;
@@ -42,7 +42,7 @@ export type EditBlogitemT = {
   hide_comments: boolean;
   // modify_date: string;
   open_graph_image: string | null;
-  // _absolute_url: string;
+  _absolute_url: string;
   archived: null | string;
 };
 
