@@ -4,6 +4,9 @@
 dev:
     npm run dev -- --port 4001
 
+dev-for-testing:
+    NODE_ENV=test npm run dev -- --port 4001
+
 build:
     npm run build
 
