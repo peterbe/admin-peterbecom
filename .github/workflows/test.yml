@@ -43,6 +43,8 @@ jobs:
         run: npm run tsc
 
       - name: Build
+        env:
+          NODE_ENV: test
         run: npm run build
 
       - name: Serve app
