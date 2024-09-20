@@ -24,7 +24,7 @@ export function ImageThumbnails({ oid }: { oid: string }) {
       </Container>
     );
   }
-  if (images.data) {
+  if (images.data?.images.length) {
     if (show) {
       return (
         <Container>

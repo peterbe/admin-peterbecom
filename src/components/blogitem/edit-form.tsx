@@ -183,7 +183,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         </Alert>
       )}
 
-      <ImageThumbnails oid={blogitem.oid} />
+      {Boolean(blogitem.id) && <ImageThumbnails oid={blogitem.oid} />}
 
       <form
         onSubmit={form.onSubmit((data) => {
