@@ -23,7 +23,7 @@ export function Preview({
   const { data, error, isFetching, isPending } = useQuery<PreviewData>({
     queryKey: ["preview", previewText, displayFormat],
     queryFn: async () => {
-      if (!previewText) return Promise.resolve(null);
+      if (!previewText) return null;
 
       return postPreview({
         text: previewText,
