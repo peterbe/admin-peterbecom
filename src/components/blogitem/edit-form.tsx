@@ -307,6 +307,6 @@ function slugify(s: string) {
   return s
     .trim()
     .replace(/[#\s]+/g, "-")
-    .replace(/[@/'?]/g, "")
+    .replace(/[@/'?<>]/g, "")
     .toLowerCase();
 }
