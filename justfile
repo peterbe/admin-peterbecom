@@ -13,6 +13,10 @@ build:
 start: build
     npm run preview -- --port 4001
 
+start-for-testing:
+    NODE_ENV=test npm run build
+    NODE_ENV=test npm run preview -- --port 4001
+
 pretty:
     npm run pretty
 

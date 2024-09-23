@@ -2,7 +2,9 @@ import { HttpResponse } from "msw";
 
 import type { EditBlogitemT } from "../../types";
 
-export type EditBlogitemRequestBody = EditBlogitemT;
+export type EditBlogitemRequestBody = EditBlogitemT & {
+  keywords: string;
+};
 
 export const blogitems: Record<string, EditBlogitemT> = {};
 
@@ -74,6 +76,11 @@ export function editBlogitem({
   }
   const summary = body.summary;
 
+  const keywords = body.keywords
+    .split("\n")
+    .map((keyword) => keyword.trim())
+    .filter(Boolean);
+
   if (Object.keys(errors).length) {
     return HttpResponse.json({ errors }, { status: 400 });
   }
@@ -86,6 +93,7 @@ export function editBlogitem({
   blogitem.text = text.trim();
   blogitem.summary = summary.trim();
   blogitem.pub_date = body.pub_date;
+  blogitem.keywords = keywords;
 
   console.log("TRANSFER...", body);
   console.log("INTO....", blogitem);
