@@ -21,27 +21,6 @@ export type AddBlogitemRequestBody = {
   codesyntax: string;
 };
 
-// const LOREM_IPSUM = `
-// Lorem ipsum odor amet, consectetuer adipiscing elit.
-// Cursus eros suspendisse taciti, urna malesuada hendrerit sem magna.
-// Per justo at finibus pharetra feugiat sapien condimentum tincidunt porta.
-// Tortor etiam aliquet vehicula torquent faucibus class. Duis mauris conubia
-// vivamus facilisi ex turpis semper ligula. Mauris semper suspendisse eget
-// cubilia sem feugiat bibendum eu. Ultricies in tempor per phasellus
-// molestie feugiat volutpat. Quisque mauris imperdiet ligula nisi ac porta inceptos.
-// `.trim();
-
-// const randomText = (noWords: number) => {
-//   const words = Math.floor(Math.random() * noWords) + 2;
-//   const pool = LOREM_IPSUM.split(" ")
-//     .filter(Boolean)
-//     .sort(() => Math.random() - 0.5);
-//   return capitalize(pool.slice(0, words).join(" "));
-// };
-
-// const randomTitle = () => randomText(5);
-// const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 const blogitems: (BlogitemT | AddBlogitemT)[] = [];
 
 blogitems.push({
@@ -98,9 +77,12 @@ export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
   if (!pubDate) errors.pub_date = "Required";
   const summary = body.summary;
   const url = body.url;
-  const keywords = body.keywords;
+  const keywords = body.keywords
+    .split("\n")
+    .map((keyword) => keyword.trim())
+    .filter(Boolean);
 
-  const modifyDate = new Date().toUTCString();
+  const modifyDate = new Date().toISOString();
 
   if (Object.keys(errors).length) {
     return HttpResponse.json({ errors }, { status: 400 });
@@ -114,14 +96,12 @@ export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
     // _is_published: pubDate < new Date().toISOString(),
     modify_date: modifyDate,
     categories: [],
-    keywords: [],
+    keywords,
     summary,
     archived: null,
     url,
   };
   blogitems.push(blogitem);
-
-  console.log("BLOGITEMS NOW:", blogitems);
 
   const editBlogitem: EditBlogitemT = {
     id: blogitem.id,
@@ -129,9 +109,9 @@ export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
     title: blogitem.title,
     text: text,
     summary: blogitem.summary,
-    modify_date: new Date().toUTCString(),
+    modify_date: new Date().toISOString(),
     pub_date: pubDate,
-    keywords: keywords.split("\n"),
+    keywords,
     display_format: body.display_format,
     codesyntax: body.codesyntax,
     url: url,
@@ -144,32 +124,8 @@ export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
   };
 
   addEditBlogitem(editBlogitem);
-  // throw new Error("stop");
   return HttpResponse.json({ blogitem });
 }
-// for (const i of Array.from({ length: 25 }, (_, i) => i)) {
-//   let pubDate = new Date(
-//     new Date().getTime() - 1000 * 60 * 60 * 24 * Math.random() * 450
-//   );
-//   if (Math.random() > 0.9) {
-//     pubDate = new Date(pubDate.getTime() + 1000 * 60 * 60 * 24 * 10);
-//   }
-
-//   blogitems.push({
-//     id: i + 100,
-//     oid: `slug-${i}`,
-//     title: randomTitle(),
-//     pub_date: pubDate.toISOString(),
-//     _is_published: pubDate < new Date(),
-//     modify_date: new Date(
-//       new Date().getTime() - 1000 * 60 * 60 * 24 * Math.random() * 365
-//     ).toISOString(),
-//     categories: [],
-//     keywords: ["one", "two"],
-//     summary: Math.random() > 0.5 ? randomText(30) : "",
-//     archived: null,
-//   });
-// }
 
 export const BLOGITEMS = (params: URLSearchParams) => {
   const all = {
