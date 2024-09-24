@@ -1,7 +1,5 @@
 import { HttpResponse } from "msw";
 
-// import type { BlogitemT } from "../../types";
-// import { addEditBlogitem } from "./blogitem";
 import {
   type BlogitemFull,
   CATEGORIES,
@@ -10,9 +8,6 @@ import {
   getNextId,
 } from "./db";
 
-// type AddBlogitemT = Omit<BlogitemT, "_is_published"> & {
-//   url: string;
-// };
 export type AddBlogitemRequestBody = {
   oid: string;
   title: string;

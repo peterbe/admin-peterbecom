@@ -1,34 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-// test("search and find and edit hello-world blogitem", async ({ page }) => {
-//   await page.goto("/");
-//   await expect(page).toHaveTitle(/Sign in/);
-//   await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click();
-//   await page
-//     .getByRole("banner")
-//     .getByRole("link", { name: "Blogitems" })
-//     .click();
-
-//   await expect(page).toHaveTitle(/Blogitems/);
-
-//   await page.getByPlaceholder("Search").click();
-//   await page.getByPlaceholder("Search").fill("xxx");
-//   await page.getByPlaceholder("Search").press("Enter");
-//   await page.getByRole("button", { name: "Clear" }).click();
-//   await page.getByPlaceholder("Search").fill("hello");
-//   await page.getByPlaceholder("Search").press("Enter");
-//   await page.getByRole("link", { name: "Hello World" }).click();
-//   await expect(page).toHaveTitle(/Edit hello-world/);
-
-//   await page.getByRole("button", { name: "Edit" }).click();
-//   await page.getByPlaceholder("Title").click();
-//   await page.getByPlaceholder("Title").fill("Hello World Playwrightwashere");
-//   await page.getByRole("button", { name: "Save" }).click();
-//   await page.getByRole("link", { name: "Blogitems" }).click();
-//   await page.getByRole("link", { name: "Hello World" }).click();
-//   await page.getByPlaceholder("Title").click();
-// });
-
 test("add, find, edit blogitem", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/Sign in/);
@@ -66,7 +37,6 @@ test("add, find, edit blogitem", async ({ page }) => {
   // XXX WHY DO YOU HAVE TO CLICK IT TWICE?!
   await button.click();
 
-  // await expect(page).toHaveURL(/\/plog\/hello-world$/);
   await expect(page).toHaveURL("/plog/hello-world");
   await expect(page).toHaveTitle(/Edit hello-world/);
 
@@ -91,15 +61,3 @@ test("add, find, edit blogitem", async ({ page }) => {
   await expect(page).toHaveURL("/plog/hello-new-world");
   await expect(page).toHaveTitle(/Edit hello-new-world/);
 });
-
-// test("get started link", async ({ page }) => {
-//   await page.goto("https://playwright.dev/");
-
-//   // Click the get started link.
-//   await page.getByRole("link", { name: "Get started" }).click();
-
-//   // Expects page to have a heading with the name of Installation.
-//   await expect(
-//     page.getByRole("heading", { name: "Installation" })
-//   ).toBeVisible();
-// });

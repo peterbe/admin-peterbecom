@@ -1,7 +1,7 @@
 import { HttpResponse } from "msw";
 import type { ImageT } from "../../hooks/use-images";
 import { getBlogitems } from "./db";
-// import { blogitems } from "./blogitem";
+
 const UPLOADED_IMAGES: Record<string, ImageT[]> = {};
 export const IMAGES = (slug: string | readonly string[]) => {
   if (typeof slug !== "string")
