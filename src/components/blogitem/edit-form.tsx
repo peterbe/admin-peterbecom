@@ -43,7 +43,7 @@ type PostedSuccess = {
   };
 };
 type PostedError = {
-  errors: Record<string, string[]>;
+  errors: Record<string, string | string[]>;
 };
 
 export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
@@ -142,7 +142,10 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           color: "red",
         });
         for (const [field, errors] of Object.entries(json.errors)) {
-          form.setFieldError(field, errors.join(", "));
+          form.setFieldError(
+            field,
+            Array.isArray(errors) ? errors.join(", ") : errors,
+          );
         }
       } else if (response.status === 201) {
         notifications.show({
@@ -307,6 +310,6 @@ function slugify(s: string) {
   return s
     .trim()
     .replace(/[#\s]+/g, "-")
-    .replace(/[@/'?<>]/g, "")
+    .replace(/[@/'?<>!]/g, "")
     .toLowerCase();
 }

@@ -52,6 +52,7 @@ export function Preview({
       {data?.blogitem.html && (
         <ScrollArea
           className="markdown-preview"
+          data-testid="preview"
           bg="var(--mantine-color-gray-0)"
           bd={"1px solid var(--mantine-color-gray-3)"}
           h={790}

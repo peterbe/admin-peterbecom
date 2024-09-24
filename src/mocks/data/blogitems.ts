@@ -1,11 +1,18 @@
 import { HttpResponse } from "msw";
 
-import type { BlogitemT, EditBlogitemT } from "../../types";
-import { addEditBlogitem } from "./blogitem";
+// import type { BlogitemT } from "../../types";
+// import { addEditBlogitem } from "./blogitem";
+import {
+  type BlogitemFull,
+  CATEGORIES,
+  addBlogitem as addBlogitemFull,
+  getBlogitems,
+  getNextId,
+} from "./db";
 
-type AddBlogitemT = Omit<BlogitemT, "_is_published"> & {
-  url: string;
-};
+// type AddBlogitemT = Omit<BlogitemT, "_is_published"> & {
+//   url: string;
+// };
 export type AddBlogitemRequestBody = {
   oid: string;
   title: string;
@@ -20,49 +27,6 @@ export type AddBlogitemRequestBody = {
   keywords: string;
   codesyntax: string;
 };
-
-const blogitems: (BlogitemT | AddBlogitemT)[] = [];
-
-blogitems.push({
-  id: 1,
-  oid: "hello-world",
-  title: "Hello World",
-  pub_date: new Date(
-    new Date().getTime() - 1000 * 60 * 60 * 24 * 7,
-  ).toISOString(),
-  _is_published: true,
-  modify_date: new Date(new Date().getTime() - 1000 * 60 * 60).toISOString(),
-  categories: [
-    {
-      id: 1,
-      name: "Software",
-    },
-    { id: 2, name: "Hardware" },
-  ],
-  keywords: ["one", "two"],
-  summary: "This is but a summary",
-  archived: null,
-});
-
-blogitems.push({
-  id: 2,
-  oid: "fit-for-crime",
-  title: "Fit for Crime",
-  pub_date: new Date(
-    new Date().getTime() - 1000 * 60 * 60 * 24 * 8,
-  ).toISOString(),
-  _is_published: true,
-  modify_date: new Date(
-    new Date().getTime() - 1000 * 60 * 60 * 5,
-  ).toISOString(),
-  categories: [{ id: 2, name: "Hardware" }],
-  keywords: ["foo", "bar"],
-  summary: "",
-  archived: null,
-});
-
-const ids = blogitems.map((item) => item.id);
-if (ids.length !== new Set(ids).size) throw new Error("ids not unique");
 
 export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
   const errors: Record<string, string | string[]> = {};
@@ -83,59 +47,49 @@ export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
     .filter(Boolean);
 
   const modifyDate = new Date().toISOString();
+  const rawCategories = body.categories;
+  if (!rawCategories.length) {
+    errors.categories = "Required";
+  }
 
   if (Object.keys(errors).length) {
     return HttpResponse.json({ errors }, { status: 400 });
   }
 
-  const blogitem: AddBlogitemT = {
-    id: blogitems.length + 1,
+  const categories = CATEGORIES().categories.filter((category) => {
+    return rawCategories.includes(`${category.id}`);
+  });
+
+  const blogitem: BlogitemFull = {
+    id: getNextId(),
     oid,
-    title: body.title,
+    title,
+    text,
     pub_date: pubDate,
-    // _is_published: pubDate < new Date().toISOString(),
     modify_date: modifyDate,
-    categories: [],
+    categories,
     keywords,
     summary,
     archived: null,
     url,
-  };
-  blogitems.push(blogitem);
-
-  const editBlogitem: EditBlogitemT = {
-    id: blogitem.id,
-    oid: blogitem.oid,
-    title: blogitem.title,
-    text: text,
-    summary: blogitem.summary,
-    modify_date: new Date().toISOString(),
-    pub_date: pubDate,
-    keywords,
     display_format: body.display_format,
     codesyntax: body.codesyntax,
-    url: url,
     disallow_comments: false,
     hide_comments: false,
-    _absolute_url: "",
-    categories: [],
     open_graph_image: null,
-    archived: null,
   };
+  addBlogitemFull(blogitem);
 
-  addEditBlogitem(editBlogitem);
   return HttpResponse.json({ blogitem });
 }
 
 export const BLOGITEMS = (params: URLSearchParams) => {
-  const all = {
-    blogitems,
-  };
-
-  const filtered = all.blogitems.filter((item) => {
+  const filtered = Object.values(getBlogitems()).filter((item) => {
     return (
       !params.get("search") ||
-      item.title.includes(params.get("search") as string)
+      item.title
+        .toLowerCase()
+        .includes((params.get("search") as string).toLowerCase())
     );
   });
   if (params.get("order") === "modify_date") {

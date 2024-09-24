@@ -43,3 +43,17 @@ export default tseslint.config({
   },
 })
 ```
+
+## Playwright
+
+Local testing
+
+```bash
+PLAYWRIGHT_BASE_URL=http://localhost:4001 npx playwright test
+```
+
+Start codegen:
+
+```bash
+npx playwright codegen
+```

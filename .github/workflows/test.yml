@@ -57,5 +57,10 @@ jobs:
           sleep 1
           curl --fail --retry-connrefused --retry 3 localhost:3000
 
+      - name: Run Playwright tests
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+        run: npx playwright test
+
       - name: Test manifest
         run: npm run test-manifest

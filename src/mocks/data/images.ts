@@ -1,12 +1,14 @@
 import { HttpResponse } from "msw";
 import type { ImageT } from "../../hooks/use-images";
-import { blogitems } from "./blogitem";
+import { getBlogitems } from "./db";
+// import { blogitems } from "./blogitem";
 const UPLOADED_IMAGES: Record<string, ImageT[]> = {};
 export const IMAGES = (slug: string | readonly string[]) => {
   if (typeof slug !== "string")
     return new HttpResponse("Not Found", { status: 404 });
 
-  if (!blogitems[slug]) {
+  const blogitem = getBlogitems()[slug];
+  if (!blogitem) {
     return new HttpResponse("Not Found", { status: 404 });
   }
   if (slug in UPLOADED_IMAGES) {
