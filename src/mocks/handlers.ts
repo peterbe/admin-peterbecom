@@ -10,7 +10,7 @@ import {
   BLOGITEMS,
   addBlogItem,
 } from "./data/blogitems";
-import { CATEGORIES } from "./data/categories";
+import { CATEGORIES } from "./data/db";
 import {
   type EditBlogitemImagesRequestBody,
   IMAGES,
