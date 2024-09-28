@@ -22,6 +22,7 @@ export type BlogitemT = {
   keywords: string[];
   summary: string;
   archived: null;
+  has_split: boolean;
 };
 
 export type EditBlogitemT = {
