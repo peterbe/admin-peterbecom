@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import type { PreviewData } from "../../types";
 import "./highlight.js.css"; // for the preview
+import "./preview.css"; // for the preview
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { postPreview } from "./post-preview";
 import { RefreshPreviewAreaHeight } from "./refresh-preview-area-height";

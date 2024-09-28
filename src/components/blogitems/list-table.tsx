@@ -142,6 +142,9 @@ export function ListTable({
                 {item.archived && (
                   <CustomBadge color="red">Archived</CustomBadge>
                 )}
+                {!item.has_split && (
+                  <CustomBadge color="yellow">No split</CustomBadge>
+                )}
 
                 {!item._is_published ? (
                   <CustomBadge color="orange">
