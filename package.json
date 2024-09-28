@@ -28,7 +28,7 @@
     "date-fns": "^3.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "valibot": "^0.41.0",
+    "valibot": "^0.42.1",
     "wouter": "^3.3.5"
   },
   "devDependencies": {
