@@ -1,4 +1,4 @@
-import { Alert, Box, LoadingOverlay } from "@mantine/core";
+import { Alert, Box } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 
 import { useLocation, useSearch } from "wouter";
@@ -28,30 +28,27 @@ export function List() {
   });
 
   return (
-    <Box pos="relative">
-      <LoadingOverlay visible={isPending} />
-
+    <Box>
       {error && (
         <Alert color="red">Failed to load blogitems: {error.message}</Alert>
       )}
 
-      {data && (
-        <ListTable
-          data={data}
-          orderBy={orderBy}
-          search={search}
-          updateSearch={(s: string) => {
-            const sp = new URLSearchParams(searchString);
-            const existing = sp.get("search");
-            if (s.trim() && s !== existing) {
-              sp.set("search", s);
-            } else {
-              sp.delete("search");
-            }
-            navigate(sp.toString() ? `?${sp.toString()}` : location);
-          }}
-        />
-      )}
+      <ListTable
+        isPending={isPending}
+        data={data}
+        orderBy={orderBy}
+        search={search}
+        updateSearch={(s: string) => {
+          const sp = new URLSearchParams(searchString);
+          const existing = sp.get("search");
+          if (s.trim() && s !== existing) {
+            sp.set("search", s);
+          } else {
+            sp.delete("search");
+          }
+          navigate(sp.toString() ? `?${sp.toString()}` : location);
+        }}
+      />
     </Box>
   );
 }
