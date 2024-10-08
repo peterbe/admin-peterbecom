@@ -6,15 +6,16 @@ import {
   SimpleGrid,
   TextInput,
   Textarea,
+  Tooltip,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { API_BASE } from "../../config";
 import { useCategories } from "../../hooks/use-categories";
 import type { EditBlogitemT } from "../../types";
 import "./highlight.js.css"; // for the preview
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useLocation } from "wouter";
 import classes from "./edit-form.module.css";
@@ -178,6 +179,23 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     },
   });
 
+  // const formRef = useRef<HTMLFormElement>(null);
+  const saveButtonRef = useRef<HTMLButtonElement>(null);
+
+  const triggerSave = () => {
+    if (saveButtonRef.current) {
+      saveButtonRef.current.click();
+    } else {
+      notifications.show({
+        title: "Can't save",
+        message: "Form not ready to be saved",
+        color: "red",
+      });
+    }
+  };
+
+  useHotkeys([["mod+S", triggerSave]]);
+
   return (
     <div>
       {mutation.isError && (
@@ -292,14 +310,17 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         />
 
         <Box mt={10}>
-          <Button
-            type="submit"
-            fullWidth
-            disabled={mutation.isPending}
-            loading={mutation.isPending}
-          >
-            Save
-          </Button>
+          <Tooltip label="Keyboard shortcut: ⌘+S">
+            <Button
+              type="submit"
+              fullWidth
+              disabled={mutation.isPending}
+              loading={mutation.isPending}
+              ref={saveButtonRef}
+            >
+              Save
+            </Button>
+          </Tooltip>
         </Box>
       </form>
     </div>

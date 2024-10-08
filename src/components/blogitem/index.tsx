@@ -3,13 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 
 import { Alert, Box, LoadingOverlay } from "@mantine/core";
-import { API_BASE } from "../../config";
 import type { EditBlogitemT } from "../../types";
 import { DisplayDate } from "../blogitems/list-table";
 import { SignedIn } from "../signed-in";
 import { DangerZone } from "./danger-zone";
 import { Form } from "./edit-form";
 import { BlogitemLinks } from "./links";
+
+import { blogitemQueryKey, fetchBlogitem } from "../api-utils";
 
 export default function Blogitem() {
   const params = useParams();
@@ -30,17 +31,12 @@ type ServerData = {
 
 function Edit({ oid }: { oid: string | null }) {
   const { data, error, isPending } = useQuery<ServerData>({
-    queryKey: ["blogitem", oid],
+    queryKey: blogitemQueryKey(oid),
     queryFn: async () => {
-      const response = await fetch(`${API_BASE}/plog/${oid}`);
-      if (response.status === 404) {
-        return { notFound: true };
-      }
-      if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
-      }
-      return await response.json();
+      if (!oid) return null;
+      return fetchBlogitem(oid);
     },
+    enabled: !!oid,
   });
 
   return (

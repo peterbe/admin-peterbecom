@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import { Link, useSearch } from "wouter";
 import type { BlogitemsServerData } from "../../types";
+import { usePrefetchBlogitem } from "../api-utils";
 import { formatDistanceCompact } from "./format-distance-compact";
 import { SearchTips } from "./search-tips";
 
@@ -62,9 +63,13 @@ export function ListTable({
 
   const [showTips, setShowTips] = useState(false);
 
+  const { prefetchBlogitemSoon, dontPrefetchBlogitemSoon } =
+    usePrefetchBlogitem();
+
   return (
     <Box pos="relative" style={{ minHeight: 100 }}>
       <LoadingOverlay visible={isPending} />
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -146,7 +151,11 @@ export function ListTable({
               {data.blogitems.map((item) => (
                 <Table.Tr key={item.id}>
                   <Table.Td>
-                    <Link href={`/plog/${item.oid}`}>
+                    <Link
+                      href={`/plog/${item.oid}`}
+                      onMouseOver={() => prefetchBlogitemSoon(item.oid)}
+                      onMouseOut={() => dontPrefetchBlogitemSoon(item.oid)}
+                    >
                       {search ? (
                         <Highlight highlight={search} component="span">
                           {item.title}
