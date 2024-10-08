@@ -18,6 +18,7 @@ import "./highlight.js.css"; // for the preview
 import { useDebouncedValue, useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useLocation } from "wouter";
+import { blogitemQueryKey } from "../api-utils";
 import classes from "./edit-form.module.css";
 import { ImageThumbnails } from "./image-thumbnails";
 import { Preview } from "./preview";
@@ -174,12 +175,16 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["blogitem", blogitem.oid] });
+      form.resetTouched();
+      form.resetDirty();
+
+      queryClient.invalidateQueries({
+        queryKey: blogitemQueryKey(blogitem.oid),
+      });
       queryClient.invalidateQueries({ queryKey: ["blogitems"] });
     },
   });
 
-  // const formRef = useRef<HTMLFormElement>(null);
   const saveButtonRef = useRef<HTMLButtonElement>(null);
 
   const triggerSave = () => {
