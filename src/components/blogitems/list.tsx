@@ -26,6 +26,7 @@ export function List() {
       return await response.json();
     },
   });
+  console.log({ isPending });
 
   return (
     <Box>

@@ -3,6 +3,8 @@ import { Route, Router, Switch } from "wouter";
 
 import { LoadingOverlay } from "@mantine/core";
 import { Custom404 } from "./components/404";
+import Blogitem from "./components/blogitem";
+import Blogitems from "./components/blogitems";
 import { Home } from "./components/home";
 
 type LazyComponentT = React.LazyExoticComponent<() => JSX.Element>;
@@ -18,8 +20,8 @@ function LC(Component: LazyComponentT, loadingText = "") {
   };
 }
 
-const Blogitems = LC(lazy(() => import("./components/blogitems")));
-const Blogitem = LC(lazy(() => import("./components/blogitem")));
+// const Blogitems = LC(lazy(() => import("./components/blogitems")));
+// const Blogitem = LC(lazy(() => import("./components/blogitem")));
 const OpenGraphImage = LC(
   lazy(() => import("./components/blogitem/open-graph-image")),
 );
