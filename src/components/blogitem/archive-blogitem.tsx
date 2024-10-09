@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { API_BASE } from "../../config";
 import type { EditBlogitemT } from "../../types";
+import { blogitemQueryKey, blogitemsQueryKey } from "../api-utils";
 
 export function ArchiveBlogitem({ blogitem }: { blogitem: EditBlogitemT }) {
   const [asked, setAsked] = useState(false);
@@ -35,8 +36,10 @@ export function ArchiveBlogitem({ blogitem }: { blogitem: EditBlogitemT }) {
         color: "green",
       });
 
-      queryClient.invalidateQueries({ queryKey: ["blogitem", blogitem.oid] });
-      queryClient.invalidateQueries({ queryKey: ["blogitems"] });
+      queryClient.invalidateQueries({
+        queryKey: blogitemQueryKey(blogitem.oid),
+      });
+      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() });
     },
   });
 

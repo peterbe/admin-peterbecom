@@ -18,7 +18,7 @@ export function Filters({ disabled }: { disabled: boolean }) {
   const [search, setSearch] = useState(searchParams.get("search") || "");
 
   return (
-    <Box>
+    <Box mb={30}>
       <Grid>
         <Grid.Col span={{ base: 12, md: 8, lg: 8 }}>
           <form
