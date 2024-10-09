@@ -10,9 +10,10 @@ export function Nav() {
     <header>
       <Group justify="space-between">
         <Group>
-          ADMIN - <SmartAnchor href="/">Home</SmartAnchor> -{" "}
+          <SmartAnchor href="/">Home</SmartAnchor> -{" "}
           <SmartAnchor href="/plog">Blogitems</SmartAnchor> -{" "}
-          <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
+          <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor> -{" "}
+          <SmartAnchor href="/plog/comments">Comments</SmartAnchor>
         </Group>
 
         <Group>
