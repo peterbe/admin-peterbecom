@@ -11,6 +11,10 @@ export function commentsQueryKey(searchParams: URLSearchParams) {
   return ["comments", searchParams.toString()];
 }
 
+export function blogitemsQueryKey() {
+  return ["blogitems"];
+}
+
 export async function fetchBlogitem(oid: string) {
   const response = await fetch(`${API_BASE}/plog/${oid}`);
   if (response.status === 404) {

@@ -1,6 +1,6 @@
-import { Alert, Box, LoadingOverlay } from "@mantine/core";
+import { Alert, Box, LoadingOverlay, Text } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearch } from "wouter";
 import { commentsQueryKey, fetchComments } from "../api-utils";
 import { CommentsTree } from "./comments-tree";
@@ -31,6 +31,8 @@ export function Tree() {
   }
   useDocumentTitle(title);
 
+  const queryClient = useQueryClient();
+
   return (
     <Box>
       <LoadingOverlay visible={isPending} />
@@ -38,9 +40,21 @@ export function Tree() {
         <Alert color="red">Failed to load blogitems: {error.message}</Alert>
       )}
       <Filters disabled={isPending} />
-      {isFetching && !isPending && <p>Refetching...</p>}
+      <Text ta="right">
+        {isFetching && !isPending && "Refetching..."}&nbsp;
+      </Text>
 
-      {data && <CommentsTree comments={data.comments} disabled={isPending} />}
+      {data && (
+        <CommentsTree
+          comments={data.comments}
+          disabled={isPending}
+          refetchComments={() => {
+            queryClient.invalidateQueries({
+              queryKey: commentsQueryKey(searchParams),
+            });
+          }}
+        />
+      )}
     </Box>
   );
 }
