@@ -2,7 +2,7 @@ import { useDocumentTitle } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 
-import { Alert, Box, LoadingOverlay } from "@mantine/core";
+import { Alert, Box, LoadingOverlay, Text } from "@mantine/core";
 import type { EditBlogitemT } from "../../types";
 import { DisplayDate } from "../blogitems/list-table";
 import { SignedIn } from "../signed-in";
@@ -30,7 +30,7 @@ type ServerData = {
 };
 
 function Edit({ oid }: { oid: string | null }) {
-  const { data, error, isPending } = useQuery<ServerData>({
+  const { data, error, isPending, isFetching } = useQuery<ServerData>({
     queryKey: blogitemQueryKey(oid),
     queryFn: async () => {
       if (!oid) return null;
@@ -59,6 +59,17 @@ function Edit({ oid }: { oid: string | null }) {
 
       {data?.blogitem?.id && <BlogitemLinks oid={data.blogitem.oid} />}
 
+      {data?.blogitem?.id && (
+        <Text size="xs" ta="right">
+          {isFetching ? (
+            "Fetching..."
+          ) : (
+            <>
+              Modified <DisplayDate date={data.blogitem.modify_date} />
+            </>
+          )}
+        </Text>
+      )}
       {data?.blogitem && <Form blogitem={data.blogitem} />}
       {data?.blogitem?.id && <DangerZone blogitem={data.blogitem} />}
     </Box>
