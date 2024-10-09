@@ -17,6 +17,9 @@ export function Home() {
           <Button size="xl" component={Link} to="/plog">
             Blogitems
           </Button>
+          <Button size="xl" component={Link} to="/plog/comments">
+            Comments
+          </Button>
         </Group>
       </Box>
     </SignedIn>

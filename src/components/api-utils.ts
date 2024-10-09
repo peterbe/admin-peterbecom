@@ -7,6 +7,10 @@ export function blogitemQueryKey(oid: string | null) {
   return ["blogitem", oid];
 }
 
+export function commentsQueryKey(searchParams: URLSearchParams) {
+  return ["comments", searchParams.toString()];
+}
+
 export async function fetchBlogitem(oid: string) {
   const response = await fetch(`${API_BASE}/plog/${oid}`);
   if (response.status === 404) {
@@ -16,6 +20,23 @@ export async function fetchBlogitem(oid: string) {
     throw new Error(`${response.status} on ${response.url}`);
   }
   return await response.json();
+}
+
+export async function fetchComments(search: URLSearchParams) {
+  const copy = new URLSearchParams(search);
+  if (copy.get("only") === "unapproved") {
+    copy.set("unapproved", "only");
+    copy.delete("only");
+  } else if (copy.get("only") === "autoapproved") {
+    copy.set("autoapproved", "only");
+    copy.delete("only");
+  }
+
+  const response = await fetch(`${API_BASE}/plog/comments/?${copy}`);
+  if (!response.ok) {
+    throw new Error(`${response.status} on ${response.url}`);
+  }
+  return response.json();
 }
 
 export function usePrefetchBlogitem() {
