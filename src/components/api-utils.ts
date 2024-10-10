@@ -7,6 +7,10 @@ export function blogitemQueryKey(oid: string | null) {
   return ["blogitem", oid];
 }
 
+export function blogitemPageviewsQueryKey(oid: string) {
+  return ["blogitem-pageviews", oid];
+}
+
 export function commentsQueryKey(searchParams: URLSearchParams) {
   return ["comments", searchParams.toString()];
 }
@@ -20,6 +24,16 @@ export async function fetchBlogitem(oid: string) {
   if (response.status === 404) {
     return { notFound: true };
   }
+  if (!response.ok) {
+    throw new Error(`${response.status} on ${response.url}`);
+  }
+  return await response.json();
+}
+
+export async function fetchAnalyticsQuery(query: string) {
+  const response = await fetch(
+    `${API_BASE}/analytics/query?${new URLSearchParams({ query })}`,
+  );
   if (!response.ok) {
     throw new Error(`${response.status} on ${response.url}`);
   }
