@@ -1,4 +1,15 @@
-import { Box, Grid, SegmentedControl, TextInput } from "@mantine/core";
+import {
+  Box,
+  Button,
+  CloseButton,
+  Code,
+  Grid,
+  Modal,
+  SegmentedControl,
+  Text,
+  TextInput,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import { useLocation, useSearch } from "wouter";
@@ -39,10 +50,25 @@ export function Filters({ disabled }: { disabled: boolean }) {
               value={search}
               onChange={(event) => setSearch(event.currentTarget.value)}
               radius="xl"
-              rightSection={<IconSearch />}
+              rightSection={
+                search ? (
+                  <CloseButton
+                    aria-label="Clear input"
+                    onClick={() => {
+                      setSearch("");
+                      const sp = new URLSearchParams(searchString);
+                      sp.delete("search");
+                      navigate(sp.toString() ? `?${sp.toString()}` : location);
+                    }}
+                  />
+                ) : (
+                  <IconSearch />
+                )
+              }
               disabled={disabled}
             />
           </form>
+          <SearchTips />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 4, lg: 4 }}>
           <SegmentedControl
@@ -66,5 +92,32 @@ export function Filters({ disabled }: { disabled: boolean }) {
         </Grid.Col>
       </Grid>
     </Box>
+  );
+}
+
+function SearchTips() {
+  const [opened, { open, close }] = useDisclosure(false);
+  return (
+    <>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title="Search tips"
+        overlayProps={{
+          backgroundOpacity: 0.55,
+          blur: 2,
+        }}
+      >
+        <Text>
+          For example:
+          <Code>oid:my-oid</Code>
+          <br />
+          <Code>https://www.peterbe.com/plog/my-oid</Code>
+        </Text>
+      </Modal>
+      <Button variant="transparent" size="xs" onClick={open}>
+        Search tips
+      </Button>
+    </>
   );
 }
