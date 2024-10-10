@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Avatar,
   Box,
   Button,
@@ -16,7 +17,7 @@ import classes from "./comments-tree.module.css";
 import { gravatarSrc } from "./gravatar-src";
 import type { Comment } from "./types";
 
-import { API_BASE } from "../../config";
+import { API_BASE, PUBLIC_BASE_URL } from "../../config";
 
 export function CommentsTree({
   comments,
@@ -27,19 +28,34 @@ export function CommentsTree({
   disabled: boolean;
   refetchComments: () => void;
 }) {
-  return (
-    <Box>
-      {comments.map((comment) => (
-        <div key={comment.id}>
-          <InnerComment
-            disabled={disabled}
-            comment={comment}
-            refetchComments={refetchComments}
-          />
-        </div>
-      ))}
-    </Box>
-  );
+  let prevBlogitem = "";
+
+  const nodes = comments.map((comment) => {
+    const newTitle = prevBlogitem !== comment.blogitem.oid;
+    const title = newTitle ? (
+      <Anchor
+        href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}`}
+        fw={700}
+        size="lg"
+      >
+        {comment.blogitem.title}
+      </Anchor>
+    ) : null;
+
+    prevBlogitem = comment.blogitem.oid;
+    return (
+      <Box key={comment.id} mt={newTitle ? 50 : 0}>
+        {title}
+        <InnerComment
+          disabled={disabled}
+          comment={comment}
+          refetchComments={refetchComments}
+        />
+      </Box>
+    );
+  });
+
+  return <Box>{nodes}</Box>;
 }
 
 type PostedError = {
@@ -148,12 +164,16 @@ function InnerComment({
             )}
             {!editMode && (
               <Text size="xs">
-                <DisplayDate date={comment.add_date} />
-                {!equalDates(comment.add_date, comment.modify_date) && (
-                  <>
-                    , modified <DisplayDate date={comment.modify_date} />
-                  </>
-                )}
+                <Anchor
+                  href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}#${comment.oid}`}
+                >
+                  <DisplayDate date={comment.add_date} />
+                  {!equalDates(comment.add_date, comment.modify_date) && (
+                    <>
+                      , modified <DisplayDate date={comment.modify_date} />
+                    </>
+                  )}
+                </Anchor>
               </Text>
             )}
           </div>
