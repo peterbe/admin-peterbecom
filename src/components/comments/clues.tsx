@@ -9,7 +9,7 @@ export function DisplayClues({ clues }: { clues: Clues }) {
   ) {
     return null;
   }
-  console.log(clues);
+
   return (
     <Box pl={54} mt={10}>
       <Group>

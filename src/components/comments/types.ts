@@ -5,7 +5,7 @@ type CommentBlogitem = {
   _absolute_url: string;
 };
 
-type LocationT = {
+export type LocationT = {
   city: string;
   continent_code: string;
   continent_name: string;
