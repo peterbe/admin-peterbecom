@@ -1,5 +1,5 @@
 import { LineChart } from "@mantine/charts";
-import { Alert, Box, LoadingOverlay } from "@mantine/core";
+import { Alert, Box, LoadingOverlay, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import type { EditBlogitemT, QueryResult } from "../../types";
 import { blogitemPageviewsQueryKey, fetchAnalyticsQuery } from "../api-utils";
@@ -61,7 +61,7 @@ LIMIT 100
   });
 
   return (
-    <Box pos="relative" style={{ minHeight: 300 }}>
+    <Box pos="relative" style={{ minHeight: 200 }}>
       {analyticsThisWeek.error && (
         <Alert color="red">
           Failed to load blogitem: {analyticsThisWeek.error.message}
@@ -76,6 +76,16 @@ LIMIT 100
 }
 
 function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
+  if (data.rows.length === 0) {
+    return (
+      <div>
+        <Text m={50} ta="center" fs="italic">
+          Not enough data to show a graph
+        </Text>
+      </div>
+    );
+  }
+
   const dataX = data.rows.map((row) => {
     let date = (row.date as string).split("T")[0];
     if (interval === "month") {

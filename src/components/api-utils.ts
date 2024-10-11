@@ -71,8 +71,6 @@ export function usePrefetchBlogitem() {
 
   useEffect(() => {
     if (debounced) {
-      console.log("Prefetching", debounced);
-
       queryClient.prefetchQuery({
         queryKey: blogitemQueryKey(debounced),
         queryFn: async () => fetchBlogitem(debounced),
