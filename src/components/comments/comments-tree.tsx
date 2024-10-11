@@ -19,6 +19,7 @@ import type { Comment } from "./types";
 
 import { API_BASE, PUBLIC_BASE_URL } from "../../config";
 import { DisplayClues } from "./clues";
+import { DisplayLocation } from "./location";
 
 export function CommentsTree({
   comments,
@@ -163,16 +164,7 @@ function InnerComment({
                   {comment.name ? <b>{comment.name}</b> : <i>No name</i>}{" "}
                   {comment.email ? <b>{comment.email}</b> : <i>No email</i>}
                 </Text>
-                {comment.location?.country_code && (
-                  <Text size="sm" fw={700}>
-                    {/* <Flag
-                      name={comment.location.country_code.toLowerCase()}
-                      title={JSON.stringify(comment.location, null, 2)}
-                    />{" "} */}
-                    {comment.location.city || <i>no city</i>},{" "}
-                    {comment.location.country_name || <i>no country</i>}
-                  </Text>
-                )}
+                <DisplayLocation location={comment.location} />
               </Group>
             )}
             {!editMode && (
