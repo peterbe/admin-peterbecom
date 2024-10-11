@@ -18,7 +18,7 @@ type LocationT = {
   time_zone: string;
 };
 
-type Clues = {
+export type Clues = {
   good: { [key: string]: string };
   bad: { [key: string]: string };
 };

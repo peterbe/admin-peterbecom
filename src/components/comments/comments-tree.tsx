@@ -18,6 +18,7 @@ import { gravatarSrc } from "./gravatar-src";
 import type { Comment } from "./types";
 
 import { API_BASE, PUBLIC_BASE_URL } from "../../config";
+import { DisplayClues } from "./clues";
 
 export function CommentsTree({
   comments,
@@ -157,10 +158,22 @@ function InnerComment({
                 />
               </Group>
             ) : (
-              <Text size="sm" fw={700}>
-                {comment.name ? <b>{comment.name}</b> : <i>No name</i>}{" "}
-                {comment.email ? <b>{comment.email}</b> : <i>No email</i>}
-              </Text>
+              <Group>
+                <Text size="sm" fw={700}>
+                  {comment.name ? <b>{comment.name}</b> : <i>No name</i>}{" "}
+                  {comment.email ? <b>{comment.email}</b> : <i>No email</i>}
+                </Text>
+                {comment.location?.country_code && (
+                  <Text size="sm" fw={700}>
+                    {/* <Flag
+                      name={comment.location.country_code.toLowerCase()}
+                      title={JSON.stringify(comment.location, null, 2)}
+                    />{" "} */}
+                    {comment.location.city || <i>no city</i>},{" "}
+                    {comment.location.country_name || <i>no country</i>}
+                  </Text>
+                )}
+              </Group>
             )}
             {!editMode && (
               <Text size="xs">
@@ -226,6 +239,8 @@ function InnerComment({
             </Button>
           )}
         </Group>
+
+        <DisplayClues clues={comment._clues} />
       </form>
     </Box>
   );

@@ -132,7 +132,6 @@ export function ListTable({
             <Table.Tbody>
               <Table.Tr>
                 <Table.Td colSpan={2}>
-                  {/* <Title order={3}>Advanced searches</Title> */}
                   <SearchTips
                     append={(s: string) => {
                       setValue((v) => {
