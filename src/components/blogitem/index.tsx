@@ -11,6 +11,7 @@ import { Form } from "./edit-form";
 import { BlogitemLinks } from "./links";
 
 import { blogitemQueryKey, fetchBlogitem } from "../api-utils";
+import { Pageviews } from "./pageviews-loader";
 
 export default function Blogitem() {
   const params = useParams();
@@ -71,6 +72,7 @@ function Edit({ oid }: { oid: string | null }) {
         </Text>
       )}
       {data?.blogitem && <Form blogitem={data.blogitem} />}
+      {data?.blogitem?.id && <Pageviews blogitem={data.blogitem} />}
       {data?.blogitem?.id && <DangerZone blogitem={data.blogitem} />}
     </Box>
   );
