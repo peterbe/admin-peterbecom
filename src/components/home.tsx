@@ -11,11 +11,11 @@ export function Home() {
     <SignedIn>
       <Box m={100}>
         <Group justify="center">
-          <Button size="xl" component={Link} to="/">
-            Home
-          </Button>
           <Button size="xl" component={Link} to="/plog">
             Blogitems
+          </Button>
+          <Button size="xl" component={Link} to="/plog/add">
+            Add blogitem
           </Button>
           <Button size="xl" component={Link} to="/plog/comments">
             Comments
