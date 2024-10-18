@@ -113,6 +113,9 @@ function SearchTips() {
           <Code>oid:my-oid</Code>
           <br />
           <Code>https://www.peterbe.com/plog/my-oid</Code>
+          <br />
+          <Code>oid:!my-oid</Code> (anything but that blog item)
+          <br />
         </Text>
       </Modal>
       <Button variant="transparent" size="xs" onClick={open}>

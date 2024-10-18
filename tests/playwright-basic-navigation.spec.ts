@@ -61,3 +61,39 @@ test("add, find, edit blogitem", async ({ page }) => {
   await expect(page).toHaveURL("/plog/hello-new-world");
   await expect(page).toHaveTitle(/Edit hello-new-world/);
 });
+
+test("approve and delete comments", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveTitle(/Sign in/);
+  await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click();
+
+  await page
+    .locator("header")
+    .getByRole("link", { name: "Comments", exact: true })
+    .click();
+
+  await expect(page).toHaveURL("/plog/comments");
+  await expect(page).toHaveTitle("(2) Comments");
+  await page.getByText("approved", { exact: true }).click();
+  await expect(page.getByText("Blabla")).toBeVisible();
+  await expect(page.getByText("This has already been approved")).toBeVisible();
+
+  await page.getByText("Unapproved").click();
+  await expect(page).toHaveTitle("(1) Comment");
+  await expect(page.getByText("Blabla")).toBeVisible();
+  await expect(
+    page.getByText("This has already been approved"),
+  ).not.toBeVisible();
+
+  await page.getByText("Autoapproved").click();
+  await expect(page).toHaveTitle("(0) Comments");
+  await expect(page.getByText("Blabla")).not.toBeVisible();
+  await expect(
+    page.getByText("This has already been approved"),
+  ).not.toBeVisible();
+
+  await page.getByText("Any").click();
+  await expect(page).toHaveTitle("(2) Comments");
+  await expect(page.getByText("Blabla")).toBeVisible();
+  await expect(page.getByText("This has already been approved")).toBeVisible();
+});

@@ -34,7 +34,7 @@ export type Comment = {
   comment: string;
   email: string;
   name: string;
-  location: LocationT;
+  location: LocationT | null;
   max_add_date: string;
   modify_date: string;
   page: number;
@@ -45,4 +45,10 @@ export type Comment = {
   _absolute_url: string;
   _bumped: boolean;
   _clues: Clues;
+};
+
+export type CommentsServerData = {
+  comments: Comment[];
+  count: number;
+  oldest: string;
 };

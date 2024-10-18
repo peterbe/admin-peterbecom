@@ -1,6 +1,7 @@
 import { LineChart } from "@mantine/charts";
 import { Alert, Box, LoadingOverlay, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
+import { thousands } from "../../number-formatter";
 import type { EditBlogitemT, QueryResult } from "../../types";
 import { blogitemPageviewsQueryKey, fetchAnalyticsQuery } from "../api-utils";
 
@@ -118,7 +119,7 @@ function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
         ]}
         strokeWidth={4}
         curveType="natural"
-        valueFormatter={(value) => new Intl.NumberFormat("en-US").format(value)}
+        valueFormatter={(value) => thousands(value as number)}
       />
     </div>
   );

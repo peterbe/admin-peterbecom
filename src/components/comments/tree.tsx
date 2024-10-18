@@ -2,16 +2,13 @@ import { Alert, Box, LoadingOverlay, Text } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearch } from "wouter";
+import { thousands } from "../../number-formatter";
 import { commentsQueryKey, fetchComments } from "../api-utils";
+import { BatchSubmit } from "./batch-submit";
 import { CommentsTree } from "./comments-tree";
 import { Filters } from "./filters";
-import type { Comment } from "./types";
-
-type CommentsServerData = {
-  comments: Comment[];
-  count: number;
-  oldest: string;
-};
+import type { CommentsServerData } from "./types";
+import { useBatchSubmission } from "./use-batch-submission";
 
 export function Tree() {
   const searchString = useSearch();
@@ -25,13 +22,16 @@ export function Tree() {
 
   let title = "Comments";
   if (data) {
-    title = `(${data.count}) Comment${data.count === 1 ? "" : "s"}`;
+    title = `(${thousands(data.count)}) Comment${data.count === 1 ? "" : "s"}`;
   } else if (isPending) {
     title = "Loading comments...";
   }
   useDocumentTitle(title);
 
   const queryClient = useQueryClient();
+
+  const { toApprove, toggleToApprove, toDelete, toggleToDelete } =
+    useBatchSubmission();
 
   return (
     <Box>
@@ -45,15 +45,23 @@ export function Tree() {
       </Text>
 
       {data && (
-        <CommentsTree
-          comments={data.comments}
-          disabled={isPending}
-          refetchComments={() => {
-            queryClient.invalidateQueries({
-              queryKey: commentsQueryKey(searchParams),
-            });
-          }}
-        />
+        <>
+          <BatchSubmit toApprove={toApprove} toDelete={toDelete} />
+
+          <CommentsTree
+            comments={data.comments}
+            disabled={isPending}
+            refetchComments={() => {
+              queryClient.invalidateQueries({
+                queryKey: commentsQueryKey(searchParams),
+              });
+            }}
+            toApprove={toApprove}
+            toDelete={toDelete}
+            onCheckApprove={toggleToApprove}
+            onCheckDelete={toggleToDelete}
+          />
+        </>
       )}
     </Box>
   );
