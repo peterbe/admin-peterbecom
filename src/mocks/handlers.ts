@@ -1,5 +1,6 @@
 import { http, HttpResponse, type PathParams } from "msw";
 
+import { ANALYTICS } from "./data/analytics";
 import {
   BLOGITEM,
   type EditBlogitemRequestBody,
@@ -97,5 +98,9 @@ export const handlers = [
     });
   }),
 
+  http.get("/api/v0/analytics/query", ({ request }) => {
+    const url = request.url;
+    return ANALYTICS(new URLSearchParams(new URL(url).search));
+  }),
   // REMEMBER! Order is important. Slugs that can hide other regexes.
 ];
