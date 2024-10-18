@@ -5,7 +5,10 @@ test("add, find, edit blogitem", async ({ page }) => {
   await expect(page).toHaveTitle(/Sign in/);
   await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click();
 
-  await page.getByRole("link", { name: "Add blogitem" }).click();
+  await page
+    .locator("header")
+    .getByRole("link", { name: "Add blogitem" })
+    .click();
   await page.getByPlaceholder("Title").click();
   await page.getByPlaceholder("Title").fill("Hello World!");
   await page.getByLabel("Text *").click();
