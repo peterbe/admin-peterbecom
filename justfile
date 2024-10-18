@@ -40,3 +40,6 @@ format: prettyfix lintfix
 
 install:
     npm install
+
+outdated:
+    npx npm-check-updates --interactive
