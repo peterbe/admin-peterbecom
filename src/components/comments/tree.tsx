@@ -7,14 +7,8 @@ import { commentsQueryKey, fetchComments } from "../api-utils";
 import { BatchSubmit } from "./batch-submit";
 import { CommentsTree } from "./comments-tree";
 import { Filters } from "./filters";
-import type { Comment } from "./types";
+import type { CommentsServerData } from "./types";
 import { useBatchSubmission } from "./use-batch-submission";
-
-type CommentsServerData = {
-  comments: Comment[];
-  count: number;
-  oldest: string;
-};
 
 export function Tree() {
   const searchString = useSearch();

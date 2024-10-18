@@ -10,6 +10,7 @@ import {
   BLOGITEMS,
   addBlogItem,
 } from "./data/blogitems";
+import { COMMENTS } from "./data/comments";
 import { CATEGORIES } from "./data/db";
 import {
   type EditBlogitemImagesRequestBody,
@@ -35,6 +36,11 @@ export const handlers = [
 
   http.post("/api/v0/plog/preview/", () => {
     return HttpResponse.json(PREVIEW());
+  }),
+
+  http.get("/api/v0/plog/comments/", ({ request }) => {
+    const url = request.url;
+    return COMMENTS(new URLSearchParams(new URL(url).search));
   }),
 
   http.get("/api/v0/plog/:slug/images", ({ params }) => {
@@ -90,4 +96,6 @@ export const handlers = [
       },
     });
   }),
+
+  // REMEMBER! Order is important. Slugs that can hide other regexes.
 ];

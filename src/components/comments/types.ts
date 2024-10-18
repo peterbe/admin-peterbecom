@@ -46,3 +46,9 @@ export type Comment = {
   _bumped: boolean;
   _clues: Clues;
 };
+
+export type CommentsServerData = {
+  comments: Comment[];
+  count: number;
+  oldest: string;
+};
