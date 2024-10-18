@@ -34,7 +34,7 @@ export type Comment = {
   comment: string;
   email: string;
   name: string;
-  location: LocationT;
+  location: LocationT | null;
   max_add_date: string;
   modify_date: string;
   page: number;

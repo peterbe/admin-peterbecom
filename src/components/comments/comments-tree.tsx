@@ -3,6 +3,7 @@ import {
   Avatar,
   Box,
   Button,
+  Grid,
   Group,
   Text,
   TextInput,
@@ -18,6 +19,7 @@ import { gravatarSrc } from "./gravatar-src";
 import type { Comment } from "./types";
 
 import { API_BASE, PUBLIC_BASE_URL } from "../../config";
+import { ApprovalForm } from "./approval-form";
 import { DisplayClues } from "./clues";
 import { DisplayLocation } from "./location";
 
@@ -25,34 +27,63 @@ export function CommentsTree({
   comments,
   disabled,
   refetchComments,
+  showTitles = false,
+  toApprove,
+  toDelete,
+  onCheckApprove,
+  onCheckDelete,
 }: {
   comments: Comment[];
   disabled: boolean;
   refetchComments: () => void;
+  showTitles?: boolean;
+  toApprove: string[];
+  toDelete: string[];
+  onCheckApprove: (oid: string) => void;
+  onCheckDelete: (oid: string) => void;
 }) {
   let prevBlogitem = "";
-
   const nodes = comments.map((comment) => {
     const newTitle = prevBlogitem !== comment.blogitem.oid;
-    const title = newTitle ? (
-      <Anchor
-        href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}`}
-        fw={700}
-        size="lg"
-      >
-        {comment.blogitem.title}
-      </Anchor>
-    ) : null;
+    const title =
+      showTitles && newTitle ? (
+        <Anchor
+          href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}`}
+          fw={700}
+          size="lg"
+        >
+          {comment.blogitem.title}
+        </Anchor>
+      ) : null;
 
     prevBlogitem = comment.blogitem.oid;
     return (
-      <Box key={comment.id} mt={newTitle ? 50 : 0}>
+      <Box key={comment.id} mt={newTitle ? 40 : 0} mb={30}>
         {title}
         <InnerComment
           disabled={disabled}
           comment={comment}
           refetchComments={refetchComments}
+          toApprove={toApprove}
+          toDelete={toDelete}
+          onCheckApprove={onCheckApprove}
+          onCheckDelete={onCheckDelete}
         />
+
+        <Grid>
+          <Grid.Col span={1}> </Grid.Col>
+          <Grid.Col span={11}>
+            <CommentsTree
+              comments={comment.replies}
+              disabled={disabled}
+              refetchComments={refetchComments}
+              toApprove={toApprove}
+              toDelete={toDelete}
+              onCheckApprove={onCheckApprove}
+              onCheckDelete={onCheckDelete}
+            />
+          </Grid.Col>
+        </Grid>
       </Box>
     );
   });
@@ -68,10 +99,18 @@ function InnerComment({
   comment,
   disabled,
   refetchComments,
+  toApprove,
+  toDelete,
+  onCheckApprove,
+  onCheckDelete,
 }: {
   comment: Comment;
   disabled: boolean;
   refetchComments: () => void;
+  toApprove: string[];
+  toDelete: string[];
+  onCheckApprove: (oid: string) => void;
+  onCheckDelete: (oid: string) => void;
 }) {
   const [editMode, setEditMode] = useState(false);
 
@@ -126,7 +165,7 @@ function InnerComment({
   });
 
   return (
-    <Box mb={30}>
+    <Box>
       <form
         onSubmit={form.onSubmit((data) => {
           if (data !== null) {
@@ -142,7 +181,7 @@ function InnerComment({
           />
           <div>
             {editMode ? (
-              <Group>
+              <Group grow>
                 <TextInput
                   label="Name"
                   placeholder="name"
@@ -164,7 +203,11 @@ function InnerComment({
                   {comment.name ? <b>{comment.name}</b> : <i>No name</i>}{" "}
                   {comment.email ? <b>{comment.email}</b> : <i>No email</i>}
                 </Text>
-                <DisplayLocation location={comment.location} />
+                {comment.location ? (
+                  <DisplayLocation location={comment.location} />
+                ) : (
+                  <em>location not known</em>
+                )}
               </Group>
             )}
             {!editMode && (
@@ -230,6 +273,13 @@ function InnerComment({
               Save changes
             </Button>
           )}
+          <ApprovalForm
+            comment={comment}
+            toApprove={toApprove.includes(comment.oid)}
+            toDelete={toDelete.includes(comment.oid)}
+            onCheckApprove={onCheckApprove}
+            onCheckDelete={onCheckDelete}
+          />
         </Group>
 
         <DisplayClues clues={comment._clues} />
