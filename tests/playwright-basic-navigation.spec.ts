@@ -67,7 +67,10 @@ test("approve and delete comments", async ({ page }) => {
   await expect(page).toHaveTitle(/Sign in/);
   await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click();
 
-  await page.getByRole("link", { name: "Comments", exact: true }).click();
+  await page
+    .locator("header")
+    .getByRole("link", { name: "Comments", exact: true })
+    .click();
 
   await expect(page).toHaveURL("/plog/comments");
   await expect(page).toHaveTitle("(2) Comments");
