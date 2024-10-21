@@ -49,6 +49,8 @@ jobs:
 
       - name: Curious about transforms
         run: |
+          ls -l node_modules/
+          ls -l node_modules/.vite
           ls -l node_modules/.vite/deps
           du -sh node_modules/.vite/deps
 
