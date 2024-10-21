@@ -5,6 +5,9 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [react()],
   server: {
+    warmup: {
+      clientFiles: ["./src/routes.tsx"],
+    },
     port: 4000,
     proxy: {
       "/api": {
