@@ -57,6 +57,30 @@ export async function fetchComments(search: URLSearchParams) {
   return response.json();
 }
 
+export async function batchSubmitComments({
+  approve,
+  _delete,
+}: {
+  approve: string[];
+  _delete: string[];
+}) {
+  const response = await fetch(`${API_BASE}/plog/comments/both/`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      approve,
+      delete: _delete,
+    }),
+  });
+  if (response.status >= 500) {
+    throw new Error(`${response.status} on ${response.url}`);
+  }
+  return response.json();
+}
+
 export function usePrefetchBlogitem() {
   const queryClient = useQueryClient();
 
