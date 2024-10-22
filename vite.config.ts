@@ -13,9 +13,9 @@ export default defineConfig({
   },
   server: {
     warmup: {
-      clientFiles: ["./src/routes.tsx"],
+      clientFiles: ["./src/main.tsx"],
     },
-    port: 4000,
+    port: 4001,
     proxy: {
       "/api": {
         target: "http://127.0.0.1:8000",
