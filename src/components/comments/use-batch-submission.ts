@@ -4,6 +4,9 @@ export function useBatchSubmission() {
   const [toApprove, setToApprove] = useState<string[]>([]);
   const [toDelete, setToDelete] = useState<string[]>([]);
 
+  const [approved, setApproved] = useState<string[]>([]);
+  const [deleted, setDeleted] = useState<string[]>([]);
+
   function toggleToApprove(oid: string) {
     if (toApprove.includes(oid)) {
       setToApprove((prev) => prev.filter((o) => o !== oid));
@@ -22,5 +25,20 @@ export function useBatchSubmission() {
     setToApprove((prev) => prev.filter((o) => o !== oid));
   }
 
-  return { toApprove, toggleToApprove, toDelete, toggleToDelete };
+  function reset() {
+    setToApprove([]);
+    setToDelete([]);
+  }
+
+  return {
+    toApprove,
+    toggleToApprove,
+    toDelete,
+    toggleToDelete,
+    reset,
+    approved,
+    deleted,
+    setApproved,
+    setDeleted,
+  };
 }

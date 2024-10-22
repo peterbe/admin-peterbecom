@@ -1,4 +1,4 @@
-import { Alert, Box, LoadingOverlay, Text } from "@mantine/core";
+import { Alert, Box, Button, LoadingOverlay, Text } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearch } from "wouter";
@@ -14,11 +14,12 @@ export function Tree() {
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);
 
-  const { data, error, isPending, isFetching } = useQuery<CommentsServerData>({
-    queryKey: commentsQueryKey(searchParams),
-    queryFn: () => fetchComments(searchParams),
-    refetchOnWindowFocus: false,
-  });
+  const { data, error, isPending, isFetching, refetch } =
+    useQuery<CommentsServerData>({
+      queryKey: commentsQueryKey(searchParams),
+      queryFn: () => fetchComments(searchParams),
+      refetchOnWindowFocus: false,
+    });
 
   let title = "Comments";
   if (data) {
@@ -30,8 +31,17 @@ export function Tree() {
 
   const queryClient = useQueryClient();
 
-  const { toApprove, toggleToApprove, toDelete, toggleToDelete } =
-    useBatchSubmission();
+  const {
+    toApprove,
+    toggleToApprove,
+    toDelete,
+    toggleToDelete,
+    reset,
+    approved,
+    setApproved,
+    deleted,
+    setDeleted,
+  } = useBatchSubmission();
 
   return (
     <Box>
@@ -46,7 +56,25 @@ export function Tree() {
 
       {data && (
         <>
-          <BatchSubmit toApprove={toApprove} toDelete={toDelete} />
+          <BatchSubmit
+            toApprove={toApprove}
+            toDelete={toDelete}
+            setApproved={setApproved}
+            setDeleted={setDeleted}
+            reset={reset}
+          />
+
+          {(deleted.length > 0 || approved.length > 0) && (
+            <Button
+              variant="transparent"
+              size="xs"
+              onClick={() => {
+                refetch();
+              }}
+            >
+              Refetch
+            </Button>
+          )}
 
           <CommentsTree
             comments={data.comments}
@@ -60,6 +88,8 @@ export function Tree() {
             toDelete={toDelete}
             onCheckApprove={toggleToApprove}
             onCheckDelete={toggleToDelete}
+            approved={approved}
+            deleted={deleted}
           />
         </>
       )}

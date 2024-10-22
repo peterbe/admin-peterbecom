@@ -1,6 +1,7 @@
 import {
   Anchor,
   Avatar,
+  Badge,
   Box,
   Button,
   Grid,
@@ -32,6 +33,8 @@ export function CommentsTree({
   toDelete,
   onCheckApprove,
   onCheckDelete,
+  approved,
+  deleted,
 }: {
   comments: Comment[];
   disabled: boolean;
@@ -41,6 +44,8 @@ export function CommentsTree({
   toDelete: string[];
   onCheckApprove: (oid: string) => void;
   onCheckDelete: (oid: string) => void;
+  approved: string[];
+  deleted: string[];
 }) {
   let prevBlogitem = "";
   const nodes = comments.map((comment) => {
@@ -68,6 +73,8 @@ export function CommentsTree({
           toDelete={toDelete}
           onCheckApprove={onCheckApprove}
           onCheckDelete={onCheckDelete}
+          approved={approved}
+          deleted={deleted}
         />
 
         <Grid>
@@ -81,6 +88,8 @@ export function CommentsTree({
               toDelete={toDelete}
               onCheckApprove={onCheckApprove}
               onCheckDelete={onCheckDelete}
+              approved={approved}
+              deleted={deleted}
             />
           </Grid.Col>
         </Grid>
@@ -103,6 +112,8 @@ function InnerComment({
   toDelete,
   onCheckApprove,
   onCheckDelete,
+  approved,
+  deleted,
 }: {
   comment: Comment;
   disabled: boolean;
@@ -111,6 +122,8 @@ function InnerComment({
   toDelete: string[];
   onCheckApprove: (oid: string) => void;
   onCheckDelete: (oid: string) => void;
+  approved: string[];
+  deleted: string[];
 }) {
   const [editMode, setEditMode] = useState(false);
 
@@ -163,6 +176,9 @@ function InnerComment({
       refetchComments();
     },
   });
+
+  const isApproved = approved.includes(comment.oid);
+  const isDeleted = deleted.includes(comment.oid);
 
   return (
     <Box>
@@ -273,13 +289,17 @@ function InnerComment({
               Save changes
             </Button>
           )}
-          <ApprovalForm
-            comment={comment}
-            toApprove={toApprove.includes(comment.oid)}
-            toDelete={toDelete.includes(comment.oid)}
-            onCheckApprove={onCheckApprove}
-            onCheckDelete={onCheckDelete}
-          />
+          {isDeleted ? <Badge color="red">Deleted</Badge> : null}
+          {isApproved ? <Badge color="green">Approved!</Badge> : null}
+          {!isDeleted && !isApproved && !comment.approved && (
+            <ApprovalForm
+              comment={comment}
+              toApprove={toApprove.includes(comment.oid)}
+              toDelete={toDelete.includes(comment.oid)}
+              onCheckApprove={onCheckApprove}
+              onCheckDelete={onCheckDelete}
+            />
+          )}
         </Group>
 
         <DisplayClues clues={comment._clues} />
