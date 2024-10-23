@@ -83,6 +83,7 @@ const COMMENTS: Comment[] = [
       good: { text: "Good!" },
       bad: { agent: "Bad!" },
     },
+    gravatar_url: "https://www.peterbe.com/avatar.abc123.png",
   },
   {
     id: 2,
@@ -114,6 +115,7 @@ const COMMENTS: Comment[] = [
       good: {},
       bad: {},
     },
+    gravatar_url: "https://www.peterbe.com/avatar.xyz789.png",
   },
 ];
 
