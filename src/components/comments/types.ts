@@ -45,6 +45,7 @@ export type Comment = {
   _absolute_url: string;
   _bumped: boolean;
   _clues: Clues;
+  gravatar_url: string;
 };
 
 export type CommentsServerData = {

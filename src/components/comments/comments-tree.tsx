@@ -16,7 +16,6 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { DisplayDate } from "../blogitems/list-table";
 import classes from "./comments-tree.module.css";
-import { gravatarSrc } from "./gravatar-src";
 import type { Comment } from "./types";
 
 import { API_BASE, PUBLIC_BASE_URL } from "../../config";
@@ -199,7 +198,7 @@ function InnerComment({
       >
         <Group>
           <Avatar
-            src={gravatarSrc(comment)}
+            src={comment.gravatar_url}
             alt={comment.name || comment.email || "No name or email"}
             radius="xl"
           />
