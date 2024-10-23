@@ -1,4 +1,4 @@
-import { Badge, Box, Group } from "@mantine/core";
+import { Badge, Box, Group, Text } from "@mantine/core";
 import type { Clues } from "./types";
 
 export function DisplayClues({ clues }: { clues: Clues }) {
@@ -13,6 +13,9 @@ export function DisplayClues({ clues }: { clues: Clues }) {
   return (
     <Box pl={54} mt={10}>
       <Group>
+        <Text size="sm" fw={500}>
+          Clues:
+        </Text>
         {Object.entries(clues.good).map(([key, value]) => {
           return (
             <Badge

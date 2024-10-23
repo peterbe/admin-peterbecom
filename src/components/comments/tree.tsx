@@ -61,7 +61,13 @@ export function Tree() {
             toDelete={toDelete}
             setApproved={setApproved}
             setDeleted={setDeleted}
-            reset={reset}
+            reset={() => {
+              reset();
+
+              queryClient.invalidateQueries({
+                queryKey: ["count-unapproved-comments"],
+              });
+            }}
           />
 
           {(deleted.length > 0 || approved.length > 0) && (
@@ -77,6 +83,7 @@ export function Tree() {
           )}
 
           <CommentsTree
+            showTitles={true}
             comments={data.comments}
             disabled={isPending}
             refetchComments={() => {
