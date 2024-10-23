@@ -29,7 +29,7 @@ export function Filters({ disabled }: { disabled: boolean }) {
   const [search, setSearch] = useState(searchParams.get("search") || "");
 
   return (
-    <Box mb={30}>
+    <Box mb={30} data-testid="comments-filters">
       <Grid>
         <Grid.Col span={{ base: 12, md: 8, lg: 8 }}>
           <form

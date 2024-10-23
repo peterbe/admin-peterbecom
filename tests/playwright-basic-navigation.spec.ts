@@ -84,7 +84,7 @@ test("approve and delete comments", async ({ page }) => {
   await expect(page.getByText("Blabla")).toBeVisible();
   await expect(page.getByText("This has already been approved")).toBeVisible();
 
-  await page.getByText("Unapproved").click();
+  await page.getByTestId("comments-filters").getByText("Unapproved").click();
   await expect(page).toHaveTitle("(1) Comment");
   await expect(page.getByText("Blabla")).toBeVisible();
   await expect(
