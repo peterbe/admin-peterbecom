@@ -20,16 +20,20 @@ export function Home() {
           <Button size="xl" component={Link} to="/plog/add">
             Add blogitem
           </Button>
-          <Button size="xl" component={Link} to="/plog/comments">
-            Comments
-          </Button>
+
           {countUnapprovedComments && (
             <Button
               size="xl"
               component={Link}
-              to="/plog/comments?only=unapproved"
+              to={
+                countUnapprovedComments?.count
+                  ? "/plog/comments?only=unapproved"
+                  : "/plog/comments"
+              }
             >
-              ({countUnapprovedComments.count}) Unapproved Comments
+              {countUnapprovedComments?.count
+                ? `(${countUnapprovedComments.count}) Comments`
+                : "Comments"}
             </Button>
           )}
         </Group>

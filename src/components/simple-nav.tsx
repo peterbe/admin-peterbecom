@@ -16,12 +16,17 @@ export function Nav() {
           <SmartAnchor href="/">Home</SmartAnchor>
           <SmartAnchor href="/plog">Blogitems</SmartAnchor>
           <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
-          <SmartAnchor href="/plog/comments">Comments</SmartAnchor>
-          {countUnapprovedComments && (
-            <SmartAnchor href="/plog/comments?only=unapproved">
-              ({countUnapprovedComments.count}) Unapproved Comments
-            </SmartAnchor>
-          )}
+          <SmartAnchor
+            href={
+              countUnapprovedComments?.count
+                ? "/plog/comments?only=unapproved"
+                : "/plog/comments"
+            }
+          >
+            {countUnapprovedComments?.count
+              ? `(${countUnapprovedComments.count}) Comments`
+              : "Comments"}
+          </SmartAnchor>
         </Group>
 
         <Group>

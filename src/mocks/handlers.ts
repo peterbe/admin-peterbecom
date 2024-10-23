@@ -39,7 +39,8 @@ export const handlers = [
     return HttpResponse.json(PREVIEW());
   }),
 
-  http.get("/api/v0/plog/comments/", ({ request }) => {
+  http.get("/api/v0/plog/comments/", ({ request, cookies }) => {
+    if (!cookies.mocksessionid) return new HttpResponse(null, { status: 403 });
     const url = request.url;
     return COMMENTS(new URLSearchParams(new URL(url).search));
   }),
@@ -68,7 +69,9 @@ export const handlers = [
 
   http.post<SlugParams, EditBlogitemRequestBody>(
     "/api/v0/plog/:slug",
-    async ({ params, request }) => {
+    async ({ params, request, cookies }) => {
+      if (!cookies.mocksessionid)
+        return new HttpResponse(null, { status: 403 });
       const slug = params.slug;
       const body = await request.json();
       return editBlogitem({ slug, body });
@@ -82,9 +85,10 @@ export const handlers = [
 
   http.post<PathParams, AddBlogitemRequestBody>(
     "/api/v0/plog/",
-    async ({ request }) => {
+    async ({ request, cookies }) => {
+      if (!cookies.mocksessionid)
+        return new HttpResponse(null, { status: 403 });
       const body = await request.json();
-
       return addBlogItem({ body });
     },
   ),
@@ -98,7 +102,8 @@ export const handlers = [
     });
   }),
 
-  http.get("/api/v0/analytics/query", ({ request }) => {
+  http.get("/api/v0/analytics/query", ({ request, cookies }) => {
+    if (!cookies.mocksessionid) return new HttpResponse(null, { status: 403 });
     const url = request.url;
     return ANALYTICS(new URLSearchParams(new URL(url).search));
   }),
