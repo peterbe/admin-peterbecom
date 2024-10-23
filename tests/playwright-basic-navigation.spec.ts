@@ -75,14 +75,15 @@ test("approve and delete comments", async ({ page }) => {
 
   await page
     .locator("header")
-    .getByRole("link", { name: "Comments", exact: true })
+    .getByRole("link", { name: "(1) Comments" })
     .click();
 
-  await expect(page).toHaveURL("/plog/comments");
-  await expect(page).toHaveTitle("(2) Comments");
-  await page.getByText("approved", { exact: true }).click();
+  await expect(page).toHaveURL("/plog/comments?only=unapproved");
+  await expect(page).toHaveTitle("(1) Comment");
   await expect(page.getByText("Blabla")).toBeVisible();
-  await expect(page.getByText("This has already been approved")).toBeVisible();
+  await expect(
+    page.getByText("This has already been approved"),
+  ).not.toBeVisible();
 
   await page.getByTestId("comments-filters").getByText("Unapproved").click();
   await expect(page).toHaveTitle("(1) Comment");

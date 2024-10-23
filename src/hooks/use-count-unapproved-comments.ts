@@ -10,5 +10,6 @@ export function useCountUnapprovedComments() {
     queryKey: ["count-unapproved-comments"],
     queryFn: () =>
       fetchComments(new URLSearchParams({ unapproved: "only", count: "true" })),
+    retry: false,
   });
 }
