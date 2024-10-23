@@ -52,13 +52,21 @@ export function CommentsTree({
     const newTitle = prevBlogitem !== comment.blogitem.oid;
     const title =
       showTitles && newTitle ? (
-        <Anchor
-          href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}`}
-          fw={700}
-          size="lg"
+        <Box
+          style={{
+            borderBottom: "1px solid var(--mantine-color-gray-3) ",
+          }}
+          mb={20}
+          pb={10}
         >
-          {comment.blogitem.title}
-        </Anchor>
+          <Anchor
+            href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}`}
+            fw={700}
+            size="xl"
+          >
+            {comment.blogitem.title}
+          </Anchor>
+        </Box>
       ) : null;
 
     prevBlogitem = comment.blogitem.oid;
@@ -253,7 +261,7 @@ function InnerComment({
             autosize
             minRows={3}
             maxRows={10}
-            disabled={disabled}
+            disabled={disabled || mutation.isPending}
           />
         ) : (
           <Text
@@ -285,12 +293,30 @@ function InnerComment({
             {editMode ? "Close" : "Edit"}
           </Button>
           {editMode && (
-            <Button type="submit" disabled={disabled}>
+            <Button type="submit" disabled={disabled || mutation.isPending}>
               Save changes
             </Button>
           )}
-          {isDeleted ? <Badge color="red">Deleted</Badge> : null}
-          {isApproved ? <Badge color="green">Approved!</Badge> : null}
+          {isDeleted ? (
+            <Badge
+              color="red"
+              size="lg"
+              variant="gradient"
+              gradient={{ from: "red", to: "orange", deg: 138 }}
+            >
+              Deleted
+            </Badge>
+          ) : null}
+          {isApproved ? (
+            <Badge
+              color="green"
+              size="lg"
+              variant="gradient"
+              gradient={{ from: "green", to: "cyan", deg: 138 }}
+            >
+              Approved!
+            </Badge>
+          ) : null}
           {!isDeleted && !isApproved && !comment.approved && (
             <ApprovalForm
               comment={comment}
