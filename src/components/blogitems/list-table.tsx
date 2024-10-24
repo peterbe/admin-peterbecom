@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Highlight,
+  Loader,
   LoadingOverlay,
   Table,
   TextInput,
@@ -19,6 +20,7 @@ import type { BlogitemsServerData } from "../../types";
 import { usePrefetchBlogitem } from "../api-utils";
 import { formatDistanceCompact } from "./format-distance-compact";
 import { SearchTips } from "./search-tips";
+import type { PageviewsByDate, PageviewsByOID } from "./types";
 
 export function ListTable({
   search,
@@ -26,12 +28,14 @@ export function ListTable({
   data,
   updateSearch,
   isPending,
+  pageviews,
 }: {
   search: string;
   orderBy: string;
   data: BlogitemsServerData | undefined;
   updateSearch: (s: string) => void;
   isPending: boolean;
+  pageviews: PageviewsByOID;
 }) {
   const [value, setValue] = useState(search);
 
@@ -80,6 +84,7 @@ export function ListTable({
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Title</Table.Th>
+              <Table.Th>Pageviews</Table.Th>
               <Table.Th
                 // For long date displays like "about 2 months ago"
                 style={!matchesMobile ? { minWidth: 170 } : undefined}
@@ -97,7 +102,7 @@ export function ListTable({
               </Table.Th>
             </Table.Tr>
             <Table.Tr>
-              <Table.Td>
+              <Table.Td colSpan={2}>
                 <TextInput
                   placeholder="Search"
                   aria-label="Search"
@@ -131,7 +136,7 @@ export function ListTable({
           {showTips && (
             <Table.Tbody>
               <Table.Tr>
-                <Table.Td colSpan={2}>
+                <Table.Td colSpan={3}>
                   <SearchTips
                     append={(s: string) => {
                       setValue((v) => {
@@ -207,6 +212,15 @@ export function ListTable({
                     ) : null}
                   </Table.Td>
                   <Table.Td>
+                    {pageviews.has(item.oid) ? (
+                      <Pageviews
+                        dates={pageviews.get(item.oid) as PageviewsByDate[]}
+                      />
+                    ) : (
+                      <Loader color="blue" size="xs" type="dots" />
+                    )}
+                  </Table.Td>
+                  <Table.Td>
                     <DisplayDate
                       date={
                         orderBy === "pub_date"
@@ -254,4 +268,35 @@ export function DisplayDate({
         : formatDistance(dateObj, nowObj, { addSuffix: true })}
     </span>
   );
+}
+
+function Pageviews({ dates }: { dates: PageviewsByDate[] }) {
+  const first = dates[0];
+  if (!first) {
+    return <span style={{ color: "gray" }}>n/a</span>;
+  }
+
+  return (
+    <>
+      {first.count} <Delta dates={dates} />
+    </>
+  );
+}
+
+function Delta({ dates }: { dates: PageviewsByDate[] }) {
+  if (dates.length >= 2) {
+    const delta = dates[0].count - dates[1].count;
+    if (delta === 0) {
+      return <span style={{ color: "gray" }}>±0</span>;
+    }
+    return delta > 0 ? (
+      <span style={{ color: "green" }}>+{delta}</span>
+    ) : (
+      <span style={{ color: "red" }}>{delta}</span>
+    );
+  }
+  if (dates.length === 1) {
+    return <span style={{ color: "orange" }}>{dates[0].count}</span>;
+  }
+  return <span style={{ color: "orange" }}>n/a</span>;
 }
