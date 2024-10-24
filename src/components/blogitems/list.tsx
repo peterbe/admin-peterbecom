@@ -1,19 +1,31 @@
 import { Alert, Box } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 
+import { useLocalStorage } from "@mantine/hooks";
 import { useLocation, useSearch } from "wouter";
 import { API_BASE } from "../../config";
 import type { BlogitemsServerData } from "../../types";
 import { ListTable } from "./list-table";
+import { PaginationSize } from "./pagination-size";
+
+const DEFAULT_SIZE = "10";
 
 export function List() {
   const [location, navigate] = useLocation();
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);
+  const [paginationSize, setPaginationSize] = useLocalStorage<string>({
+    key: "pagination-size",
+    defaultValue: DEFAULT_SIZE,
+  });
   const search = searchParams.get("search") || "";
   const orderBy = searchParams.get("orderBy") || "modify_date";
 
-  const sp = new URLSearchParams({ search, order: orderBy });
+  const sp = new URLSearchParams({
+    search,
+    order: orderBy,
+    batch_size: `${paginationSize}`,
+  });
   const apiUrl = `${API_BASE}/plog/?${sp}`;
 
   const { data, error, isPending } = useQuery<BlogitemsServerData>({
@@ -48,6 +60,12 @@ export function List() {
           }
           navigate(sp.toString() ? `?${sp.toString()}` : location);
         }}
+      />
+
+      <PaginationSize
+        value={paginationSize}
+        setValue={setPaginationSize}
+        disabled={!data || data.blogitems.length === 0}
       />
     </Box>
   );
