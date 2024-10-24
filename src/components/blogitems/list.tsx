@@ -7,6 +7,7 @@ import { API_BASE } from "../../config";
 import type { BlogitemsServerData } from "../../types";
 import { ListTable } from "./list-table";
 import { PaginationSize } from "./pagination-size";
+import { useRecentPageviews } from "./use-pageviews";
 
 const DEFAULT_SIZE = "10";
 
@@ -41,7 +42,6 @@ export function List() {
 
   const blogitems = data?.blogitems || [];
   const pageviews = useRecentPageviews(blogitems);
-  console.log(pageviews);
 
   return (
     <Box>
