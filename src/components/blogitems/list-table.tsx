@@ -16,6 +16,7 @@ import { useState } from "react";
 
 import { useMediaQuery } from "@mantine/hooks";
 import { Link, useSearch } from "wouter";
+import { thousands } from "../../number-formatter";
 import type { BlogitemsServerData } from "../../types";
 import { usePrefetchBlogitem } from "../api-utils";
 import { formatDistanceCompact } from "./format-distance-compact";
@@ -212,7 +213,7 @@ export function ListTable({
                     ) : null}
                   </Table.Td>
                   <Table.Td>
-                    {pageviews.has(item.oid) ? (
+                    {(pageviews.get(item.oid) || []).length > 0 ? (
                       <Pageviews
                         dates={pageviews.get(item.oid) as PageviewsByDate[]}
                       />
@@ -271,32 +272,41 @@ export function DisplayDate({
 }
 
 function Pageviews({ dates }: { dates: PageviewsByDate[] }) {
-  const first = dates[0];
-  if (!first) {
+  if (dates.length === 0) {
     return <span style={{ color: "gray" }}>n/a</span>;
   }
+  if (dates.length === 1) {
+    const first = dates[0];
+    return <span style={{ color: "green" }}>{largeNumber(first.count)}</span>;
+  }
 
+  return <Delta first={dates[0]} second={dates[1]} />;
+}
+
+function Delta({
+  first,
+  second,
+}: {
+  first: PageviewsByDate;
+  second: PageviewsByDate;
+}) {
+  const delta = first.count - second.count;
+  if (delta === 0) {
+    return <span style={{ color: "gray" }}>±0</span>;
+  }
   return (
-    <>
-      {first.count} <Delta dates={dates} />
-    </>
+    <span style={{ color: delta > 0 ? "green" : "red" }}>
+      {largeNumber(second.count)} &rarr; {largeNumber(first.count)}
+    </span>
   );
 }
 
-function Delta({ dates }: { dates: PageviewsByDate[] }) {
-  if (dates.length >= 2) {
-    const delta = dates[0].count - dates[1].count;
-    if (delta === 0) {
-      return <span style={{ color: "gray" }}>±0</span>;
-    }
-    return delta > 0 ? (
-      <span style={{ color: "green" }}>+{delta}</span>
-    ) : (
-      <span style={{ color: "red" }}>{delta}</span>
-    );
+function largeNumber(n: number) {
+  if (n > 10_000) {
+    return `${(n / 1_000).toFixed(1)}k`;
   }
-  if (dates.length === 1) {
-    return <span style={{ color: "orange" }}>{dates[0].count}</span>;
+  if (n > 1_000) {
+    return thousands(n);
   }
-  return <span style={{ color: "orange" }}>n/a</span>;
+  return `${n}`;
 }

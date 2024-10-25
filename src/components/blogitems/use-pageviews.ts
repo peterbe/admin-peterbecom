@@ -42,19 +42,15 @@ export function useRecentPageviews(blogitems: BlogitemT[]): PageviewsByOID {
     refetchOnWindowFocus: process.env.NODE_ENV === "development",
   });
 
-  //   console.log("ANALYTICS", analytics.data);
-
   const map = new Map<string, PageviewsByDate[]>();
   for (const b of blogitems) {
     map.set(b.oid, []);
   }
   for (const row of analytics.data?.rows || []) {
-    // console.log("ROW:", row);
     const pathname = row.pathname as string;
     const oid = pathname.replace("/plog/", "");
     const date = row.date as string;
     const count = row.count as number;
-    // console.log({ oid, date, count });
     if (map.has(oid)) {
       const existing = map.get(oid) || [];
       existing.push({ date, count });
