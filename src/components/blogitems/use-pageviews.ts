@@ -3,10 +3,6 @@ import type { BlogitemT, QueryResult } from "../../types";
 import { fetchAnalyticsQuery } from "../api-utils";
 import type { PageviewsByDate, PageviewsByOID } from "./types";
 
-// type PageviewsT = {
-//     [oid: string]: PageviewsByDate;
-// }
-
 export function useRecentPageviews(blogitems: BlogitemT[]): PageviewsByOID {
   const interval = "month";
   const days = 60;
