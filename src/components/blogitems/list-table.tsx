@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Highlight,
+  Loader,
   LoadingOverlay,
   Table,
   TextInput,
@@ -15,10 +16,12 @@ import { useState } from "react";
 
 import { useMediaQuery } from "@mantine/hooks";
 import { Link, useSearch } from "wouter";
+import { thousands } from "../../number-formatter";
 import type { BlogitemsServerData } from "../../types";
 import { usePrefetchBlogitem } from "../api-utils";
 import { formatDistanceCompact } from "./format-distance-compact";
 import { SearchTips } from "./search-tips";
+import type { PageviewsByDate, PageviewsByOID } from "./types";
 
 export function ListTable({
   search,
@@ -26,12 +29,14 @@ export function ListTable({
   data,
   updateSearch,
   isPending,
+  pageviews,
 }: {
   search: string;
   orderBy: string;
   data: BlogitemsServerData | undefined;
   updateSearch: (s: string) => void;
   isPending: boolean;
+  pageviews: PageviewsByOID;
 }) {
   const [value, setValue] = useState(search);
 
@@ -80,6 +85,7 @@ export function ListTable({
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Title</Table.Th>
+              <Table.Th>Pageviews</Table.Th>
               <Table.Th
                 // For long date displays like "about 2 months ago"
                 style={!matchesMobile ? { minWidth: 170 } : undefined}
@@ -97,7 +103,7 @@ export function ListTable({
               </Table.Th>
             </Table.Tr>
             <Table.Tr>
-              <Table.Td>
+              <Table.Td colSpan={2}>
                 <TextInput
                   placeholder="Search"
                   aria-label="Search"
@@ -131,7 +137,7 @@ export function ListTable({
           {showTips && (
             <Table.Tbody>
               <Table.Tr>
-                <Table.Td colSpan={2}>
+                <Table.Td colSpan={3}>
                   <SearchTips
                     append={(s: string) => {
                       setValue((v) => {
@@ -207,6 +213,15 @@ export function ListTable({
                     ) : null}
                   </Table.Td>
                   <Table.Td>
+                    {(pageviews.get(item.oid) || []).length > 0 ? (
+                      <Pageviews
+                        dates={pageviews.get(item.oid) as PageviewsByDate[]}
+                      />
+                    ) : (
+                      <Loader color="blue" size="xs" type="dots" />
+                    )}
+                  </Table.Td>
+                  <Table.Td>
                     <DisplayDate
                       date={
                         orderBy === "pub_date"
@@ -254,4 +269,44 @@ export function DisplayDate({
         : formatDistance(dateObj, nowObj, { addSuffix: true })}
     </span>
   );
+}
+
+function Pageviews({ dates }: { dates: PageviewsByDate[] }) {
+  if (dates.length === 0) {
+    return <span style={{ color: "gray" }}>n/a</span>;
+  }
+  if (dates.length === 1) {
+    const first = dates[0];
+    return <span style={{ color: "green" }}>{largeNumber(first.count)}</span>;
+  }
+
+  return <Delta first={dates[0]} second={dates[1]} />;
+}
+
+function Delta({
+  first,
+  second,
+}: {
+  first: PageviewsByDate;
+  second: PageviewsByDate;
+}) {
+  const delta = first.count - second.count;
+  if (delta === 0) {
+    return <span style={{ color: "gray" }}>±0</span>;
+  }
+  return (
+    <span style={{ color: delta > 0 ? "green" : "red" }}>
+      {largeNumber(second.count)} &rarr; {largeNumber(first.count)}
+    </span>
+  );
+}
+
+function largeNumber(n: number) {
+  if (n > 10_000) {
+    return `${(n / 1_000).toFixed(1)}k`;
+  }
+  if (n > 1_000) {
+    return thousands(n);
+  }
+  return `${n}`;
 }
