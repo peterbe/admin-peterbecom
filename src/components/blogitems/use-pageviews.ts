@@ -1,12 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import type { BlogitemT, QueryResult } from "../../types";
 import { fetchAnalyticsQuery } from "../api-utils";
-import type { PageviewsByDate, PageviewsByOID } from "./types";
+import type { PageviewsByDate } from "./types";
 
-export function useRecentPageviews(blogitems: BlogitemT[]): PageviewsByOID {
+export function useRecentPageviews(
+  blogitems: BlogitemT[],
+): Map<string, PageviewsByDate[]> {
+  const [cache, setCache] = useState<Map<string, PageviewsByDate[]>>(
+    () => new Map(),
+  );
   const interval = "month";
   const days = 60;
-  const pathnames = blogitems.map((b) => `/plog/${b.oid}`);
+  const oids = blogitems
+    .map((b) => b.oid)
+    .filter((oid) => {
+      return !cache.has(oid);
+    });
+  const pathnames = oids.map((oid) => `/plog/${oid}`);
   const analytics = useQuery<QueryResult>({
     queryKey: ["recent-pageviews", interval, days, ...pathnames],
     queryFn: async () => {
@@ -38,23 +49,26 @@ export function useRecentPageviews(blogitems: BlogitemT[]): PageviewsByOID {
     refetchOnWindowFocus: process.env.NODE_ENV === "development",
   });
 
-  const map = new Map<string, PageviewsByDate[]>();
-  for (const b of blogitems) {
-    map.set(b.oid, []);
-  }
-  for (const row of analytics.data?.rows || []) {
-    const pathname = row.pathname as string;
-    const oid = pathname.replace("/plog/", "");
-    const date = row.date as string;
-    const count = row.count as number;
-    if (map.has(oid)) {
-      const existing = map.get(oid) || [];
+  useEffect(() => {
+    const acc = new Map<string, PageviewsByDate[]>();
+    for (const row of analytics.data?.rows || []) {
+      const pathname = row.pathname as string;
+      const oid = pathname.replace("/plog/", "");
+      const date = row.date as string;
+      const count = row.count as number;
+      const existing = acc.get(oid) || [];
       existing.push({ date, count });
-      map.set(oid, existing);
-    } else {
-      map.set(oid, [{ date, count }]);
+      acc.set(oid, existing);
     }
-  }
 
-  return map;
+    setCache((map) => {
+      const copy = new Map(map);
+      for (const [oid, value] of acc) {
+        copy.set(oid, value);
+      }
+      return copy;
+    });
+  }, [analytics.data]);
+
+  return cache;
 }
