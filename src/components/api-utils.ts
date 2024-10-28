@@ -75,6 +75,16 @@ export async function batchSubmitComments({
       delete: _delete,
     }),
   });
+  if (response.status === 400) {
+    let message = "400 Validation error";
+    try {
+      const json = await response.json();
+      message += ` (${JSON.stringify(json)})`;
+    } catch (e) {
+      console.warn("Unabled to format json error", e);
+    }
+    throw new Error(message);
+  }
   if (response.status >= 500) {
     throw new Error(`${response.status} on ${response.url}`);
   }

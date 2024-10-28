@@ -323,6 +323,7 @@ function InnerComment({
               toDelete={toDelete.includes(comment.oid)}
               onCheckApprove={onCheckApprove}
               onCheckDelete={onCheckDelete}
+              disabled={disabled}
             />
           )}
         </Group>

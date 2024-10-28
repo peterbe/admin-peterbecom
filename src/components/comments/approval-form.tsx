@@ -8,16 +8,19 @@ export function ApprovalForm({
   toDelete,
   onCheckApprove,
   onCheckDelete,
+  disabled,
 }: {
   comment: Comment;
   toApprove: boolean;
   toDelete: boolean;
   onCheckApprove: (oid: string) => void;
   onCheckDelete: (oid: string) => void;
+  disabled: boolean;
 }) {
   return (
     <Group>
       <Checkbox
+        disabled={disabled}
         classNames={classes}
         checked={toApprove}
         label="Approve"
@@ -30,6 +33,7 @@ export function ApprovalForm({
         }}
       />
       <Checkbox
+        disabled={disabled}
         classNames={classes}
         checked={toDelete}
         label="Delete"
