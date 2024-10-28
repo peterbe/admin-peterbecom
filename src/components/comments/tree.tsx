@@ -7,6 +7,7 @@ import { commentsQueryKey, fetchComments } from "../api-utils";
 import { BatchSubmit } from "./batch-submit";
 import { CommentsTree } from "./comments-tree";
 import { Filters } from "./filters";
+import { NoComments } from "./no-comments";
 import type { CommentsServerData } from "./types";
 import { useBatchSubmission } from "./use-batch-submission";
 
@@ -42,6 +43,11 @@ export function Tree() {
     deleted,
     setDeleted,
   } = useBatchSubmission();
+
+  const isMutatatingBatchSubmit =
+    queryClient.isMutating({
+      mutationKey: ["batch-submit"],
+    }) > 0;
 
   return (
     <Box>
@@ -82,10 +88,12 @@ export function Tree() {
             </Button>
           )}
 
+          {data.comments.length === 0 && <NoComments />}
+
           <CommentsTree
             showTitles={true}
             comments={data.comments}
-            disabled={isPending}
+            disabled={isPending || isMutatatingBatchSubmit}
             refetchComments={() => {
               queryClient.invalidateQueries({
                 queryKey: commentsQueryKey(searchParams),
