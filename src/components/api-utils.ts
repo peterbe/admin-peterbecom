@@ -18,6 +18,9 @@ export function commentsQueryKey(searchParams: URLSearchParams) {
 export function blogitemsQueryKey() {
   return ["blogitems"];
 }
+export function blogitemsShowAllQueryKey() {
+  return ["blogitems", "show-all"];
+}
 
 export async function fetchBlogitem(oid: string) {
   const response = await fetch(`${API_BASE}/plog/${oid}`);
@@ -38,6 +41,15 @@ export async function fetchAnalyticsQuery(query: string) {
     throw new Error(`${response.status} on ${response.url}`);
   }
   return await response.json();
+}
+
+export async function fetchShowAllBlogitems() {
+  const sp = new URLSearchParams({ show: "all" });
+  const response = await fetch(`${API_BASE}/plog/?${sp}`);
+  if (!response.ok) {
+    throw new Error(`${response.status} on ${response.url}`);
+  }
+  return response.json();
 }
 
 export async function fetchComments(search: URLSearchParams) {

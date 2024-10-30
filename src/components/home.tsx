@@ -3,6 +3,7 @@ import { useDocumentTitle } from "@mantine/hooks";
 import { Link } from "wouter";
 
 import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments";
+import { NavigationSearch } from "./navigation-search";
 import { SignedIn } from "./signed-in";
 
 export function Home() {
@@ -13,6 +14,11 @@ export function Home() {
   return (
     <SignedIn>
       <Box m={100}>
+        <Group justify="center">
+          <Box p={50}>
+            <NavigationSearch />
+          </Box>
+        </Group>
         <Group justify="center">
           <Button size="xl" component={Link} to="/plog">
             Blogitems
