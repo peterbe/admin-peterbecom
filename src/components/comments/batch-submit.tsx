@@ -29,11 +29,15 @@ export function BatchSubmit({
     onSuccess: (result) => {
       let message = "";
       if (result.approved.length > 0) {
-        message += `${result.approved.length} comments approved. `;
+        message += `${result.approved.length} comment${
+          result.approved.length === 1 ? "" : "s"
+        } approved. `;
         setApproved(result.approved);
       }
       if (result.deleted.length > 0) {
-        message += `${result.deleted.length} comments deleted. `;
+        message += `${result.deleted.length} comment${
+          result.deleted.length === 1 ? "" : "s"
+        } deleted. `;
         setDeleted(result.deleted);
       }
 
