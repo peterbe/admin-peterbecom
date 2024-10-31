@@ -6,6 +6,7 @@ import {
   Button,
   type ComboboxItem,
   Group,
+  type MantineSize,
   type OptionsFilter,
   Text,
 } from "@mantine/core";
@@ -55,7 +56,13 @@ const renderAutocompleteOption: AutocompleteProps["renderOption"] = (props) => {
   );
 };
 
-export function NavigationSearch() {
+export function NavigationSearch({
+  w,
+  size,
+}: {
+  w?: number;
+  size?: MantineSize;
+}) {
   const [, navigate] = useLocation();
   const { data, isError, error, isPending, refetch } =
     useQuery<ShowAllBlogitems>({
@@ -80,8 +87,8 @@ export function NavigationSearch() {
         </Alert>
       )}
       <Autocomplete
-        size="xl"
-        w={500}
+        size={size}
+        w={w}
         placeholder="Search titles or OIDs"
         data={items}
         filter={optionsFilter}

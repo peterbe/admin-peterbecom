@@ -9,8 +9,8 @@ test("add, find, edit blogitem", async ({ page }) => {
     .locator("header")
     .getByRole("link", { name: "Add blogitem" })
     .click();
-  await page.getByPlaceholder("Title").click();
-  await page.getByPlaceholder("Title").fill("Hello World!");
+  await page.getByPlaceholder("Title", { exact: true }).click();
+  await page.getByPlaceholder("Title", { exact: true }).fill("Hello World!");
   await page.getByLabel("Text *").click();
   await page.getByLabel("Text *").fill("Hello!");
   await expect(page.getByTestId("preview")).toHaveText("Hello world");
@@ -49,12 +49,12 @@ test("add, find, edit blogitem", async ({ page }) => {
     .click();
   await expect(page).toHaveURL("/plog");
 
-  await page.getByPlaceholder("Search").click();
-  await page.getByPlaceholder("Search").fill("xxx");
-  await page.getByPlaceholder("Search").press("Enter");
+  await page.getByPlaceholder("Search", { exact: true }).click();
+  await page.getByPlaceholder("Search", { exact: true }).fill("xxx");
+  await page.getByPlaceholder("Search", { exact: true }).press("Enter");
   await page.getByRole("button", { name: "Clear" }).click();
-  await page.getByPlaceholder("Search").fill("hello");
-  await page.getByPlaceholder("Search").press("Enter");
+  await page.getByPlaceholder("Search", { exact: true }).fill("hello");
+  await page.getByPlaceholder("Search", { exact: true }).press("Enter");
   await page.getByRole("link", { name: "Hello World" }).click();
   await expect(page).toHaveTitle(/Edit hello-world/);
 
@@ -66,6 +66,12 @@ test("add, find, edit blogitem", async ({ page }) => {
 
   await expect(page.getByText("Pageviews")).toBeVisible();
   await expect(page.getByText("Not enough data to show a graph")).toBeVisible();
+
+  await page.getByRole("link", { name: "Home" }).click();
+  await page.getByPlaceholder("Search titles or OIDs").click();
+  await page.getByPlaceholder("Search titles or OIDs").fill("hello");
+  await page.getByPlaceholder("Search titles or OIDs").press("Enter");
+  await page.getByRole("option", { name: "Hello World!" }).click();
 });
 
 test("approve and delete comments", async ({ page }) => {
