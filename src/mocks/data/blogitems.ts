@@ -79,6 +79,19 @@ export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
 }
 
 export const BLOGITEMS = (params: URLSearchParams) => {
+  const showAll = params.get("show") === "all";
+  if (showAll) {
+    const blogitems = Object.values(getBlogitems()).map((item) => {
+      return {
+        id: item.id,
+        oid: item.oid,
+        title: item.title,
+      };
+    });
+    return HttpResponse.json({
+      blogitems,
+    });
+  }
   const filtered = Object.values(getBlogitems()).filter((item) => {
     return (
       !params.get("search") ||

@@ -56,7 +56,7 @@ export function Preview({
           data-testid="preview"
           bg="var(--mantine-color-gray-0)"
           bd={"1px solid var(--mantine-color-gray-3)"}
-          h={790}
+          h={190}
           pt={2}
           pb={2}
           pl={10}

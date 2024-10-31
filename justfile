@@ -41,11 +41,11 @@ install:
 outdated:
     npx npm-check-updates --interactive
 
-playwright-test:
+test-playwright:
     curl -s http://localhost:4001 > /dev/null
     PLAYWRIGHT_BASE_URL=http://localhost:4001 npx playwright test
 
 test-manifest:
     npm run test-manifest -- http://localhost:4001
 
-test: playwright-test test-manifest
+test: test-playwright test-manifest

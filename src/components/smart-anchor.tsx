@@ -1,22 +1,16 @@
-import { Anchor } from "@mantine/core";
-import { Link, useLocation } from "wouter";
+import { Anchor, type AnchorProps } from "@mantine/core";
+import { Link, type LinkProps, useLocation } from "wouter";
 
-export function SmartAnchor({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+export function SmartAnchor({ ...props }: AnchorProps & LinkProps) {
   const [location] = useLocation();
 
+  const { href, ...rest } = props;
   return (
     <Anchor
       component={Link}
       href={href}
       underline={location === href ? "never" : "always"}
-    >
-      {children}
-    </Anchor>
+      {...rest}
+    />
   );
 }
