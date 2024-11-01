@@ -18,8 +18,13 @@ export function commentsQueryKey(searchParams: URLSearchParams) {
 export function blogitemsQueryKey() {
   return ["blogitems"];
 }
+
 export function blogitemsShowAllQueryKey() {
   return ["blogitems", "show-all"];
+}
+
+export function spamSignaturesQueryKey() {
+  return ["spam", "signatures"];
 }
 
 export async function fetchBlogitem(oid: string) {
@@ -31,6 +36,18 @@ export async function fetchBlogitem(oid: string) {
     throw new Error(`${response.status} on ${response.url}`);
   }
   return await response.json();
+}
+
+export async function fetchSpamSignatures() {
+  return standardFetch(`${API_BASE}/spam/signatures`);
+}
+
+async function standardFetch(url: string) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`${response.status} on ${response.url}`);
+  }
+  return response.json();
 }
 
 export async function fetchAnalyticsQuery(query: string) {

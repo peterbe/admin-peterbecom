@@ -76,3 +76,12 @@ export type QueryResult = {
   meta: QueryMetaResult;
   error: string | null;
 };
+
+export type SpamSignature = {
+  id: number;
+  name: string | null;
+  email: string | null;
+  kills: number;
+  add_date: string;
+  modify_date: string;
+};
