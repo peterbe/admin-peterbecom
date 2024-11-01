@@ -12,7 +12,7 @@ export function Home() {
 
   return (
     <SignedIn>
-      <Box m={100}>
+      <Box m={50}>
         <Group justify="center">
           <Button size="xl" component={Link} to="/plog">
             Blogitems
@@ -36,6 +36,16 @@ export function Home() {
                 : "Comments"}
             </Button>
           )}
+        </Group>
+      </Box>
+      <Box m={100}>
+        <Group justify="center">
+          <Button size="xl" component={Link} to="/spam/signatures">
+            Spam Comment Signatures
+          </Button>
+          <Button size="xl" component={Link} to="/spam/patterns">
+            Spam Comment Patterns
+          </Button>
         </Group>
       </Box>
     </SignedIn>

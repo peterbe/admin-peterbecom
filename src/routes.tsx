@@ -21,12 +21,11 @@ function LC(Component: LazyComponentT, loadingText = "") {
   };
 }
 
-// const Blogitems = LC(lazy(() => import("./components/blogitems")));
-// const Blogitem = LC(lazy(() => import("./components/blogitem")));
 const OpenGraphImage = LC(
   lazy(() => import("./components/blogitem/open-graph-image")),
 );
 const Images = LC(lazy(() => import("./components/blogitem/images")));
+const SpamSignatures = LC(lazy(() => import("./components/spam/signatures")));
 
 export function Routes() {
   return (
@@ -39,6 +38,7 @@ export function Routes() {
         <Route path="/plog/:oid/open-graph-image" component={OpenGraphImage} />
         <Route path="/plog/:oid/images" component={Images} />
         <Route path="/plog" component={Blogitems} />
+        <Route path="/spam/signatures" component={SpamSignatures} />
         <Route>
           <Custom404 />
         </Route>
