@@ -41,7 +41,6 @@ export type EditBlogitemT = {
   codesyntax: string;
   disallow_comments: boolean;
   hide_comments: boolean;
-  // modify_date: string;
   open_graph_image: string | null;
   _absolute_url: string;
   archived: null | string;
@@ -81,6 +80,16 @@ export type SpamSignature = {
   id: number;
   name: string | null;
   email: string | null;
+  kills: number;
+  add_date: string;
+  modify_date: string;
+};
+
+export type SpamPattern = {
+  id: number;
+  pattern: string;
+  is_regex: boolean;
+  is_url_pattern: boolean;
   kills: number;
   add_date: string;
   modify_date: string;

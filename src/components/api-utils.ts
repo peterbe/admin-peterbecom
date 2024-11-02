@@ -27,6 +27,10 @@ export function spamSignaturesQueryKey() {
   return ["spam", "signatures"];
 }
 
+export function spamPatternsQueryKey() {
+  return ["spam", "patterns"];
+}
+
 export async function fetchBlogitem(oid: string) {
   const response = await fetch(`${API_BASE}/plog/${oid}`);
   if (response.status === 404) {
@@ -39,7 +43,11 @@ export async function fetchBlogitem(oid: string) {
 }
 
 export async function fetchSpamSignatures() {
-  return standardFetch(`${API_BASE}/spam/signatures`);
+  return standardFetch(`${API_BASE}/plog/spam/signatures`);
+}
+
+export async function fetchSpamPatterns() {
+  return standardFetch(`${API_BASE}/plog/spam/patterns`);
 }
 
 async function standardFetch(url: string) {
