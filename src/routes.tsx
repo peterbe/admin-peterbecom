@@ -26,6 +26,7 @@ const OpenGraphImage = LC(
 );
 const Images = LC(lazy(() => import("./components/blogitem/images")));
 const SpamSignatures = LC(lazy(() => import("./components/spam/signatures")));
+const SpamPatterns = LC(lazy(() => import("./components/spam/patterns")));
 
 export function Routes() {
   return (
@@ -39,6 +40,7 @@ export function Routes() {
         <Route path="/plog/:oid/images" component={Images} />
         <Route path="/plog" component={Blogitems} />
         <Route path="/spam/signatures" component={SpamSignatures} />
+        <Route path="/spam/patterns" component={SpamPatterns} />
         <Route>
           <Custom404 />
         </Route>
