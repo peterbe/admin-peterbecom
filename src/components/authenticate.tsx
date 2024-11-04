@@ -2,7 +2,7 @@ import { Alert, Container, Paper } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
 import { useLocation } from "wouter";
 
-import { useUserData } from "../hooks/use-userdata";
+import { useUserData } from "../whoami/use-userdata";
 
 export function Authenticate() {
   useDocumentTitle("Sign in");

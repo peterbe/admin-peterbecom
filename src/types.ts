@@ -1,11 +1,3 @@
-export type User = {
-  username: string;
-  email: string;
-  is_superuser: boolean;
-  picture_url: string;
-  csrfmiddlewaretoken: string;
-};
-
 export type CategoryT = {
   id: number;
   name: string;

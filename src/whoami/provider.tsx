@@ -1,23 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { createContext, useEffect } from "react";
-
-import type { User } from "../types";
-
-export type UserData = {
-  user: null | User;
-};
-
-type UserContext = {
-  userData: UserData | null;
-  userError: Error | null;
-};
-
-// const UserDataContext = createContext<UserData | null>(null)
-export const UserDataContext = createContext<UserContext>({
-  userData: null,
-  userError: null,
-});
+import { useEffect } from "react";
+import { UserDataContext } from "./context";
+import type { UserContext, UserData } from "./types";
 
 // The argument for using sessionStorage rather than localStorage is because
 // it's marginally simpler and "safer". For example, if we use localStorage

@@ -1,7 +1,7 @@
 import { Alert, Box, Button, LoadingOverlay } from "@mantine/core";
 import type { ReactNode } from "react";
 
-import { useUserData } from "../hooks/use-userdata";
+import { useUserData } from "../whoami/use-userdata";
 import { Authenticate } from "./authenticate";
 
 export function SignedIn({ children }: { children: ReactNode }) {
