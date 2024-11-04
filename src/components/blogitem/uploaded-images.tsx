@@ -16,7 +16,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import type { ImageT } from "../../hooks/use-images";
-import { useUserData } from "../../hooks/use-userdata";
+import { useUserData } from "../../whoami/use-userdata";
 import { JSONPost } from "../json-post";
 import { AbsoluteImage } from "./absolute-image";
 

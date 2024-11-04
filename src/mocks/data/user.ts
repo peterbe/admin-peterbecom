@@ -1,4 +1,4 @@
-import type { User } from "../../types";
+import type { User } from "../../whoami/types";
 
 export const USER = ({ cookies }: { cookies?: Record<string, string> }) => {
   if (cookies && cookies.mocksessionid === "mruser") {

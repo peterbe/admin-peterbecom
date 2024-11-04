@@ -3,7 +3,7 @@ import { Avatar, Box, Burger, Divider, Drawer, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconHome } from "@tabler/icons-react";
 import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments";
-import { useUserData } from "../hooks/use-userdata";
+import { useUserData } from "../whoami/use-userdata";
 import { NavigationSearch } from "./navigation-search";
 import { SmartAnchor } from "./smart-anchor";
 

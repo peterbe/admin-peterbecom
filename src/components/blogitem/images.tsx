@@ -26,7 +26,7 @@ import { useForm } from "@mantine/form";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useImages } from "../../hooks/use-images";
-import { useUserData } from "../../hooks/use-userdata";
+import { useUserData } from "../../whoami/use-userdata";
 import { JSONPost } from "../json-post";
 import { UploadedImages } from "./uploaded-images";
 
