@@ -23,6 +23,10 @@ export type Clues = {
   bad: { [key: string]: string };
 };
 
+type InlineCommentClassification = {
+  classification: string;
+};
+
 export type Comment = {
   id: number;
   oid: string;
@@ -46,10 +50,19 @@ export type Comment = {
   _bumped: boolean;
   _clues: Clues;
   gravatar_url: string;
+  classification: InlineCommentClassification | null;
 };
 
 export type CommentsServerData = {
   comments: Comment[];
   count: number;
   oldest: string;
+};
+
+export type Classification = {
+  id: number;
+  text: string;
+  classification: string;
+  add_date: string;
+  modify_date: string;
 };
