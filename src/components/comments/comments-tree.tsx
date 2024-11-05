@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { DisplayDate } from "../blogitems/list-table";
 import classes from "./comments-tree.module.css";
@@ -20,6 +20,7 @@ import type { Comment } from "./types";
 
 import { API_BASE, PUBLIC_BASE_URL } from "../../config";
 import { ApprovalForm } from "./approval-form";
+import { ClassifyComment } from "./classify";
 import { DisplayClues } from "./clues";
 import { DisplayLocation } from "./location";
 
@@ -133,6 +134,7 @@ function InnerComment({
   deleted: string[];
 }) {
   const [editMode, setEditMode] = useState(false);
+  const [classifyMode, setClassifyMode] = useState(false);
 
   const form = useForm({
     mode: "uncontrolled",
@@ -186,6 +188,8 @@ function InnerComment({
 
   const isApproved = approved.includes(comment.oid);
   const isDeleted = deleted.includes(comment.oid);
+
+  const queryClient = useQueryClient();
 
   return (
     <Box>
@@ -271,6 +275,18 @@ function InnerComment({
           />
         )}
 
+        {classifyMode && (
+          <ClassifyComment
+            comment={comment}
+            onClose={() => {
+              setClassifyMode(false);
+              queryClient.invalidateQueries({
+                queryKey: ["comments"],
+              });
+            }}
+          />
+        )}
+
         <Group>
           <Button
             ml={54}
@@ -296,6 +312,22 @@ function InnerComment({
               Save changes
             </Button>
           )}
+
+          <Button
+            variant="light"
+            color={comment.classification ? "lime" : undefined}
+            onClick={() => {
+              setClassifyMode((p) => !p);
+            }}
+            disabled={disabled}
+          >
+            {classifyMode
+              ? "Close"
+              : comment.classification
+                ? `"${comment.classification.classification}"`
+                : "Classify"}
+          </Button>
+
           {isDeleted ? (
             <Badge
               color="red"

@@ -31,6 +31,10 @@ export function spamPatternsQueryKey() {
   return ["spam", "patterns"];
 }
 
+export function commentClassificationQueryKey(oid: string) {
+  return ["classify", oid];
+}
+
 export async function fetchBlogitem(oid: string) {
   const response = await fetch(`${API_BASE}/plog/${oid}`);
   if (response.status === 404) {
@@ -48,6 +52,10 @@ export async function fetchSpamSignatures() {
 
 export async function fetchSpamPatterns() {
   return standardFetch(`${API_BASE}/plog/spam/patterns`);
+}
+
+export async function fetchCommentClassification(oid: string) {
+  return standardFetch(`${API_BASE}/plog/comments/${oid}/classify/`);
 }
 
 async function standardFetch(url: string) {

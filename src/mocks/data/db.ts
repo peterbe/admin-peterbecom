@@ -84,6 +84,7 @@ const COMMENTS: Comment[] = [
       bad: { agent: "Bad!" },
     },
     gravatar_url: "https://www.peterbe.com/avatar.abc123.png",
+    classification: null,
   },
   {
     id: 2,
@@ -116,6 +117,9 @@ const COMMENTS: Comment[] = [
       bad: {},
     },
     gravatar_url: "https://www.peterbe.com/avatar.xyz789.png",
+    classification: {
+      classification: "ham",
+    },
   },
 ];
 
