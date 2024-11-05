@@ -19,6 +19,10 @@ import classes from "./comments-tree.module.css";
 import type { Comment } from "./types";
 
 import { API_BASE, PUBLIC_BASE_URL } from "../../config";
+import {
+  commentClassificationQueryKey,
+  fetchCommentClassification,
+} from "../api-utils";
 import { ApprovalForm } from "./approval-form";
 import { ClassifyComment } from "./classify";
 import { DisplayClues } from "./clues";
@@ -191,6 +195,23 @@ function InnerComment({
 
   const queryClient = useQueryClient();
 
+  const [prefetched, setPrefetched] = useState<Set<string>>(() => new Set());
+  function prefetchClassify(oid: string) {
+    if (!prefetched.has(oid)) {
+      setPrefetched((prev) => {
+        prev.add(oid);
+        return prev;
+      });
+      queryClient.prefetchQuery({
+        queryKey: commentClassificationQueryKey(oid),
+        queryFn: () => fetchCommentClassification(oid),
+        // Prefetch only fires when data is older than the staleTime,
+        // so in a case like this you definitely want to set one
+        staleTime: 3000,
+      });
+    }
+  }
+
   return (
     <Box>
       <form
@@ -320,6 +341,11 @@ function InnerComment({
               setClassifyMode((p) => !p);
             }}
             disabled={disabled}
+            onMouseEnter={() => {
+              if (!classifyMode && !comment.classification) {
+                prefetchClassify(comment.oid);
+              }
+            }}
           >
             {classifyMode
               ? "Close"

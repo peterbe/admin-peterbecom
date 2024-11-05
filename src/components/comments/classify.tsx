@@ -2,9 +2,9 @@ import {
   Alert,
   Button,
   Divider,
+  Group,
   LoadingOverlay,
   Modal,
-  Select,
   SimpleGrid,
   Text,
   TextInput,
@@ -32,8 +32,6 @@ type ClassifyServerData = {
 type PostedError = {
   errors: Record<string, string | string[]>;
 };
-
-const NEW_SYMBOL = "__NEW__";
 
 export function ClassifyComment({
   comment,
@@ -134,8 +132,6 @@ export function ClassifyComment({
     setClassification(data?.classification?.classification || null);
   }, [data?.classification]);
 
-  const [showNewClassification, setShowNewClassification] = useState(false);
-
   const [newClassficication, setNewClassification] = useState("");
 
   return (
@@ -146,46 +142,44 @@ export function ClassifyComment({
           Failed to load classification: {error.message}
         </Alert>
       )}
+
       {data && (
-        <Select
-          disabled={mutation.isPending}
-          data={data.choices
-            .map((choice) => {
-              return {
-                value: choice.value,
-                label: `${choice.value} (${choice.count})`,
-              };
-            })
-            .concat({
-              value: NEW_SYMBOL,
-              label: "New classification",
-            })}
-          value={classification || ""}
-          onChange={(value) => {
-            if (value === NEW_SYMBOL) {
-              setShowNewClassification(true);
-            } else {
-              setShowNewClassification(false);
-            }
-
-            setClassification(value);
-          }}
-        />
+        <Group>
+          {data.choices.map((choice) => {
+            return (
+              <Button
+                key={choice.value}
+                disabled={mutation.isPending}
+                fullWidth
+                variant="light"
+                color="cyan"
+                onClick={() => {
+                  mutation.mutate({
+                    text,
+                    classification: choice.value,
+                  });
+                }}
+              >
+                {choice.value} ({choice.count})
+              </Button>
+            );
+          })}
+        </Group>
       )}
 
-      {showNewClassification && (
-        <TextInput
-          label="New classification"
-          description="Always lower case"
-          value={newClassficication}
-          onChange={(event) => setNewClassification(event.currentTarget.value)}
-        />
-      )}
+      <TextInput
+        label="New classification"
+        description="Always lower case"
+        disabled={mutation.isPending || !data}
+        value={newClassficication}
+        onChange={(event) => setNewClassification(event.currentTarget.value)}
+      />
 
       <Textarea
         label="Text"
         placeholder="Comment text here..."
         value={text}
+        autosize
         onChange={(event) => setText(event.currentTarget.value)}
         disabled={isLoading || mutation.isPending}
       />
@@ -195,13 +189,10 @@ export function ClassifyComment({
         mb={20}
         disabled={!(classification || newClassficication) || mutation.isPending}
         onClick={() => {
-          if (classification) {
+          if (newClassficication) {
             mutation.mutate({
               text,
-              classification:
-                classification === NEW_SYMBOL
-                  ? newClassficication
-                  : classification,
+              classification: newClassficication,
             });
           }
         }}

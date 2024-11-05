@@ -7,15 +7,15 @@ type CommentBlogitem = {
 
 export type LocationT = {
   city: string;
-  continent_code: string;
-  continent_name: string;
+  // continent_code: string;
+  // continent_name: string;
   country_code: string;
   country_name: string;
-  latitude: number;
-  longitude: number;
-  postal_code: string | null;
-  region: string | null;
-  time_zone: string;
+  // latitude: number;
+  // longitude: number;
+  // postal_code: string | null;
+  // region: string | null;
+  // time_zone: string;
 };
 
 export type Clues = {
