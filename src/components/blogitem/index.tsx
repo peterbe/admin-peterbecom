@@ -1,6 +1,6 @@
 import { useDocumentTitle } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams } from "react-router-dom";
 
 import { Alert, Box, LoadingOverlay, Text } from "@mantine/core";
 import type { EditBlogitemT } from "../../types";
@@ -15,6 +15,7 @@ import { Pageviews } from "./pageviews-loader";
 
 export default function Blogitem() {
   const params = useParams();
+
   let oid: string | null = null;
   if ("oid" in params && typeof params.oid === "string") {
     oid = params.oid;

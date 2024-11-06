@@ -12,7 +12,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
-import { useLocation, useSearch } from "wouter";
+import { useSearchParams } from "react-router-dom";
 
 const CHOICES = [
   { label: "Any", value: "" },
@@ -21,9 +21,7 @@ const CHOICES = [
 ];
 
 export function Filters({ disabled }: { disabled: boolean }) {
-  const [location, navigate] = useLocation();
-  const searchString = useSearch();
-  const searchParams = new URLSearchParams(searchString);
+  const [searchParams, setSearchParams] = useSearchParams();
   const only = searchParams.get("only") || "";
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
@@ -35,13 +33,13 @@ export function Filters({ disabled }: { disabled: boolean }) {
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              const sp = new URLSearchParams(searchString);
+              const sp = new URLSearchParams(searchParams);
               if (search.trim()) {
                 sp.set("search", search);
               } else {
                 sp.delete("search");
               }
-              navigate(sp.toString() ? `?${sp.toString()}` : location);
+              setSearchParams(sp);
             }}
           >
             <TextInput
@@ -56,9 +54,9 @@ export function Filters({ disabled }: { disabled: boolean }) {
                     aria-label="Clear input"
                     onClick={() => {
                       setSearch("");
-                      const sp = new URLSearchParams(searchString);
+                      const sp = new URLSearchParams(searchParams);
                       sp.delete("search");
-                      navigate(sp.toString() ? `?${sp.toString()}` : location);
+                      setSearchParams(sp);
                     }}
                   />
                 ) : (
@@ -74,7 +72,7 @@ export function Filters({ disabled }: { disabled: boolean }) {
           <SegmentedControl
             value={only}
             onChange={(x) => {
-              const sp = new URLSearchParams(searchString);
+              const sp = new URLSearchParams(searchParams);
               if (x === "unapproved") {
                 sp.set("only", "unapproved");
               } else if (x === "autoapproved") {
@@ -84,7 +82,7 @@ export function Filters({ disabled }: { disabled: boolean }) {
               } else {
                 throw new Error(`Unexpected value: ${x}`);
               }
-              navigate(sp.toString() ? `?${sp.toString()}` : location);
+              setSearchParams(sp);
             }}
             data={CHOICES}
             disabled={disabled}

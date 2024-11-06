@@ -17,7 +17,7 @@ import type { EditBlogitemT } from "../../types";
 import "./highlight.js.css"; // for the preview
 import { useDebouncedValue, useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import {
   blogitemQueryKey,
   blogitemsQueryKey,
@@ -125,8 +125,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     }
   }
 
-  const [, navigate] = useLocation();
-
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({

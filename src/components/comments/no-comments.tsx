@@ -1,17 +1,16 @@
 import { Anchor, Box, Text, Title } from "@mantine/core";
-import { useLocation, useSearch } from "wouter";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
 export function NoComments() {
-  const [location] = useLocation();
-  const searchString = useSearch();
-  const searchParams = new URLSearchParams(searchString);
+  const { pathname } = useLocation();
+  const [searchParams] = useSearchParams();
 
   function subtractQueryString(key: string) {
-    const searchParams = new URLSearchParams(searchString);
-    searchParams.delete(key);
-    let url = location.toString();
-    if (searchParams.toString() !== "") {
-      url += `?${searchParams.toString()}`;
+    const sp = new URLSearchParams(searchParams);
+    sp.delete(key);
+    let url = pathname;
+    if (sp.toString() !== "") {
+      url += `?${sp.toString()}`;
     }
     return url;
   }
@@ -24,12 +23,16 @@ export function NoComments() {
 
       {searchParams.get("only") && (
         <Text ta="center">
-          <Anchor href={subtractQueryString("only")}>Drop the filtering</Anchor>
+          <Anchor component={Link} to={subtractQueryString("only")}>
+            Drop the filtering
+          </Anchor>
         </Text>
       )}
       {searchParams.get("search") && (
         <Text ta="center">
-          <Anchor href={subtractQueryString("search")}>Drop the search</Anchor>
+          <Anchor component={Link} to={subtractQueryString("search")}>
+            Drop the search
+          </Anchor>
         </Text>
       )}
     </Box>

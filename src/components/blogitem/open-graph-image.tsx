@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useParams } from "wouter";
+import { Link, useParams } from "react-router-dom";
 import {
   type OpenGraphImageT,
   useOpenGraphImages,
@@ -44,7 +44,7 @@ function Selection({ oid }: { oid: string }) {
       {error && <Alert title="Error">{error.message}</Alert>}
       {data && data.images.length === 0 && (
         <Alert title="No images found">
-          <Link href={`/plog/${oid}/images`}>Upload some images</Link>
+          <Link to={`/plog/${oid}/images`}>Upload some images</Link>
         </Alert>
       )}
       <Group>

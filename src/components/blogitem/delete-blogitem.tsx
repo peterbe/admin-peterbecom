@@ -1,12 +1,17 @@
 import { Box, Button, Group, LoadingOverlay, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Redirect } from "wouter";
+import { useNavigate } from "react-router-dom";
 import { API_BASE } from "../../config";
+import { blogitemsQueryKey } from "../api-utils";
 
 export function DeleteBlogitem({ oid }: { oid: string }) {
   const [asked, setAsked] = useState(false);
+
+  const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationKey: ["delete-blogitem", oid],
@@ -20,11 +25,14 @@ export function DeleteBlogitem({ oid }: { oid: string }) {
       notifications.show({ message: "Blogitem deleted", color: "green" });
       return response.json();
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() });
+      navigate("/plog");
+    },
   });
 
   return (
     <Box mb={10} pos="relative">
-      {mutation.data && <Redirect to="/plog" />}
       <LoadingOverlay visible={mutation.isPending} />
       {asked ? (
         <Box>

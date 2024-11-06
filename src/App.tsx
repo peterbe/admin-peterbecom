@@ -5,12 +5,11 @@ import "@mantine/charts/styles.css";
 // import "./styles/globals.css";
 
 import { MantineProvider } from "@mantine/core";
-import { Container } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider } from "react-router-dom";
 
-import { Nav } from "./components/simple-nav";
-import { Routes } from "./routes";
+import { router } from "./routes";
 import { UserDataProvider } from "./whoami/provider";
 
 const queryClient = new QueryClient();
@@ -29,10 +28,5 @@ export default function App() {
 }
 
 export function BasicAppShell() {
-  return (
-    <Container fluid size="xl">
-      <Nav />
-      <Routes />
-    </Container>
-  );
+  return <RouterProvider router={router} />;
 }

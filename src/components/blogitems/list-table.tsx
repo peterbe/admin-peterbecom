@@ -15,7 +15,8 @@ import { formatDistance, parseISO } from "date-fns";
 import { useState } from "react";
 
 import { useMediaQuery } from "@mantine/hooks";
-import { Link, useSearch } from "wouter";
+import { useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { thousands } from "../../number-formatter";
 import type { BlogitemsServerData } from "../../types";
 import { usePrefetchBlogitem } from "../api-utils";
@@ -54,14 +55,14 @@ export function ListTable({
     }
   }
 
-  const searchString = useSearch();
+  const [searchParams] = useSearchParams();
 
   function addQueryString(params: Record<string, string>) {
-    const searchParams = new URLSearchParams(searchString);
+    const sp = new URLSearchParams(searchParams);
     for (const [key, value] of Object.entries(params)) {
-      searchParams.set(key, value);
+      sp.set(key, value);
     }
-    return `?${searchParams}`;
+    return `?${sp}`;
   }
 
   const matchesMobile = useMediaQuery("(max-width: 500px)");
@@ -91,12 +92,12 @@ export function ListTable({
                 style={!matchesMobile ? { minWidth: 170 } : undefined}
               >
                 {orderBy === "pub_date" && (
-                  <Link href={addQueryString({ orderBy: "modify_date" })}>
+                  <Link to={addQueryString({ orderBy: "modify_date" })}>
                     Published
                   </Link>
                 )}
                 {orderBy === "modify_date" && (
-                  <Link href={addQueryString({ orderBy: "pub_date" })}>
+                  <Link to={addQueryString({ orderBy: "pub_date" })}>
                     Modified
                   </Link>
                 )}
@@ -157,7 +158,7 @@ export function ListTable({
                 <Table.Tr key={item.id}>
                   <Table.Td>
                     <Link
-                      href={`/plog/${item.oid}`}
+                      to={`/plog/${item.oid}`}
                       onMouseOver={() => prefetchBlogitemSoon(item.oid)}
                       onMouseOut={() => dontPrefetchBlogitemSoon(item.oid)}
                     >

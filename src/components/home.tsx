@@ -1,6 +1,6 @@
 import { Box, Button, Group } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 
 import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments";
 import { SignedIn } from "./signed-in";
