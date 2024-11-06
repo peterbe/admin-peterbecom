@@ -6,10 +6,6 @@ import ErrorPage from "./components/error-page";
 import { Home } from "./components/home";
 import { Root } from "./routes/root";
 
-const Images = () => import("./components/blogitem/images");
-const SpamSignatures = () => import("./components/spam/signatures");
-const SpamPatterns = () => import("./components/spam/patterns");
-
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -34,7 +30,7 @@ export const router = createBrowserRouter([
                   },
                   {
                     path: "images",
-                    lazy: Images,
+                    lazy: () => import("./components/blogitem/images"),
                   },
                 ],
               },
@@ -45,11 +41,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "spam/signatures",
-            lazy: SpamSignatures,
+            lazy: () => import("./components/spam/signatures"),
           },
           {
             path: "spam/patterns",
-            lazy: SpamPatterns,
+            lazy: () => import("./components/spam/patterns"),
           },
         ],
       },
