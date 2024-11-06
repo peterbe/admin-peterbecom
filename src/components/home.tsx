@@ -1,14 +1,14 @@
 import { Box, Button, Group } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
-import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments";
+import type { RootLoaderData } from "../loaders/root";
 import { SignedIn } from "./signed-in";
 
 export function Home() {
   useDocumentTitle("Home");
 
-  const { data: countUnapprovedComments } = useCountUnapprovedComments();
+  const { countUnapprovedComments } = useLoaderData() as RootLoaderData;
 
   return (
     <SignedIn>
@@ -26,13 +26,13 @@ export function Home() {
               size="xl"
               component={Link}
               to={
-                countUnapprovedComments?.count
+                countUnapprovedComments
                   ? "/plog/comments?only=unapproved"
                   : "/plog/comments"
               }
             >
-              {countUnapprovedComments?.count
-                ? `(${countUnapprovedComments.count}) Comments`
+              {countUnapprovedComments
+                ? `(${countUnapprovedComments}) Comments`
                 : "Comments"}
             </Button>
           )}

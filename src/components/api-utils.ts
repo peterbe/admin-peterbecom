@@ -2,6 +2,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { API_BASE } from "../config";
+import type { CommentsServerData } from "./comments/types";
 
 export function blogitemQueryKey(oid: string | null) {
   return ["blogitem", oid];
@@ -99,7 +100,7 @@ export async function fetchComments(search: URLSearchParams) {
   if (!response.ok) {
     throw new Error(`${response.status} on ${response.url}`);
   }
-  return response.json();
+  return (await response.json()) as CommentsServerData;
 }
 
 export async function batchSubmitComments({

@@ -2,7 +2,8 @@ import { Avatar, Box, Burger, Divider, Drawer, Group } from "@mantine/core";
 
 import { useDisclosure } from "@mantine/hooks";
 import { IconHome } from "@tabler/icons-react";
-import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments";
+import { useLoaderData } from "react-router-dom";
+import type { RootLoaderData } from "../loaders/root";
 import { useUserData } from "../whoami/use-userdata";
 import { NavigationSearch } from "./navigation-search";
 import { SmartAnchor } from "./smart-anchor";
@@ -79,7 +80,8 @@ export function Nav() {
 }
 
 function Links() {
-  const { data: countUnapprovedComments } = useCountUnapprovedComments();
+  const { countUnapprovedComments } = useLoaderData() as RootLoaderData;
+
   return (
     <>
       <SmartAnchor href="/">Home</SmartAnchor>
@@ -87,13 +89,13 @@ function Links() {
       <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
       <SmartAnchor
         href={
-          countUnapprovedComments?.count
+          countUnapprovedComments
             ? "/plog/comments?only=unapproved"
             : "/plog/comments"
         }
       >
-        {countUnapprovedComments?.count
-          ? `Comments (${countUnapprovedComments.count})`
+        {countUnapprovedComments
+          ? `Comments (${countUnapprovedComments})`
           : "Comments"}
       </SmartAnchor>
     </>

@@ -7,7 +7,6 @@ export function SmartAnchor({
 }: AnchorProps & Omit<LinkProps, "to"> & { href: string }) {
   const { href, ...rest } = props;
   const { pathname } = useLocation();
-  // return <NavLink {...rest} to={href} />;
   return (
     <Anchor
       {...rest}
@@ -17,14 +16,3 @@ export function SmartAnchor({
     />
   );
 }
-
-//   const { href, ...rest } = props;
-//   return (
-//     <Anchor
-//       component={Link}
-//       to={href}
-//       underline={location === href ? "never" : "always"}
-//       {...rest}
-//     />
-//   );
-// }
