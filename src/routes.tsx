@@ -6,7 +6,6 @@ import ErrorPage from "./components/error-page";
 import { Home } from "./components/home";
 import { Root } from "./routes/root";
 
-const OpenGraphImage = () => import("./components/blogitem/open-graph-image");
 const Images = () => import("./components/blogitem/images");
 const SpamSignatures = () => import("./components/spam/signatures");
 const SpamPatterns = () => import("./components/spam/patterns");
@@ -30,7 +29,8 @@ export const router = createBrowserRouter([
                   { index: true, element: <Blogitem /> },
                   {
                     path: "open-graph-image",
-                    lazy: OpenGraphImage,
+                    lazy: () =>
+                      import("./components/blogitem/open-graph-image"),
                   },
                   {
                     path: "images",
