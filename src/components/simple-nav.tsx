@@ -89,10 +89,7 @@ function Links() {
       <SmartAnchor href="/plog">Blogitems</SmartAnchor>
       <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
       <Suspense fallback={<CommentsLink />}>
-        <Await
-          resolve={data.countUnapprovedComments}
-          errorElement={<CommentsLink />}
-        >
+        <Await resolve={data} errorElement={<CommentsLink />}>
           {(countUnapprovedComments) => (
             <CommentsLink count={countUnapprovedComments.count} />
           )}
