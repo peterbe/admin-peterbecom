@@ -19,7 +19,7 @@ import { SignedIn } from "../signed-in";
 import { AbsoluteImage } from "./absolute-image";
 import { BlogitemLinks } from "./links";
 
-export default function OpenGraphImage() {
+export function Component() {
   const params = useParams();
   const oid = params.oid as string;
 

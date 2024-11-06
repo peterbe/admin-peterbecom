@@ -30,7 +30,7 @@ import { useUserData } from "../../whoami/use-userdata";
 import { JSONPost } from "../json-post";
 import { UploadedImages } from "./uploaded-images";
 
-export default function OpenGraphImage() {
+export function Component() {
   const params = useParams();
   const oid = params.oid as string;
   const { userData } = useUserData();

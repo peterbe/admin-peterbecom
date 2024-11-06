@@ -4,7 +4,7 @@ import { SignedIn } from "../signed-in";
 import { AddPattern } from "./add-pattern";
 import { ListPatterns } from "./list-patterns";
 
-export default function SpamPatterns() {
+export function Component() {
   useDocumentTitle("Spam Comment Patterns");
 
   return (
