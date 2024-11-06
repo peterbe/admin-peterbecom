@@ -16,3 +16,14 @@ export function SmartAnchor({
     />
   );
 }
+
+//   const { href, ...rest } = props;
+//   return (
+//     <Anchor
+//       component={Link}
+//       to={href}
+//       underline={location === href ? "never" : "always"}
+//       {...rest}
+//     />
+//   );
+// }
