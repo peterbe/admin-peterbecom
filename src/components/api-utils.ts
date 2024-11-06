@@ -36,6 +36,10 @@ export function commentClassificationQueryKey(oid: string) {
   return ["classify", oid];
 }
 
+export function commentsCountQueryKey() {
+  return ["count-unapproved-comments"];
+}
+
 export async function fetchBlogitem(oid: string) {
   const response = await fetch(`${API_BASE}/plog/${oid}`);
   if (response.status === 404) {
@@ -84,6 +88,12 @@ export async function fetchShowAllBlogitems() {
     throw new Error(`${response.status} on ${response.url}`);
   }
   return response.json();
+}
+
+export async function fetchCommentsCount() {
+  return fetchComments(
+    new URLSearchParams({ unapproved: "only", count: "true" }),
+  );
 }
 
 export async function fetchComments(search: URLSearchParams) {

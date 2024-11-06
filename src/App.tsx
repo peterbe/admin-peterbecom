@@ -6,13 +6,12 @@ import "@mantine/charts/styles.css";
 
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router-dom";
 
+import { queryClient } from "./query-client";
 import { router } from "./routes";
 import { UserDataProvider } from "./whoami/provider";
-
-const queryClient = new QueryClient();
 
 export default function App() {
   return (

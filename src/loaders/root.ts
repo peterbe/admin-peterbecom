@@ -1,16 +1,20 @@
 import { defer } from "react-router-dom";
-import { fetchComments } from "../components/api-utils";
+import {
+  commentsCountQueryKey,
+  fetchCommentsCount,
+} from "../components/api-utils";
+import { queryClient } from "../query-client";
 
 export type RootLoaderData = {
   countUnapprovedComments: number;
 };
 
 export async function loader() {
-  const commentsPromise = fetchComments(
-    new URLSearchParams({ unapproved: "only", count: "True" }),
-  );
-
   return defer({
-    countUnapprovedComments: commentsPromise,
+    countUnapprovedComments: queryClient.fetchQuery({
+      queryKey: commentsCountQueryKey(),
+      queryFn: fetchCommentsCount,
+      staleTime: 5000,
+    }),
   });
 }

@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchComments } from "../components/api-utils";
+import {
+  commentsCountQueryKey,
+  fetchCommentsCount,
+} from "../components/api-utils";
 
 type Counts = {
   count: number;
@@ -7,9 +10,8 @@ type Counts = {
 
 export function useCountUnapprovedComments() {
   return useQuery<Counts>({
-    queryKey: ["count-unapproved-comments"],
-    queryFn: () =>
-      fetchComments(new URLSearchParams({ unapproved: "only", count: "true" })),
+    queryKey: commentsCountQueryKey(),
+    queryFn: fetchCommentsCount,
     retry: false,
   });
 }
