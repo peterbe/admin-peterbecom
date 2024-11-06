@@ -2,7 +2,8 @@ import { Avatar, Box, Burger, Divider, Drawer, Group } from "@mantine/core";
 
 import { useDisclosure } from "@mantine/hooks";
 import { IconHome } from "@tabler/icons-react";
-import { useLoaderData } from "react-router-dom";
+import { Suspense } from "react";
+import { Await, useRouteLoaderData } from "react-router-dom";
 import type { RootLoaderData } from "../loaders/root";
 import { useUserData } from "../whoami/use-userdata";
 import { NavigationSearch } from "./navigation-search";
@@ -80,24 +81,33 @@ export function Nav() {
 }
 
 function Links() {
-  const { countUnapprovedComments } = useLoaderData() as RootLoaderData;
+  const data = useRouteLoaderData("root") as RootLoaderData;
 
   return (
     <>
       <SmartAnchor href="/">Home</SmartAnchor>
       <SmartAnchor href="/plog">Blogitems</SmartAnchor>
       <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
-      <SmartAnchor
-        href={
-          countUnapprovedComments
-            ? "/plog/comments?only=unapproved"
-            : "/plog/comments"
-        }
-      >
-        {countUnapprovedComments
-          ? `Comments (${countUnapprovedComments})`
-          : "Comments"}
-      </SmartAnchor>
+      <Suspense fallback={<CommentsLink />}>
+        <Await
+          resolve={data.countUnapprovedComments}
+          errorElement={<CommentsLink />}
+        >
+          {(countUnapprovedComments) => (
+            <CommentsLink count={countUnapprovedComments.count} />
+          )}
+        </Await>
+      </Suspense>
     </>
+  );
+}
+
+function CommentsLink({ count }: { count?: number }) {
+  return (
+    <SmartAnchor
+      href={count ? "/plog/comments?only=unapproved" : "/plog/comments"}
+    >
+      {count ? `Comments (${count})` : "Comments"}
+    </SmartAnchor>
   );
 }

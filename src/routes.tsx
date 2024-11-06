@@ -13,12 +13,13 @@ export const router = createBrowserRouter([
     path: "/",
     element: <Root />,
     loader: rootLoader,
+    id: "root",
     errorElement: <ErrorPage />,
     children: [
       {
         errorElement: <ErrorPage />,
         children: [
-          { index: true, element: <Home />, loader: rootLoader },
+          { index: true, element: <Home /> },
           {
             path: "plog",
             children: [

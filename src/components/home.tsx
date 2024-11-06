@@ -1,14 +1,15 @@
 import { Box, Button, Group } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
-import { Link, useLoaderData } from "react-router-dom";
+import { Await, Link, useRouteLoaderData } from "react-router-dom";
 
+import { Suspense } from "react";
 import type { RootLoaderData } from "../loaders/root";
 import { SignedIn } from "./signed-in";
 
 export function Home() {
   useDocumentTitle("Home");
 
-  const { countUnapprovedComments } = useLoaderData() as RootLoaderData;
+  const data = useRouteLoaderData("root") as RootLoaderData;
 
   return (
     <SignedIn>
@@ -21,21 +22,16 @@ export function Home() {
             Add blogitem
           </Button>
 
-          {countUnapprovedComments && (
-            <Button
-              size="xl"
-              component={Link}
-              to={
-                countUnapprovedComments
-                  ? "/plog/comments?only=unapproved"
-                  : "/plog/comments"
-              }
+          <Suspense fallback={<CommentsButton />}>
+            <Await
+              resolve={data.countUnapprovedComments}
+              errorElement={<CommentsButton />}
             >
-              {countUnapprovedComments
-                ? `(${countUnapprovedComments}) Comments`
-                : "Comments"}
-            </Button>
-          )}
+              {(countUnapprovedComments) => (
+                <CommentsButton count={countUnapprovedComments.count} />
+              )}
+            </Await>
+          </Suspense>
         </Group>
       </Box>
       <Box m={100}>
@@ -49,5 +45,17 @@ export function Home() {
         </Group>
       </Box>
     </SignedIn>
+  );
+}
+
+function CommentsButton({ count }: { count?: number }) {
+  return (
+    <Button
+      size="xl"
+      component={Link}
+      to={count ? "/plog/comments?only=unapproved" : "/plog/comments"}
+    >
+      {count ? `Comments (${count})` : "Comments"}
+    </Button>
   );
 }
