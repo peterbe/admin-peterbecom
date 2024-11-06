@@ -12,7 +12,8 @@ import {
 } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { blogitemsShowAllQueryKey, fetchShowAllBlogitems } from "./api-utils";
 
 type ShowAllBlogitems = {
@@ -63,7 +64,10 @@ export function NavigationSearch({
   w?: number;
   size?: MantineSize;
 }) {
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
+
+  const [value, setValue] = useState("");
+
   const { data, isError, error, isPending, refetch } =
     useQuery<ShowAllBlogitems>({
       queryKey: blogitemsShowAllQueryKey(),
@@ -89,6 +93,8 @@ export function NavigationSearch({
       <Autocomplete
         size={size}
         w={w}
+        value={value}
+        onChange={setValue}
         placeholder="Search titles or OIDs"
         data={items}
         filter={optionsFilter}
@@ -96,6 +102,7 @@ export function NavigationSearch({
         limit={10}
         onOptionSubmit={(picked) => {
           if (picked) {
+            setValue(""); // XXX doesn't work
             navigate(`/plog/${picked}`);
           }
         }}

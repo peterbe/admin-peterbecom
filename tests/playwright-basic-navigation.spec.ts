@@ -81,7 +81,7 @@ test("approve and delete comments", async ({ page }) => {
 
   await page
     .locator("header")
-    .getByRole("link", { name: "(1) Comments" })
+    .getByRole("link", { name: "Comments (1)" })
     .click();
 
   await expect(page).toHaveURL("/plog/comments?only=unapproved");

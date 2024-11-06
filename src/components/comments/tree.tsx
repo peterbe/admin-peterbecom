@@ -1,7 +1,7 @@
 import { Alert, Box, Button, LoadingOverlay, Text } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSearch } from "wouter";
+import { useSearchParams } from "react-router-dom";
 import { thousands } from "../../number-formatter";
 import { commentsQueryKey, fetchComments } from "../api-utils";
 import { BatchSubmit } from "./batch-submit";
@@ -12,8 +12,7 @@ import type { CommentsServerData } from "./types";
 import { useBatchSubmission } from "./use-batch-submission";
 
 export function Tree() {
-  const searchString = useSearch();
-  const searchParams = new URLSearchParams(searchString);
+  const [searchParams] = useSearchParams();
 
   const { data, error, isPending, isFetching, refetch } =
     useQuery<CommentsServerData>({

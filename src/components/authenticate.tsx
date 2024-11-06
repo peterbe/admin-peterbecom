@@ -1,7 +1,7 @@
 import { Alert, Container, Paper } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
-import { useLocation } from "wouter";
 
+import { useSearchParams } from "react-router-dom";
 import { useUserData } from "../whoami/use-userdata";
 
 export function Authenticate() {
@@ -22,8 +22,8 @@ export function Authenticate() {
 }
 
 function SignIn() {
-  const [next] = useLocation();
-  const sp = new URLSearchParams({ next });
+  const [searchParams] = useSearchParams();
+  const sp = new URLSearchParams(searchParams);
   return (
     <Paper withBorder shadow="md" p={30} mt={30} radius="md">
       <a

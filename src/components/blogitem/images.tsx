@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams } from "react-router-dom";
 import { SignedIn } from "../signed-in";
 import { BlogitemLinks } from "./links";
 import "@mantine/dropzone/styles.css";
@@ -30,7 +30,7 @@ import { useUserData } from "../../whoami/use-userdata";
 import { JSONPost } from "../json-post";
 import { UploadedImages } from "./uploaded-images";
 
-export default function OpenGraphImage() {
+export function Component() {
   const params = useParams();
   const oid = params.oid as string;
   const { userData } = useUserData();

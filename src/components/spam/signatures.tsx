@@ -4,7 +4,7 @@ import { SignedIn } from "../signed-in";
 import { AddSignature } from "./add-signature";
 import { ListSignatures } from "./list-signatures";
 
-export default function SpamSignatures() {
+export function Component() {
   useDocumentTitle("Spam Comment Signatures");
 
   return (

@@ -93,7 +93,7 @@ function Links() {
         }
       >
         {countUnapprovedComments?.count
-          ? `(${countUnapprovedComments.count}) Comments`
+          ? `Comments (${countUnapprovedComments.count})`
           : "Comments"}
       </SmartAnchor>
     </>

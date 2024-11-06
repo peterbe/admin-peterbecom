@@ -2,7 +2,7 @@ import { Alert, Box } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 
 import { useLocalStorage } from "@mantine/hooks";
-import { useLocation, useSearch } from "wouter";
+import { useSearchParams } from "react-router-dom";
 import { API_BASE } from "../../config";
 import type { BlogitemsServerData } from "../../types";
 import { ListTable } from "./list-table";
@@ -12,9 +12,7 @@ import { useRecentPageviews } from "./use-pageviews";
 const DEFAULT_SIZE = "10";
 
 export function List() {
-  const [location, navigate] = useLocation();
-  const searchString = useSearch();
-  const searchParams = new URLSearchParams(searchString);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [paginationSize, setPaginationSize] = useLocalStorage<string>({
     key: "pagination-size",
     defaultValue: DEFAULT_SIZE,
@@ -55,14 +53,14 @@ export function List() {
         orderBy={orderBy}
         search={search}
         updateSearch={(s: string) => {
-          const sp = new URLSearchParams(searchString);
+          const sp = new URLSearchParams(searchParams);
           const existing = sp.get("search");
           if (s.trim() && s !== existing) {
             sp.set("search", s);
           } else {
             sp.delete("search");
           }
-          navigate(sp.toString() ? `?${sp.toString()}` : location);
+          setSearchParams(sp);
         }}
         pageviews={pageviews}
       />
