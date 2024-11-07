@@ -3,9 +3,6 @@ import { Avatar, Box, Burger, Divider, Drawer, Group } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { IconHome } from "@tabler/icons-react"
 import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments"
-// import { Suspense } from "react";
-// import { Await, useRouteLoaderData } from "react-router-dom";
-// import type { RootLoaderData } from "../loaders/root";
 import { useUserData } from "../whoami/use-userdata"
 import { NavigationSearch } from "./navigation-search"
 import { SmartAnchor } from "./smart-anchor"
@@ -82,12 +79,7 @@ export function Nav() {
 }
 
 function Links() {
-  // const { countUnapprovedComments } = useRouteLoaderData(
-  //   "root"
-  // ) as RootLoaderData;
-
-  const { data, isPending } = useCountUnapprovedComments()
-  console.log("RENDERING NAV LINKS", { data: !!data, isPending })
+  const { data } = useCountUnapprovedComments()
 
   return (
     <>
@@ -95,16 +87,6 @@ function Links() {
       <SmartAnchor href="/plog">Blogitems</SmartAnchor>
       <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
       <CommentsLink count={data?.count} />
-      {/* <Suspense fallback={<CommentsLink />}>
-        <Await
-          resolve={countUnapprovedComments}
-          errorElement={<CommentsLink />}
-        >
-          {(countUnapprovedComments) => (
-            <CommentsLink count={countUnapprovedComments.count} />
-          )}
-        </Await>
-      </Suspense> */}
     </>
   )
 }
