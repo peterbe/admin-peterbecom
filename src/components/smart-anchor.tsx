@@ -10,20 +10,10 @@ export function SmartAnchor({
   return (
     <Anchor
       {...rest}
+      viewTransition
       component={Link}
       to={href}
       underline={pathname === href ? "never" : "always"}
     />
   )
 }
-
-//   const { href, ...rest } = props;
-//   return (
-//     <Anchor
-//       component={Link}
-//       to={href}
-//       underline={location === href ? "never" : "always"}
-//       {...rest}
-//     />
-//   );
-// }
