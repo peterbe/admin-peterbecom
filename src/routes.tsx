@@ -4,7 +4,6 @@ import Blogitems from "./components/blogitems";
 import Comments from "./components/comments";
 import ErrorPage from "./components/error-page";
 import { Home } from "./components/home";
-// import { loader as blogitemLoader } from "./loaders/blogitem";
 import { loader as rootLoader } from "./loaders/root";
 import { Root } from "./routes/root";
 
@@ -29,7 +28,6 @@ export const router = createBrowserRouter([
                   {
                     index: true,
                     element: <Blogitem />,
-                    // loader: blogitemLoader,
                   },
                   {
                     path: "open-graph-image",
@@ -43,7 +41,6 @@ export const router = createBrowserRouter([
                 ],
               },
               { index: true, element: <Blogitems /> },
-              // { path: "add", element: <Blogitem />, loader: blogitemLoader },
               { path: "add", element: <Blogitem /> },
               { path: "comments", element: <Comments /> },
             ],
