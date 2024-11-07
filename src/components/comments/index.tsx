@@ -1,6 +1,6 @@
-import { Container } from "@mantine/core";
-import { SignedIn } from "../signed-in";
-import { Tree } from "./tree";
+import { Container } from "@mantine/core"
+import { SignedIn } from "../signed-in"
+import { Tree } from "./tree"
 
 export default function Comments() {
   return (
@@ -9,5 +9,5 @@ export default function Comments() {
         <Tree />
       </Container>
     </SignedIn>
-  );
+  )
 }

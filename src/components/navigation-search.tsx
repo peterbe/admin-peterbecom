@@ -9,42 +9,42 @@ import {
   type MantineSize,
   type OptionsFilter,
   Text,
-} from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { blogitemsShowAllQueryKey, fetchShowAllBlogitems } from "./api-utils";
+} from "@mantine/core"
+import { IconSearch } from "@tabler/icons-react"
+import { useQuery } from "@tanstack/react-query"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { blogitemsShowAllQueryKey, fetchShowAllBlogitems } from "./api-utils"
 
 type ShowAllBlogitems = {
   blogitems: {
-    id: number;
-    oid: string;
-    title: string;
-  }[];
-  count: number;
-};
+    id: number
+    oid: string
+    title: string
+  }[]
+  count: number
+}
 
-const escaped = (s: string) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+const escaped = (s: string) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")
 
 const optionsFilter: OptionsFilter = ({ options, search }) => {
-  const s = search.toLowerCase().trim();
-  const rex = s ? new RegExp(`\\b${escaped(s)}`, "i") : null;
+  const s = search.toLowerCase().trim()
+  const rex = s ? new RegExp(`\\b${escaped(s)}`, "i") : null
 
   const filtered = (options as ComboboxItem[]).filter((option) => {
-    if (!rex) return false;
-    if (!s) return false;
+    if (!rex) return false
+    if (!s) return false
 
     if (option.label.match(rex) || option.value.match(rex)) {
-      return true;
+      return true
     }
-    return false;
-  });
-  return filtered;
-};
+    return false
+  })
+  return filtered
+}
 
 const renderAutocompleteOption: AutocompleteProps["renderOption"] = (props) => {
-  const option = props.option as ComboboxItem;
+  const option = props.option as ComboboxItem
   return (
     <Group gap="sm">
       <div>
@@ -54,33 +54,33 @@ const renderAutocompleteOption: AutocompleteProps["renderOption"] = (props) => {
         </Text>
       </div>
     </Group>
-  );
-};
+  )
+}
 
 export function NavigationSearch({
   w,
   size,
 }: {
-  w?: number;
-  size?: MantineSize;
+  w?: number
+  size?: MantineSize
 }) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState("")
 
   const { data, isError, error, isPending, refetch } =
     useQuery<ShowAllBlogitems>({
       queryKey: blogitemsShowAllQueryKey(),
       queryFn: fetchShowAllBlogitems,
       refetchOnWindowFocus: false,
-    });
+    })
 
   const items = !data
     ? []
     : data.blogitems.map((blogitem) => ({
         value: blogitem.oid,
         label: blogitem.title,
-      }));
+      }))
 
   return (
     <Box>
@@ -102,8 +102,8 @@ export function NavigationSearch({
         limit={10}
         onOptionSubmit={(picked) => {
           if (picked) {
-            setValue(""); // XXX doesn't work
-            navigate(`/plog/${picked}`);
+            setValue("") // XXX doesn't work
+            navigate(`/plog/${picked}`)
           }
         }}
         disabled={!data || isError || isPending}
@@ -117,5 +117,5 @@ export function NavigationSearch({
         }}
       />
     </Box>
-  );
+  )
 }

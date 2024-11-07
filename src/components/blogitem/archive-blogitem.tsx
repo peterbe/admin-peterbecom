@@ -1,15 +1,15 @@
-import { Box, Button, Group, LoadingOverlay, Text } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { API_BASE } from "../../config";
-import type { EditBlogitemT } from "../../types";
-import { blogitemQueryKey, blogitemsQueryKey } from "../api-utils";
+import { Box, Button, Group, LoadingOverlay, Text } from "@mantine/core"
+import { notifications } from "@mantine/notifications"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useEffect, useState } from "react"
+import { API_BASE } from "../../config"
+import type { EditBlogitemT } from "../../types"
+import { blogitemQueryKey, blogitemsQueryKey } from "../api-utils"
 
 export function ArchiveBlogitem({ blogitem }: { blogitem: EditBlogitemT }) {
-  const [asked, setAsked] = useState(false);
+  const [asked, setAsked] = useState(false)
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationKey: ["archive-blogitem", blogitem.oid],
@@ -23,31 +23,31 @@ export function ArchiveBlogitem({ blogitem }: { blogitem: EditBlogitemT }) {
         body: JSON.stringify({
           toggle_archived: true,
         }),
-      });
+      })
       if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      return response.json();
+      return response.json()
     },
     onSuccess: () => {
-      setAsked(false);
+      setAsked(false)
       notifications.show({
         message: "Blogitem archived status toggled",
         color: "green",
-      });
+      })
 
       queryClient.invalidateQueries({
         queryKey: blogitemQueryKey(blogitem.oid),
-      });
-      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() });
+      })
+      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() })
     },
-  });
+  })
 
   useEffect(() => {
     if (mutation.data) {
-      setAsked(false);
+      setAsked(false)
     }
-  }, [mutation.data]);
+  }, [mutation.data])
 
   return (
     <Box mb={10} pos="relative">
@@ -59,7 +59,7 @@ export function ArchiveBlogitem({ blogitem }: { blogitem: EditBlogitemT }) {
             <Button
               color="red"
               onClick={() => {
-                mutation.mutate();
+                mutation.mutate()
               }}
             >
               Yes, {blogitem.archived ? "unarchive" : "archive"} it
@@ -73,5 +73,5 @@ export function ArchiveBlogitem({ blogitem }: { blogitem: EditBlogitemT }) {
         </Button>
       )}
     </Box>
-  );
+  )
 }

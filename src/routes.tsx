@@ -1,11 +1,11 @@
-import { createBrowserRouter } from "react-router-dom";
-import Blogitem from "./components/blogitem";
-import Blogitems from "./components/blogitems";
-import Comments from "./components/comments";
-import ErrorPage from "./components/error-page";
-import { Home } from "./components/home";
-import { loader as rootLoader } from "./loaders/root";
-import { Root } from "./routes/root";
+import { createBrowserRouter } from "react-router-dom"
+import Blogitem from "./components/blogitem"
+import Blogitems from "./components/blogitems"
+import Comments from "./components/comments"
+import ErrorPage from "./components/error-page"
+import { Home } from "./components/home"
+import { loader as rootLoader } from "./loaders/root"
+import { Root } from "./routes/root"
 
 export const router = createBrowserRouter([
   {
@@ -57,4 +57,4 @@ export const router = createBrowserRouter([
       },
     ],
   },
-]);
+])

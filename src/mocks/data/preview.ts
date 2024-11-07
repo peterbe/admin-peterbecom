@@ -3,5 +3,5 @@ export const PREVIEW = () => {
     blogitem: {
       html: "<p>Hello <strong>world</strong></p>",
     },
-  };
-};
+  }
+}

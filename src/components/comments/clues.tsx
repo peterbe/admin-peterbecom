@@ -1,13 +1,13 @@
-import { Badge, Box, Group, Text } from "@mantine/core";
-import type { Clues } from "./types";
+import { Badge, Box, Group, Text } from "@mantine/core"
+import type { Clues } from "./types"
 
 export function DisplayClues({ clues }: { clues: Clues }) {
-  if (!clues) return null;
+  if (!clues) return null
   if (
     Object.keys(clues.bad).length === 0 &&
     Object.keys(clues.good).length === 0
   ) {
-    return null;
+    return null
   }
 
   return (
@@ -25,7 +25,7 @@ export function DisplayClues({ clues }: { clues: Clues }) {
             >
               {value}
             </Badge>
-          );
+          )
         })}
         {Object.entries(clues.bad).map(([key, value]) => {
           return (
@@ -36,9 +36,9 @@ export function DisplayClues({ clues }: { clues: Clues }) {
             >
               {value}
             </Badge>
-          );
+          )
         })}
       </Group>
     </Box>
-  );
+  )
 }

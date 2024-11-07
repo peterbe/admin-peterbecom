@@ -1,16 +1,16 @@
-import { Button, Code, Container, Text, Title } from "@mantine/core";
+import { Button, Code, Container, Text, Title } from "@mantine/core"
 
-import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom";
+import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom"
 
 export default function ErrorPage() {
-  const error = useRouteError();
+  const error = useRouteError()
   if (isRouteErrorResponse(error)) {
-    console.warn(error);
+    console.warn(error)
     if (error.status === 404) {
-      return <Custom404 />;
+      return <Custom404 />
     }
   } else {
-    console.error(error);
+    console.error(error)
   }
 
   return (
@@ -27,7 +27,7 @@ export default function ErrorPage() {
         <Text ta="center">Error unknown. See console logs.</Text>
       )}
     </Container>
-  );
+  )
 }
 
 function Custom404() {
@@ -42,5 +42,5 @@ function Custom404() {
         </Link>
       </Text>
     </Container>
-  );
+  )
 }

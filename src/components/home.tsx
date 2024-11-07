@@ -1,21 +1,21 @@
-import { Box, Button, Group } from "@mantine/core";
-import { useDocumentTitle } from "@mantine/hooks";
+import { Box, Button, Group } from "@mantine/core"
+import { useDocumentTitle } from "@mantine/hooks"
 // import { Await, Link, useRouteLoaderData } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"
 
-import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments";
+import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments"
 // import { Suspense } from "react";
 // import type { RootLoaderData } from "../loaders/root";
-import { SignedIn } from "./signed-in";
+import { SignedIn } from "./signed-in"
 
 export function Home() {
-  useDocumentTitle("Home");
+  useDocumentTitle("Home")
 
   // const { countUnapprovedComments } = useRouteLoaderData(
   //   "root"
   // ) as RootLoaderData;
-  const { data, isPending } = useCountUnapprovedComments();
-  console.log("RENDERING HOME COMPONENT", { data: !!data, isPending });
+  const { data, isPending } = useCountUnapprovedComments()
+  console.log("RENDERING HOME COMPONENT", { data: !!data, isPending })
 
   return (
     <SignedIn>
@@ -52,7 +52,7 @@ export function Home() {
         </Group>
       </Box>
     </SignedIn>
-  );
+  )
 }
 
 function CommentsButton({ count }: { count?: number }) {
@@ -64,5 +64,5 @@ function CommentsButton({ count }: { count?: number }) {
     >
       {count ? `Comments (${count})` : "Comments"}
     </Button>
-  );
+  )
 }

@@ -1,18 +1,18 @@
-import { Box, Group, SegmentedControl, Text } from "@mantine/core";
+import { Box, Group, SegmentedControl, Text } from "@mantine/core"
 
 const CHOICES = [5, 10, 15, 25, 50, 100].map((n) => ({
   label: n.toString(),
   value: n.toString(),
-}));
+}))
 
 export function PaginationSize({
   value,
   setValue,
   disabled,
 }: {
-  value: string;
-  setValue: (value: string) => void;
-  disabled: boolean;
+  value: string
+  setValue: (value: string) => void
+  disabled: boolean
 }) {
   return (
     <Box mt={30}>
@@ -29,5 +29,5 @@ export function PaginationSize({
         />
       </Group>
     </Box>
-  );
+  )
 }

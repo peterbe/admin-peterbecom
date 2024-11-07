@@ -9,49 +9,49 @@ import {
   Text,
   TextInput,
   Textarea,
-} from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { API_BASE } from "../../config";
+} from "@mantine/core"
+import { notifications } from "@mantine/notifications"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useEffect, useState } from "react"
+import { API_BASE } from "../../config"
 import {
   commentClassificationQueryKey,
   fetchCommentClassification,
-} from "../api-utils";
-import { DisplayDate } from "../blogitems/list-table";
-import type { Classification, Comment } from "./types";
+} from "../api-utils"
+import { DisplayDate } from "../blogitems/list-table"
+import type { Classification, Comment } from "./types"
 
 type Choice = {
-  value: string;
-  count: number;
-};
+  value: string
+  count: number
+}
 type ClassifyServerData = {
-  classification: Classification | null;
-  choices: Choice[];
-};
+  classification: Classification | null
+  choices: Choice[]
+}
 type PostedError = {
-  errors: Record<string, string | string[]>;
-};
+  errors: Record<string, string | string[]>
+}
 
 export function ClassifyComment({
   comment,
   onClose,
 }: {
-  comment: Comment;
-  onClose: () => void;
+  comment: Comment
+  onClose: () => void
 }) {
-  const [text, setText] = useState(comment.comment);
+  const [text, setText] = useState(comment.comment)
 
   useEffect(() => {
-    setText(comment.comment);
-  }, [comment.comment]);
+    setText(comment.comment)
+  }, [comment.comment])
 
   const { data, error, isPending, isLoading } = useQuery<ClassifyServerData>({
     queryKey: commentClassificationQueryKey(comment.oid),
     queryFn: () => fetchCommentClassification(comment.oid),
-  });
+  })
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationKey: commentClassificationQueryKey(comment.oid),
@@ -59,8 +59,8 @@ export function ClassifyComment({
       text,
       classification,
     }: {
-      text: string;
-      classification: string;
+      text: string
+      classification: string
     }) => {
       const response = await fetch(
         `${API_BASE}/plog/comments/${comment.oid}/classify/`,
@@ -71,68 +71,68 @@ export function ClassifyComment({
             text,
           }),
         },
-      );
+      )
       if (response.status === 400) {
-        const errors = (await response.json()) as PostedError;
-        throw new Error(JSON.stringify(errors.errors));
+        const errors = (await response.json()) as PostedError
+        throw new Error(JSON.stringify(errors.errors))
       }
       if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      return response.json();
+      return response.json()
     },
     onSuccess: () => {
       notifications.show({
         title: "Classified",
         message: "Comment text classification saved",
         color: "green",
-      });
+      })
       queryClient.invalidateQueries({
         queryKey: commentClassificationQueryKey(comment.oid),
-      });
+      })
 
-      onClose();
+      onClose()
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationKey: [...commentClassificationQueryKey(comment.oid), "delete"],
     mutationFn: async () => {
       if (!data?.classification) {
-        return null;
+        return null
       }
-      const sp = new URLSearchParams({ id: `${data.classification.id}` });
+      const sp = new URLSearchParams({ id: `${data.classification.id}` })
       const response = await fetch(
         `${API_BASE}/plog/comments/${comment.oid}/classify/?${sp.toString()}`,
         {
           method: "DELETE",
         },
-      );
+      )
       if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      return response.json();
+      return response.json()
     },
     onSuccess: () => {
       notifications.show({
         title: "Removed",
         message: "Comment text classification deleted",
         color: "green",
-      });
+      })
       queryClient.invalidateQueries({
         queryKey: commentClassificationQueryKey(comment.oid),
-      });
+      })
 
-      onClose();
+      onClose()
     },
-  });
+  })
 
-  const [classification, setClassification] = useState<string | null>();
+  const [classification, setClassification] = useState<string | null>()
   useEffect(() => {
-    setClassification(data?.classification?.classification || null);
-  }, [data?.classification]);
+    setClassification(data?.classification?.classification || null)
+  }, [data?.classification])
 
-  const [newClassficication, setNewClassification] = useState("");
+  const [newClassficication, setNewClassification] = useState("")
 
   return (
     <Modal opened={true} onClose={onClose} title="Classify">
@@ -157,12 +157,12 @@ export function ClassifyComment({
                   mutation.mutate({
                     text,
                     classification: choice.value,
-                  });
+                  })
                 }}
               >
                 {choice.value} ({choice.count})
               </Button>
-            );
+            )
           })}
         </Group>
       )}
@@ -193,7 +193,7 @@ export function ClassifyComment({
             mutation.mutate({
               text,
               classification: newClassficication,
-            });
+            })
           }
         }}
       >
@@ -211,7 +211,7 @@ export function ClassifyComment({
               color="orange"
               size="xs"
               onClick={() => {
-                deleteMutation.mutate();
+                deleteMutation.mutate()
               }}
             >
               Delete
@@ -220,5 +220,5 @@ export function ClassifyComment({
         </>
       )}
     </Modal>
-  );
+  )
 }

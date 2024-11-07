@@ -6,33 +6,33 @@ import {
   LoadingOverlay,
   ScrollArea,
   Text,
-} from "@mantine/core";
-import type { PreviewData } from "../../types";
-import "./highlight.js.css"; // for the preview
-import "./preview.css"; // for the preview
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { postPreview } from "./post-preview";
-import { RefreshPreviewAreaHeight } from "./refresh-preview-area-height";
+} from "@mantine/core"
+import type { PreviewData } from "../../types"
+import "./highlight.js.css" // for the preview
+import "./preview.css" // for the preview
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { postPreview } from "./post-preview"
+import { RefreshPreviewAreaHeight } from "./refresh-preview-area-height"
 
 export function Preview({
   previewText,
   displayFormat,
 }: {
-  previewText: string;
-  displayFormat: string;
+  previewText: string
+  displayFormat: string
 }) {
   const { data, error, isFetching, isPending } = useQuery<PreviewData>({
     queryKey: ["preview", previewText, displayFormat],
     queryFn: async () => {
-      if (!previewText) return null;
+      if (!previewText) return null
 
       return postPreview({
         text: previewText,
         displayFormat,
-      });
+      })
     },
     placeholderData: keepPreviousData,
-  });
+  })
 
   return (
     <Box pos="relative" style={{ minHeight: 100 }}>
@@ -68,5 +68,5 @@ export function Preview({
 
       {data?.blogitem.html && <RefreshPreviewAreaHeight />}
     </Box>
-  );
+  )
 }

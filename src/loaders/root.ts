@@ -1,13 +1,13 @@
-import { defer } from "react-router-dom";
+import { defer } from "react-router-dom"
 import {
   commentsCountQueryKey,
   fetchCommentsCount,
-} from "../components/api-utils";
-import { queryClient } from "../query-client";
+} from "../components/api-utils"
+import { queryClient } from "../query-client"
 
 export type RootLoaderData = {
-  countUnapprovedComments: number;
-};
+  countUnapprovedComments: number
+}
 
 export async function loader() {
   return defer({
@@ -16,5 +16,5 @@ export async function loader() {
       queryFn: fetchCommentsCount,
       staleTime: 5000,
     }),
-  });
+  })
 }

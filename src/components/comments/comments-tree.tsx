@@ -9,24 +9,24 @@ import {
   Text,
   TextInput,
   Textarea,
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { DisplayDate } from "../blogitems/list-table";
-import classes from "./comments-tree.module.css";
-import type { Comment } from "./types";
+} from "@mantine/core"
+import { useForm } from "@mantine/form"
+import { notifications } from "@mantine/notifications"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
+import { DisplayDate } from "../blogitems/list-table"
+import classes from "./comments-tree.module.css"
+import type { Comment } from "./types"
 
-import { API_BASE, PUBLIC_BASE_URL } from "../../config";
+import { API_BASE, PUBLIC_BASE_URL } from "../../config"
 import {
   commentClassificationQueryKey,
   fetchCommentClassification,
-} from "../api-utils";
-import { ApprovalForm } from "./approval-form";
-import { ClassifyComment } from "./classify";
-import { DisplayClues } from "./clues";
-import { DisplayLocation } from "./location";
+} from "../api-utils"
+import { ApprovalForm } from "./approval-form"
+import { ClassifyComment } from "./classify"
+import { DisplayClues } from "./clues"
+import { DisplayLocation } from "./location"
 
 export function CommentsTree({
   comments,
@@ -40,20 +40,20 @@ export function CommentsTree({
   approved,
   deleted,
 }: {
-  comments: Comment[];
-  disabled: boolean;
-  refetchComments: () => void;
-  showTitles?: boolean;
-  toApprove: string[];
-  toDelete: string[];
-  onCheckApprove: (oid: string) => void;
-  onCheckDelete: (oid: string) => void;
-  approved: string[];
-  deleted: string[];
+  comments: Comment[]
+  disabled: boolean
+  refetchComments: () => void
+  showTitles?: boolean
+  toApprove: string[]
+  toDelete: string[]
+  onCheckApprove: (oid: string) => void
+  onCheckDelete: (oid: string) => void
+  approved: string[]
+  deleted: string[]
 }) {
-  let prevBlogitem = "";
+  let prevBlogitem = ""
   const nodes = comments.map((comment) => {
-    const newTitle = prevBlogitem !== comment.blogitem.oid;
+    const newTitle = prevBlogitem !== comment.blogitem.oid
     const title =
       showTitles && newTitle ? (
         <Box
@@ -71,9 +71,9 @@ export function CommentsTree({
             {comment.blogitem.title}
           </Anchor>
         </Box>
-      ) : null;
+      ) : null
 
-    prevBlogitem = comment.blogitem.oid;
+    prevBlogitem = comment.blogitem.oid
     return (
       <Box key={comment.id} mt={newTitle ? 40 : 0} mb={30}>
         {title}
@@ -106,15 +106,15 @@ export function CommentsTree({
           </Grid.Col>
         </Grid>
       </Box>
-    );
-  });
+    )
+  })
 
-  return <Box>{nodes}</Box>;
+  return <Box>{nodes}</Box>
 }
 
 type PostedError = {
-  errors: Record<string, string | string[]>;
-};
+  errors: Record<string, string | string[]>
+}
 
 function InnerComment({
   comment,
@@ -127,18 +127,18 @@ function InnerComment({
   approved,
   deleted,
 }: {
-  comment: Comment;
-  disabled: boolean;
-  refetchComments: () => void;
-  toApprove: string[];
-  toDelete: string[];
-  onCheckApprove: (oid: string) => void;
-  onCheckDelete: (oid: string) => void;
-  approved: string[];
-  deleted: string[];
+  comment: Comment
+  disabled: boolean
+  refetchComments: () => void
+  toApprove: string[]
+  toDelete: string[]
+  onCheckApprove: (oid: string) => void
+  onCheckDelete: (oid: string) => void
+  approved: string[]
+  deleted: string[]
 }) {
-  const [editMode, setEditMode] = useState(false);
-  const [classifyMode, setClassifyMode] = useState(false);
+  const [editMode, setEditMode] = useState(false)
+  const [classifyMode, setClassifyMode] = useState(false)
 
   const form = useForm({
     mode: "uncontrolled",
@@ -148,11 +148,11 @@ function InnerComment({
       name: comment.name || "",
       email: comment.email || "",
     },
-  });
+  })
 
   const mutation = useMutation({
     mutationFn: async (data: typeof form.values) => {
-      const url = `${API_BASE}/plog/comments/`;
+      const url = `${API_BASE}/plog/comments/`
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -160,55 +160,55 @@ function InnerComment({
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      });
+      })
       if (response.status === 400) {
-        const json = (await response.json()) as PostedError;
+        const json = (await response.json()) as PostedError
         notifications.show({
           title: "Validation errors",
           message: "Look for red",
           color: "red",
-        });
+        })
         for (const [field, errors] of Object.entries(json.errors)) {
           form.setFieldError(
             field,
             Array.isArray(errors) ? errors.join(", ") : errors,
-          );
+          )
         }
       } else if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      return response.json();
+      return response.json()
     },
     onSuccess: () => {
       notifications.show({
         title: "Saved",
         message: "Comment details saved and updated",
         color: "green",
-      });
-      setEditMode(false);
-      refetchComments();
+      })
+      setEditMode(false)
+      refetchComments()
     },
-  });
+  })
 
-  const isApproved = approved.includes(comment.oid);
-  const isDeleted = deleted.includes(comment.oid);
+  const isApproved = approved.includes(comment.oid)
+  const isDeleted = deleted.includes(comment.oid)
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
-  const [prefetched, setPrefetched] = useState<Set<string>>(() => new Set());
+  const [prefetched, setPrefetched] = useState<Set<string>>(() => new Set())
   function prefetchClassify(oid: string) {
     if (!prefetched.has(oid)) {
       setPrefetched((prev) => {
-        prev.add(oid);
-        return prev;
-      });
+        prev.add(oid)
+        return prev
+      })
       queryClient.prefetchQuery({
         queryKey: commentClassificationQueryKey(oid),
         queryFn: () => fetchCommentClassification(oid),
         // Prefetch only fires when data is older than the staleTime,
         // so in a case like this you definitely want to set one
         staleTime: 3000,
-      });
+      })
     }
   }
 
@@ -217,7 +217,7 @@ function InnerComment({
       <form
         onSubmit={form.onSubmit((data) => {
           if (data !== null) {
-            mutation.mutate(data);
+            mutation.mutate(data)
           }
         })}
       >
@@ -300,10 +300,10 @@ function InnerComment({
           <ClassifyComment
             comment={comment}
             onClose={() => {
-              setClassifyMode(false);
+              setClassifyMode(false)
               queryClient.invalidateQueries({
                 queryKey: ["comments"],
-              });
+              })
             }}
           />
         )}
@@ -316,13 +316,13 @@ function InnerComment({
               if (editMode) {
                 if (form.isDirty()) {
                   if (window.confirm("Discard changes?")) {
-                    form.reset();
+                    form.reset()
                   } else {
-                    return;
+                    return
                   }
                 }
               }
-              setEditMode((p) => !p);
+              setEditMode((p) => !p)
             }}
             disabled={disabled}
           >
@@ -338,12 +338,12 @@ function InnerComment({
             variant="light"
             color={comment.classification ? "lime" : undefined}
             onClick={() => {
-              setClassifyMode((p) => !p);
+              setClassifyMode((p) => !p)
             }}
             disabled={disabled}
             onMouseEnter={() => {
               if (!classifyMode && !comment.classification) {
-                prefetchClassify(comment.oid);
+                prefetchClassify(comment.oid)
               }
             }}
           >
@@ -389,10 +389,10 @@ function InnerComment({
         <DisplayClues clues={comment._clues} />
       </form>
     </Box>
-  );
+  )
 }
 
 // E.g. '2016-05-19T22:07:40.630Z' ==  '2016-05-19T22:07:40.190Z'
 function equalDates(a: string, b: string) {
-  return a.split(".")[0] === b.split(".")[0];
+  return a.split(".")[0] === b.split(".")[0]
 }

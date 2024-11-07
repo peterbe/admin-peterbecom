@@ -1,12 +1,12 @@
-import { Anchor, Box, Container, Group, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
-import { useImages } from "../../hooks/use-images";
-import { useOpenGraphImages } from "../../hooks/use-open-graph-images";
-import { SmartAnchor } from "../smart-anchor";
+import { Anchor, Box, Container, Group, Text } from "@mantine/core"
+import { useEffect, useState } from "react"
+import { useImages } from "../../hooks/use-images"
+import { useOpenGraphImages } from "../../hooks/use-open-graph-images"
+import { SmartAnchor } from "../smart-anchor"
 
 export function BlogitemLinks({ oid }: { oid: string }) {
-  const images = useImages(oid);
-  const openGraphImages = useOpenGraphImages(oid);
+  const images = useImages(oid)
+  const openGraphImages = useOpenGraphImages(oid)
   return (
     <Container>
       <Box mt={10} mb={20}>
@@ -27,27 +27,27 @@ export function BlogitemLinks({ oid }: { oid: string }) {
         </Group>
       </Box>
     </Container>
-  );
+  )
 }
 
 function PublicURL({
   path,
   children,
 }: {
-  path: string;
-  children: React.ReactNode;
+  path: string
+  children: React.ReactNode
 }) {
-  const [url, setUrl] = useState<URL>(new URL(path, "https://www.peterbe.com"));
+  const [url, setUrl] = useState<URL>(new URL(path, "https://www.peterbe.com"))
 
   useEffect(() => {
     if (window.location.hostname === "localhost") {
-      setUrl(new URL(path, "http://localhost:3000"));
+      setUrl(new URL(path, "http://localhost:3000"))
     }
-  }, [path]);
+  }, [path])
 
   return (
     <Anchor href={url.toString()} target="_blank" underline="always">
       {children}
     </Anchor>
-  );
+  )
 }

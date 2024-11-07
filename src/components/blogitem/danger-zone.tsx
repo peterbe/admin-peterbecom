@@ -1,7 +1,7 @@
-import { Container, Group, Paper, Title } from "@mantine/core";
-import type { EditBlogitemT } from "../../types";
-import { ArchiveBlogitem } from "./archive-blogitem";
-import { DeleteBlogitem } from "./delete-blogitem";
+import { Container, Group, Paper, Title } from "@mantine/core"
+import type { EditBlogitemT } from "../../types"
+import { ArchiveBlogitem } from "./archive-blogitem"
+import { DeleteBlogitem } from "./delete-blogitem"
 
 export function DangerZone({ blogitem }: { blogitem: EditBlogitemT }) {
   return (
@@ -14,5 +14,5 @@ export function DangerZone({ blogitem }: { blogitem: EditBlogitemT }) {
         </Group>
       </Paper>
     </Container>
-  );
+  )
 }

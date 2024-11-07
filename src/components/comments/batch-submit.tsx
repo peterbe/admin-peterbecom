@@ -1,12 +1,12 @@
-import { Alert, Box, Button } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
-import { batchSubmitComments } from "../api-utils";
+import { Alert, Box, Button } from "@mantine/core"
+import { notifications } from "@mantine/notifications"
+import { useMutation } from "@tanstack/react-query"
+import { batchSubmitComments } from "../api-utils"
 
 type BatchSubmission = {
-  approved: string[];
-  deleted: string[];
-};
+  approved: string[]
+  deleted: string[]
+}
 
 export function BatchSubmit({
   toApprove,
@@ -15,45 +15,45 @@ export function BatchSubmit({
   setDeleted,
   reset,
 }: {
-  toApprove: string[];
-  toDelete: string[];
-  setApproved: (oids: string[]) => void;
-  setDeleted: (oids: string[]) => void;
-  reset: () => void;
+  toApprove: string[]
+  toDelete: string[]
+  setApproved: (oids: string[]) => void
+  setDeleted: (oids: string[]) => void
+  reset: () => void
 }) {
   const mutation = useMutation<BatchSubmission>({
     mutationKey: ["batch-submit"],
     mutationFn: async () => {
-      return batchSubmitComments({ approve: toApprove, _delete: toDelete });
+      return batchSubmitComments({ approve: toApprove, _delete: toDelete })
     },
     onSuccess: (result) => {
-      let message = "";
+      let message = ""
       if (result.approved.length > 0) {
         message += `${result.approved.length} comment${
           result.approved.length === 1 ? "" : "s"
-        } approved. `;
-        setApproved(result.approved);
+        } approved. `
+        setApproved(result.approved)
       }
       if (result.deleted.length > 0) {
         message += `${result.deleted.length} comment${
           result.deleted.length === 1 ? "" : "s"
-        } deleted. `;
-        setDeleted(result.deleted);
+        } deleted. `
+        setDeleted(result.deleted)
       }
 
       notifications.show({
         title: "Batch update complete",
         message,
         color: "green",
-      });
+      })
 
-      reset();
+      reset()
     },
-  });
+  })
 
   function go() {
-    if (toApprove.length === 0 && toDelete.length === 0) return;
-    mutation.mutate();
+    if (toApprove.length === 0 && toDelete.length === 0) return
+    mutation.mutate()
   }
 
   return (
@@ -73,5 +73,5 @@ export function BatchSubmit({
       </Button>
       {mutation.error && <Alert color="red">{mutation.error.toString()}</Alert>}
     </Box>
-  );
+  )
 }

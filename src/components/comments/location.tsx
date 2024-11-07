@@ -1,13 +1,13 @@
-import { Group, Text } from "@mantine/core";
-import type { LocationT } from "./types";
+import { Group, Text } from "@mantine/core"
+import type { LocationT } from "./types"
 
 function countryCodeToSVGPath(countryCode: string) {
-  const norm = countryCode.toLowerCase();
-  return `/flag-icons/4x3/${norm}.svg`;
+  const norm = countryCode.toLowerCase()
+  return `/flag-icons/4x3/${norm}.svg`
 }
 
 export function DisplayLocation({ location }: { location: LocationT }) {
-  if (!location.country_code) return null;
+  if (!location.country_code) return null
 
   return (
     <Group>
@@ -22,5 +22,5 @@ export function DisplayLocation({ location }: { location: LocationT }) {
         {location.country_name || <i>no country</i>}
       </Text>
     </Group>
-  );
+  )
 }

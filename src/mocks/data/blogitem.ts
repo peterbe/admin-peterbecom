@@ -1,68 +1,68 @@
-import { HttpResponse } from "msw";
+import { HttpResponse } from "msw"
 
-import type { EditBlogitemT } from "../../types";
-import { getBlogitems, renameBlogitem } from "./db";
+import type { EditBlogitemT } from "../../types"
+import { getBlogitems, renameBlogitem } from "./db"
 
 export type EditBlogitemRequestBody = EditBlogitemT & {
-  keywords: string;
-};
+  keywords: string
+}
 
 export const BLOGITEM = (slug: string | readonly string[]) => {
   if (typeof slug !== "string")
-    return HttpResponse.text("Not Found", { status: 404 });
-  const blogitem = getBlogitems()[slug];
+    return HttpResponse.text("Not Found", { status: 404 })
+  const blogitem = getBlogitems()[slug]
   if (blogitem) {
-    return HttpResponse.json({ blogitem });
+    return HttpResponse.json({ blogitem })
   }
-  return HttpResponse.text("Not Found", { status: 404 });
-};
+  return HttpResponse.text("Not Found", { status: 404 })
+}
 
 export function editBlogitem({
   slug,
   body,
 }: {
-  slug: string;
-  body: EditBlogitemRequestBody;
+  slug: string
+  body: EditBlogitemRequestBody
 }) {
-  const errors: Record<string, string | string[]> = {};
+  const errors: Record<string, string | string[]> = {}
 
-  const oid = body.oid;
-  if (!oid) errors.oid = "Required";
+  const oid = body.oid
+  if (!oid) errors.oid = "Required"
 
-  const blogitem = getBlogitems()[slug];
+  const blogitem = getBlogitems()[slug]
 
   if (!blogitem) {
-    return HttpResponse.text("Not Found", { status: 404 });
+    return HttpResponse.text("Not Found", { status: 404 })
   }
 
-  const title = body.title;
+  const title = body.title
   if (!title) {
-    errors.title = "Required";
+    errors.title = "Required"
   }
-  const text = body.text;
+  const text = body.text
   if (!text) {
-    errors.text = "Required";
+    errors.text = "Required"
   }
-  const summary = body.summary;
+  const summary = body.summary
 
   const keywords = body.keywords
     .split("\n")
     .map((keyword) => keyword.trim())
-    .filter(Boolean);
+    .filter(Boolean)
 
   if (Object.keys(errors).length) {
-    return HttpResponse.json({ errors }, { status: 400 });
+    return HttpResponse.json({ errors }, { status: 400 })
   }
-  blogitem.oid = oid;
+  blogitem.oid = oid
   if (oid !== slug) {
-    renameBlogitem(slug, oid);
+    renameBlogitem(slug, oid)
   }
 
-  blogitem.title = title.trim();
-  blogitem.text = text.trim();
-  blogitem.summary = summary.trim();
-  blogitem.pub_date = body.pub_date;
-  blogitem.keywords = keywords;
+  blogitem.title = title.trim()
+  blogitem.text = text.trim()
+  blogitem.summary = summary.trim()
+  blogitem.pub_date = body.pub_date
+  blogitem.keywords = keywords
 
-  return HttpResponse.json({ blogitem });
+  return HttpResponse.json({ blogitem })
 }

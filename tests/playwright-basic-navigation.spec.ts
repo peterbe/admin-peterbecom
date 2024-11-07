@@ -1,112 +1,112 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "@playwright/test"
 
 test("add, find, edit blogitem", async ({ page }) => {
-  await page.goto("/");
-  await expect(page).toHaveTitle(/Sign in/);
-  await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click();
+  await page.goto("/")
+  await expect(page).toHaveTitle(/Sign in/)
+  await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click()
 
   await page
     .locator("header")
     .getByRole("link", { name: "Add blogitem" })
-    .click();
-  await page.getByPlaceholder("Title", { exact: true }).click();
-  await page.getByPlaceholder("Title", { exact: true }).fill("Hello World!");
-  await page.getByLabel("Text *").click();
-  await page.getByLabel("Text *").fill("Hello!");
-  await expect(page.getByTestId("preview")).toHaveText("Hello world");
-  await page.getByText("Hello world").click();
-  await page.getByLabel("Summary").click();
-  await page.getByLabel("Summary").fill("This is the summary");
-  await page.getByLabel("URL").click();
-  await page.getByLabel("URL").fill(" https://www.peterbe.com ");
+    .click()
+  await page.getByPlaceholder("Title", { exact: true }).click()
+  await page.getByPlaceholder("Title", { exact: true }).fill("Hello World!")
+  await page.getByLabel("Text *").click()
+  await page.getByLabel("Text *").fill("Hello!")
+  await expect(page.getByTestId("preview")).toHaveText("Hello world")
+  await page.getByText("Hello world").click()
+  await page.getByLabel("Summary").click()
+  await page.getByLabel("Summary").fill("This is the summary")
+  await page.getByLabel("URL").click()
+  await page.getByLabel("URL").fill(" https://www.peterbe.com ")
   await page
     .locator("div")
     .filter({ hasText: /^Categories$/ })
     .locator("div")
     .nth(1)
-    .click();
-  await page.getByText("Hardware").click();
-  await page.getByText("Software").click();
-  await page.getByLabel("Keywords").click();
-  await page.getByLabel("Keywords").fill("one\n\n two \n  ");
+    .click()
+  await page.getByText("Hardware").click()
+  await page.getByText("Software").click()
+  await page.getByLabel("Keywords").click()
+  await page.getByLabel("Keywords").fill("one\n\n two \n  ")
 
-  const button = page.getByRole("button", { name: "Save" });
+  const button = page.getByRole("button", { name: "Save" })
   const isDisabled = await button.evaluate(
     (button: HTMLButtonElement) => button.disabled,
-  );
-  expect(isDisabled).toBe(false);
+  )
+  expect(isDisabled).toBe(false)
 
-  await button.click();
+  await button.click()
   // XXX WHY DO YOU HAVE TO CLICK IT TWICE?!
-  await button.click();
+  await button.click()
 
-  await expect(page).toHaveURL("/plog/hello-world");
-  await expect(page).toHaveTitle(/Edit hello-world/);
+  await expect(page).toHaveURL("/plog/hello-world")
+  await expect(page).toHaveTitle(/Edit hello-world/)
 
   await page
     .getByRole("banner")
     .getByRole("link", { name: "Blogitems" })
-    .click();
-  await expect(page).toHaveURL("/plog");
+    .click()
+  await expect(page).toHaveURL("/plog")
 
-  await page.getByPlaceholder("Search", { exact: true }).click();
-  await page.getByPlaceholder("Search", { exact: true }).fill("xxx");
-  await page.getByPlaceholder("Search", { exact: true }).press("Enter");
-  await page.getByRole("button", { name: "Clear" }).click();
-  await page.getByPlaceholder("Search", { exact: true }).fill("hello");
-  await page.getByPlaceholder("Search", { exact: true }).press("Enter");
-  await page.getByRole("link", { name: "Hello World" }).click();
-  await expect(page).toHaveTitle(/Edit hello-world/);
+  await page.getByPlaceholder("Search", { exact: true }).click()
+  await page.getByPlaceholder("Search", { exact: true }).fill("xxx")
+  await page.getByPlaceholder("Search", { exact: true }).press("Enter")
+  await page.getByRole("button", { name: "Clear" }).click()
+  await page.getByPlaceholder("Search", { exact: true }).fill("hello")
+  await page.getByPlaceholder("Search", { exact: true }).press("Enter")
+  await page.getByRole("link", { name: "Hello World" }).click()
+  await expect(page).toHaveTitle(/Edit hello-world/)
 
-  await page.getByPlaceholder("oid slug").fill("hello-new-world");
-  await page.getByRole("button", { name: "Save" }).click();
+  await page.getByPlaceholder("oid slug").fill("hello-new-world")
+  await page.getByRole("button", { name: "Save" }).click()
 
-  await expect(page).toHaveURL("/plog/hello-new-world");
-  await expect(page).toHaveTitle(/Edit hello-new-world/);
+  await expect(page).toHaveURL("/plog/hello-new-world")
+  await expect(page).toHaveTitle(/Edit hello-new-world/)
 
-  await expect(page.getByText("Pageviews")).toBeVisible();
-  await expect(page.getByText("Not enough data to show a graph")).toBeVisible();
+  await expect(page.getByText("Pageviews")).toBeVisible()
+  await expect(page.getByText("Not enough data to show a graph")).toBeVisible()
 
-  await page.getByRole("link", { name: "Home" }).click();
-  await page.getByPlaceholder("Search titles or OIDs").click();
-  await page.getByPlaceholder("Search titles or OIDs").fill("hello");
-  await page.getByPlaceholder("Search titles or OIDs").press("Enter");
-  await page.getByRole("option", { name: "Hello World!" }).click();
-});
+  await page.getByRole("link", { name: "Home" }).click()
+  await page.getByPlaceholder("Search titles or OIDs").click()
+  await page.getByPlaceholder("Search titles or OIDs").fill("hello")
+  await page.getByPlaceholder("Search titles or OIDs").press("Enter")
+  await page.getByRole("option", { name: "Hello World!" }).click()
+})
 
 test("approve and delete comments", async ({ page }) => {
-  await page.goto("/");
-  await expect(page).toHaveTitle(/Sign in/);
-  await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click();
+  await page.goto("/")
+  await expect(page).toHaveTitle(/Sign in/)
+  await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click()
 
   await page
     .locator("header")
     .getByRole("link", { name: "Comments (1)" })
-    .click();
+    .click()
 
-  await expect(page).toHaveURL("/plog/comments?only=unapproved");
-  await expect(page).toHaveTitle("(1) Comment");
-  await expect(page.getByText("Blabla")).toBeVisible();
+  await expect(page).toHaveURL("/plog/comments?only=unapproved")
+  await expect(page).toHaveTitle("(1) Comment")
+  await expect(page.getByText("Blabla")).toBeVisible()
   await expect(
     page.getByText("This has already been approved"),
-  ).not.toBeVisible();
+  ).not.toBeVisible()
 
-  await page.getByTestId("comments-filters").getByText("Unapproved").click();
-  await expect(page).toHaveTitle("(1) Comment");
-  await expect(page.getByText("Blabla")).toBeVisible();
+  await page.getByTestId("comments-filters").getByText("Unapproved").click()
+  await expect(page).toHaveTitle("(1) Comment")
+  await expect(page.getByText("Blabla")).toBeVisible()
   await expect(
     page.getByText("This has already been approved"),
-  ).not.toBeVisible();
+  ).not.toBeVisible()
 
-  await page.getByText("Autoapproved").click();
-  await expect(page).toHaveTitle("(0) Comments");
-  await expect(page.getByText("Blabla")).not.toBeVisible();
+  await page.getByText("Autoapproved").click()
+  await expect(page).toHaveTitle("(0) Comments")
+  await expect(page.getByText("Blabla")).not.toBeVisible()
   await expect(
     page.getByText("This has already been approved"),
-  ).not.toBeVisible();
+  ).not.toBeVisible()
 
-  await page.getByText("Any").click();
-  await expect(page).toHaveTitle("(2) Comments");
-  await expect(page.getByText("Blabla")).toBeVisible();
-  await expect(page.getByText("This has already been approved")).toBeVisible();
-});
+  await page.getByText("Any").click()
+  await expect(page).toHaveTitle("(2) Comments")
+  await expect(page.getByText("Blabla")).toBeVisible()
+  await expect(page.getByText("This has already been approved")).toBeVisible()
+})

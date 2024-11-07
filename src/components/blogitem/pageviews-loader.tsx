@@ -1,8 +1,8 @@
-import { Container, Title } from "@mantine/core";
-import { Suspense, lazy } from "react";
-import type { EditBlogitemT } from "../../types";
+import { Container, Title } from "@mantine/core"
+import { Suspense, lazy } from "react"
+import type { EditBlogitemT } from "../../types"
 
-const PageviewsInner = lazy(() => import("./pageviews"));
+const PageviewsInner = lazy(() => import("./pageviews"))
 
 export function Pageviews({ blogitem }: { blogitem: EditBlogitemT }) {
   return (
@@ -12,5 +12,5 @@ export function Pageviews({ blogitem }: { blogitem: EditBlogitemT }) {
         <PageviewsInner blogitem={blogitem} />
       </Suspense>
     </Container>
-  );
+  )
 }
