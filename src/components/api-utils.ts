@@ -2,6 +2,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { API_BASE } from "../config";
+import type { CommentsServerData } from "./comments/types";
 
 export function blogitemQueryKey(oid: string | null) {
   return ["blogitem", oid];
@@ -33,6 +34,10 @@ export function spamPatternsQueryKey() {
 
 export function commentClassificationQueryKey(oid: string) {
   return ["classify", oid];
+}
+
+export function commentsCountQueryKey() {
+  return ["count-unapproved-comments"];
 }
 
 export async function fetchBlogitem(oid: string) {
@@ -85,6 +90,12 @@ export async function fetchShowAllBlogitems() {
   return response.json();
 }
 
+export async function fetchCommentsCount() {
+  return fetchComments(
+    new URLSearchParams({ unapproved: "only", count: "true" }),
+  );
+}
+
 export async function fetchComments(search: URLSearchParams) {
   const copy = new URLSearchParams(search);
   if (copy.get("only") === "unapproved") {
@@ -95,11 +106,13 @@ export async function fetchComments(search: URLSearchParams) {
     copy.delete("only");
   }
 
+  console.log("FETCHING COMMENTS", new Date());
+
   const response = await fetch(`${API_BASE}/plog/comments/?${copy}`);
   if (!response.ok) {
     throw new Error(`${response.status} on ${response.url}`);
   }
-  return response.json();
+  return (await response.json()) as CommentsServerData;
 }
 
 export async function batchSubmitComments({

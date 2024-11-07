@@ -18,6 +18,8 @@ import "./highlight.js.css"; // for the preview
 import { useDebouncedValue, useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
+// import { useLoaderData, useNavigate } from "react-router-dom";
+// import type { BlogitemLoaderData } from "../../loaders/blogitem";
 import {
   blogitemQueryKey,
   blogitemsQueryKey,
@@ -53,7 +55,11 @@ type PostedError = {
 };
 
 export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
-  const { categories, error: categoriesError } = useCategories();
+  const {
+    categories,
+    isPending: categorisIsPending,
+    error: categoriesError,
+  } = useCategories();
 
   const initialValues = {
     oid: blogitem.oid,
@@ -286,7 +292,13 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           <Alert color="red">Failed to load categories</Alert>
         )}
         <MultiSelect
-          label="Categories"
+          label={
+            categoriesError
+              ? "Categories (errored!)"
+              : categorisIsPending
+                ? "Categories (loading)"
+                : "Categories"
+          }
           comboboxProps={{ shadow: "md" }}
           disabled={categories.length === 0}
           data={categories.map((category) => ({

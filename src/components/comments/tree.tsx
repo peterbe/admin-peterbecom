@@ -3,7 +3,11 @@ import { useDocumentTitle } from "@mantine/hooks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { thousands } from "../../number-formatter";
-import { commentsQueryKey, fetchComments } from "../api-utils";
+import {
+  commentsCountQueryKey,
+  commentsQueryKey,
+  fetchComments,
+} from "../api-utils";
 import { BatchSubmit } from "./batch-submit";
 import { CommentsTree } from "./comments-tree";
 import { Filters } from "./filters";
@@ -70,7 +74,7 @@ export function Tree() {
               reset();
 
               queryClient.invalidateQueries({
-                queryKey: ["count-unapproved-comments"],
+                queryKey: commentsCountQueryKey(),
               });
             }}
           />

@@ -1,14 +1,21 @@
 import { Box, Button, Group } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
+// import { Await, Link, useRouteLoaderData } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments";
+// import { Suspense } from "react";
+// import type { RootLoaderData } from "../loaders/root";
 import { SignedIn } from "./signed-in";
 
 export function Home() {
   useDocumentTitle("Home");
 
-  const { data: countUnapprovedComments } = useCountUnapprovedComments();
+  // const { countUnapprovedComments } = useRouteLoaderData(
+  //   "root"
+  // ) as RootLoaderData;
+  const { data, isPending } = useCountUnapprovedComments();
+  console.log("RENDERING HOME COMPONENT", { data: !!data, isPending });
 
   return (
     <SignedIn>
@@ -20,22 +27,18 @@ export function Home() {
           <Button size="xl" component={Link} to="/plog/add">
             Add blogitem
           </Button>
+          <CommentsButton count={data?.count} />
 
-          {countUnapprovedComments && (
-            <Button
-              size="xl"
-              component={Link}
-              to={
-                countUnapprovedComments?.count
-                  ? "/plog/comments?only=unapproved"
-                  : "/plog/comments"
-              }
+          {/* <Suspense fallback={<CommentsButton />}>
+            <Await
+              resolve={countUnapprovedComments}
+              errorElement={<CommentsButton />}
             >
-              {countUnapprovedComments?.count
-                ? `(${countUnapprovedComments.count}) Comments`
-                : "Comments"}
-            </Button>
-          )}
+              {(countUnapprovedComments) => (
+                <CommentsButton count={countUnapprovedComments.count} />
+              )}
+            </Await>
+          </Suspense> */}
         </Group>
       </Box>
       <Box m={100}>
@@ -49,5 +52,17 @@ export function Home() {
         </Group>
       </Box>
     </SignedIn>
+  );
+}
+
+function CommentsButton({ count }: { count?: number }) {
+  return (
+    <Button
+      size="xl"
+      component={Link}
+      to={count ? "/plog/comments?only=unapproved" : "/plog/comments"}
+    >
+      {count ? `Comments (${count})` : "Comments"}
+    </Button>
   );
 }
