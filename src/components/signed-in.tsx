@@ -1,11 +1,11 @@
-import { Alert, Box, Button, LoadingOverlay } from "@mantine/core";
-import type { ReactNode } from "react";
+import { Alert, Box, Button, LoadingOverlay } from "@mantine/core"
+import type { ReactNode } from "react"
 
-import { useUserData } from "../whoami/use-userdata";
-import { Authenticate } from "./authenticate";
+import { useUserData } from "../whoami/use-userdata"
+import { Authenticate } from "./authenticate"
 
 export function SignedIn({ children }: { children: ReactNode }) {
-  const { userData, userError } = useUserData();
+  const { userData, userError } = useUserData()
 
   if (userError) {
     return (
@@ -19,20 +19,20 @@ export function SignedIn({ children }: { children: ReactNode }) {
             variant="outline"
             color="red"
             onClick={() => {
-              window.location.reload();
+              window.location.reload()
             }}
           >
             Try reloading
           </Button>
         </Alert>
       </div>
-    );
+    )
   }
   if (!userData) {
-    return <LoadingOverlay visible={true} />;
+    return <LoadingOverlay visible={true} />
   }
   if (!userData.user) {
-    return <Authenticate />;
+    return <Authenticate />
   }
-  return <Box style={{ marginBottom: 100 }}>{children}</Box>;
+  return <Box style={{ marginBottom: 100 }}>{children}</Box>
 }

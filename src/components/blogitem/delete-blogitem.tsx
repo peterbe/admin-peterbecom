@@ -1,35 +1,35 @@
-import { Box, Button, Group, LoadingOverlay, Text } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { API_BASE } from "../../config";
-import { blogitemsQueryKey } from "../api-utils";
+import { Box, Button, Group, LoadingOverlay, Text } from "@mantine/core"
+import { notifications } from "@mantine/notifications"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { API_BASE } from "../../config"
+import { blogitemsQueryKey } from "../api-utils"
 
 export function DeleteBlogitem({ oid }: { oid: string }) {
-  const [asked, setAsked] = useState(false);
+  const [asked, setAsked] = useState(false)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationKey: ["delete-blogitem", oid],
     mutationFn: async () => {
       const response = await fetch(`${API_BASE}/plog/${oid}`, {
         method: "DELETE",
-      });
+      })
       if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      notifications.show({ message: "Blogitem deleted", color: "green" });
-      return response.json();
+      notifications.show({ message: "Blogitem deleted", color: "green" })
+      return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() });
-      navigate("/plog");
+      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() })
+      navigate("/plog")
     },
-  });
+  })
 
   return (
     <Box mb={10} pos="relative">
@@ -41,7 +41,7 @@ export function DeleteBlogitem({ oid }: { oid: string }) {
             <Button
               color="red"
               onClick={() => {
-                mutation.mutate();
+                mutation.mutate()
               }}
             >
               Yes, delete it
@@ -55,5 +55,5 @@ export function DeleteBlogitem({ oid }: { oid: string }) {
         </Button>
       )}
     </Box>
-  );
+  )
 }

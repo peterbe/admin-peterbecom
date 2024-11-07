@@ -1,8 +1,8 @@
 import {
   type FormatDistanceFnOptions,
   formatDistanceToNowStrict,
-} from "date-fns";
-import * as locales from "date-fns/locale";
+} from "date-fns"
+import * as locales from "date-fns/locale"
 
 const formatDistanceLocale: Record<string, string> = {
   lessThanXSeconds: "{{count}}s",
@@ -21,7 +21,7 @@ const formatDistanceLocale: Record<string, string> = {
   xYears: "{{count}}y",
   overXYears: "{{count}}y",
   almostXYears: "{{count}}y",
-} as const;
+} as const
 
 function formatDistance(
   token: string,
@@ -31,16 +31,16 @@ function formatDistance(
   const result =
     token in formatDistanceLocale
       ? formatDistanceLocale[token].replace("{{count}}", `${count}`)
-      : token;
+      : token
 
   if (options?.addSuffix) {
     if (options.comparison !== undefined && options.comparison > 0) {
-      return `in ${result}`;
+      return `in ${result}`
     }
-    return `${result} ago`;
+    return `${result} ago`
   }
 
-  return result;
+  return result
 }
 
 export function formatDistanceCompact(date: string | Date) {
@@ -50,5 +50,5 @@ export function formatDistanceCompact(date: string | Date) {
       ...locales.enUS,
       formatDistance,
     },
-  });
+  })
 }

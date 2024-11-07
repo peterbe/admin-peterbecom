@@ -7,23 +7,23 @@ import {
   Group,
   LoadingOverlay,
   Text,
-} from "@mantine/core";
-import { useDocumentTitle } from "@mantine/hooks";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
+} from "@mantine/core"
+import { useDocumentTitle } from "@mantine/hooks"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Link, useParams } from "react-router-dom"
 import {
   type OpenGraphImageT,
   useOpenGraphImages,
-} from "../../hooks/use-open-graph-images";
-import { SignedIn } from "../signed-in";
-import { AbsoluteImage } from "./absolute-image";
-import { BlogitemLinks } from "./links";
+} from "../../hooks/use-open-graph-images"
+import { SignedIn } from "../signed-in"
+import { AbsoluteImage } from "./absolute-image"
+import { BlogitemLinks } from "./links"
 
 export function Component() {
-  const params = useParams();
-  const oid = params.oid as string;
+  const params = useParams()
+  const oid = params.oid as string
 
-  useDocumentTitle(`Open Graph image for ${oid}`);
+  useDocumentTitle(`Open Graph image for ${oid}`)
 
   return (
     <SignedIn>
@@ -32,11 +32,11 @@ export function Component() {
         <Selection oid={oid} />
       </Container>
     </SignedIn>
-  );
+  )
 }
 
 function Selection({ oid }: { oid: string }) {
-  const { data, error, isPending } = useOpenGraphImages(oid);
+  const { data, error, isPending } = useOpenGraphImages(oid)
 
   return (
     <Box pos="relative">
@@ -49,15 +49,15 @@ function Selection({ oid }: { oid: string }) {
       )}
       <Group>
         {(data?.images || []).map((image) => {
-          return <ImageChoice image={image} key={image.src} oid={oid} />;
+          return <ImageChoice image={image} key={image.src} oid={oid} />
         })}
       </Group>
     </Box>
-  );
+  )
 }
 
 function ImageChoice({ image, oid }: { image: OpenGraphImageT; oid: string }) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationKey: ["open-graph-image", oid],
@@ -68,18 +68,18 @@ function ImageChoice({ image, oid }: { image: OpenGraphImageT; oid: string }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ src: image.src }),
-      });
+      })
       if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      return response.json();
+      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["open-graph-image", oid],
-      });
+      })
     },
-  });
+  })
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -96,11 +96,11 @@ function ImageChoice({ image, oid }: { image: OpenGraphImageT; oid: string }) {
       <Button
         disabled={!!image.current || mutation.isPending}
         onClick={() => {
-          mutation.mutate();
+          mutation.mutate()
         }}
       >
         This one
       </Button>
     </Card>
-  );
+  )
 }

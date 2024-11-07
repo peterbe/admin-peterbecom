@@ -1,33 +1,33 @@
-import { useState } from "react";
+import { useState } from "react"
 
 export function useBatchSubmission() {
-  const [toApprove, setToApprove] = useState<string[]>([]);
-  const [toDelete, setToDelete] = useState<string[]>([]);
+  const [toApprove, setToApprove] = useState<string[]>([])
+  const [toDelete, setToDelete] = useState<string[]>([])
 
-  const [approved, setApproved] = useState<string[]>([]);
-  const [deleted, setDeleted] = useState<string[]>([]);
+  const [approved, setApproved] = useState<string[]>([])
+  const [deleted, setDeleted] = useState<string[]>([])
 
   function toggleToApprove(oid: string) {
     if (toApprove.includes(oid)) {
-      setToApprove((prev) => prev.filter((o) => o !== oid));
+      setToApprove((prev) => prev.filter((o) => o !== oid))
     } else {
-      setToApprove([...toApprove, oid]);
+      setToApprove([...toApprove, oid])
     }
-    setToDelete((prev) => prev.filter((o) => o !== oid));
+    setToDelete((prev) => prev.filter((o) => o !== oid))
   }
 
   function toggleToDelete(oid: string) {
     if (toDelete.includes(oid)) {
-      setToDelete((prev) => prev.filter((o) => o !== oid));
+      setToDelete((prev) => prev.filter((o) => o !== oid))
     } else {
-      setToDelete([...toDelete, oid]);
+      setToDelete([...toDelete, oid])
     }
-    setToApprove((prev) => prev.filter((o) => o !== oid));
+    setToApprove((prev) => prev.filter((o) => o !== oid))
   }
 
   function reset() {
-    setToApprove([]);
-    setToDelete([]);
+    setToApprove([])
+    setToDelete([])
   }
 
   return {
@@ -40,5 +40,5 @@ export function useBatchSubmission() {
     deleted,
     setApproved,
     setDeleted,
-  };
+  }
 }

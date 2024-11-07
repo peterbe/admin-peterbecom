@@ -1,18 +1,18 @@
-import { Anchor, Box, Text, Title } from "@mantine/core";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { Anchor, Box, Text, Title } from "@mantine/core"
+import { Link, useLocation, useSearchParams } from "react-router-dom"
 
 export function NoComments() {
-  const { pathname } = useLocation();
-  const [searchParams] = useSearchParams();
+  const { pathname } = useLocation()
+  const [searchParams] = useSearchParams()
 
   function subtractQueryString(key: string) {
-    const sp = new URLSearchParams(searchParams);
-    sp.delete(key);
-    let url = pathname;
+    const sp = new URLSearchParams(searchParams)
+    sp.delete(key)
+    let url = pathname
     if (sp.toString() !== "") {
-      url += `?${sp.toString()}`;
+      url += `?${sp.toString()}`
     }
-    return url;
+    return url
   }
 
   return (
@@ -36,5 +36,5 @@ export function NoComments() {
         </Text>
       )}
     </Box>
-  );
+  )
 }

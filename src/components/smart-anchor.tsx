@@ -1,12 +1,12 @@
-import { Anchor, type AnchorProps } from "@mantine/core";
+import { Anchor, type AnchorProps } from "@mantine/core"
 
-import { Link, type LinkProps, useLocation } from "react-router-dom";
+import { Link, type LinkProps, useLocation } from "react-router-dom"
 
 export function SmartAnchor({
   ...props
 }: AnchorProps & Omit<LinkProps, "to"> & { href: string }) {
-  const { href, ...rest } = props;
-  const { pathname } = useLocation();
+  const { href, ...rest } = props
+  const { pathname } = useLocation()
   return (
     <Anchor
       {...rest}
@@ -14,7 +14,7 @@ export function SmartAnchor({
       to={href}
       underline={pathname === href ? "never" : "always"}
     />
-  );
+  )
 }
 
 //   const { href, ...rest } = props;

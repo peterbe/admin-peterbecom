@@ -1,8 +1,8 @@
-import type { Comment } from "../../components/comments/types";
-import type { CategoryT, EditBlogitemT } from "../../types";
+import type { Comment } from "../../components/comments/types"
+import type { CategoryT, EditBlogitemT } from "../../types"
 
 export function CATEGORIES(): {
-  categories: CategoryT[];
+  categories: CategoryT[]
 } {
   return {
     categories: [
@@ -10,34 +10,34 @@ export function CATEGORIES(): {
       { id: 2, name: "Hardware" },
       { id: 3, name: "Foodware" },
     ],
-  };
+  }
 }
 
-export type BlogitemFull = Omit<EditBlogitemT, "_published" | "_absolute_url">;
+export type BlogitemFull = Omit<EditBlogitemT, "_published" | "_absolute_url">
 
-type Blogitems = Record<string, BlogitemFull>;
-const blogitems: Blogitems = {};
+type Blogitems = Record<string, BlogitemFull>
+const blogitems: Blogitems = {}
 
 export function getBlogitems(): Record<string, BlogitemFull> {
-  return blogitems;
+  return blogitems
 }
 
 export function addBlogitem(blogitem: BlogitemFull) {
-  blogitems[blogitem.oid] = blogitem;
+  blogitems[blogitem.oid] = blogitem
 }
 
 export function renameBlogitem(oldOid: string, newOid: string) {
-  const blogitem = blogitems[oldOid];
+  const blogitem = blogitems[oldOid]
   if (blogitem) {
-    delete blogitems[oldOid];
-    blogitems[newOid] = blogitem;
+    delete blogitems[oldOid]
+    blogitems[newOid] = blogitem
   } else {
-    throw new Error("Blogitem not found");
+    throw new Error("Blogitem not found")
   }
 }
 
 export function getNextId(): number {
-  return Math.max(0, ...Object.values(blogitems).map((b) => b.id)) + 1;
+  return Math.max(0, ...Object.values(blogitems).map((b) => b.id)) + 1
 }
 
 const location = {
@@ -51,7 +51,7 @@ const location = {
   postal_code: null,
   region: null,
   time_zone: "UTC",
-};
+}
 const COMMENTS: Comment[] = [
   {
     id: 1,
@@ -121,8 +121,8 @@ const COMMENTS: Comment[] = [
       classification: "ham",
     },
   },
-];
+]
 
 export function getComments() {
-  return COMMENTS;
+  return COMMENTS
 }

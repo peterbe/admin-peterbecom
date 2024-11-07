@@ -1,7 +1,7 @@
-import { useContext } from "react";
+import { useContext } from "react"
 
-import { UserDataContext } from "./context";
+import { UserDataContext } from "./context"
 
 export function useUserData() {
-  return useContext(UserDataContext);
+  return useContext(UserDataContext)
 }

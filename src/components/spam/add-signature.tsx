@@ -6,23 +6,23 @@ import {
   LoadingOverlay,
   TextInput,
   Title,
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { API_BASE } from "../../config";
-import { spamSignaturesQueryKey } from "../api-utils";
+} from "@mantine/core"
+import { useForm } from "@mantine/form"
+import { notifications } from "@mantine/notifications"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { API_BASE } from "../../config"
+import { spamSignaturesQueryKey } from "../api-utils"
 
 type PostedError = {
-  errors: Record<string, string | string[]>;
-};
+  errors: Record<string, string | string[]>
+}
 
 export function AddSignature() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const { mutate, isPending, error } = useMutation({
     mutationKey: spamSignaturesQueryKey(),
     mutationFn: async (data: typeof form.values) => {
-      const url = `${API_BASE}/spam/signatures`;
+      const url = `${API_BASE}/spam/signatures`
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -30,51 +30,51 @@ export function AddSignature() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      });
+      })
 
       if (response.status === 400) {
-        const json = (await response.json()) as PostedError;
+        const json = (await response.json()) as PostedError
         notifications.show({
           title: "Validation errors",
           message: "Look for red",
           color: "red",
-        });
+        })
         for (const [field, errors] of Object.entries(json.errors)) {
           form.setFieldError(
             field,
             Array.isArray(errors) ? errors.join(", ") : errors,
-          );
+          )
         }
       } else if (response.status === 200) {
         notifications.show({
           message: "Spam signature added",
           color: "green",
-        });
+        })
       } else {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
     },
     onSuccess: () => {
-      form.reset();
-      form.setValues(initialValues);
+      form.reset()
+      form.setValues(initialValues)
 
       queryClient.invalidateQueries({
         queryKey: spamSignaturesQueryKey(),
-      });
+      })
     },
-  });
+  })
 
   const initialValues = {
     name: "",
     name_null: false,
     email: "",
     email_null: false,
-  };
+  }
 
   const form = useForm({
     mode: "uncontrolled",
     initialValues,
-  });
+  })
 
   return (
     <Box mb={10} pos="relative">
@@ -86,7 +86,7 @@ export function AddSignature() {
       <form
         onSubmit={form.onSubmit((data) => {
           if (data !== null) {
-            mutate(data);
+            mutate(data)
           }
         })}
       >
@@ -129,5 +129,5 @@ export function AddSignature() {
         </Box>
       </form>
     </Box>
-  );
+  )
 }

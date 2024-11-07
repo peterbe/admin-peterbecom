@@ -1,4 +1,4 @@
-import { HttpResponse } from "msw";
+import { HttpResponse } from "msw"
 
 import {
   type BlogitemFull,
@@ -6,54 +6,54 @@ import {
   addBlogitem as addBlogitemFull,
   getBlogitems,
   getNextId,
-} from "./db";
+} from "./db"
 
 export type AddBlogitemRequestBody = {
-  oid: string;
-  title: string;
+  oid: string
+  title: string
 
-  categories: string[];
-  display_format: string;
+  categories: string[]
+  display_format: string
   // keywords: string;
-  pub_date: string;
-  summary: string;
-  text: string;
-  url: string;
-  keywords: string;
-  codesyntax: string;
-};
+  pub_date: string
+  summary: string
+  text: string
+  url: string
+  keywords: string
+  codesyntax: string
+}
 
 export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
-  const errors: Record<string, string | string[]> = {};
+  const errors: Record<string, string | string[]> = {}
 
-  const oid = body.oid;
-  if (!oid) errors.oid = "Required";
-  const title = body.title;
-  if (!title) errors.title = "Required";
-  const text = body.text;
-  if (!text) errors.text = "Required";
-  const pubDate = body.pub_date;
-  if (!pubDate) errors.pub_date = "Required";
-  const summary = body.summary;
-  const url = body.url;
+  const oid = body.oid
+  if (!oid) errors.oid = "Required"
+  const title = body.title
+  if (!title) errors.title = "Required"
+  const text = body.text
+  if (!text) errors.text = "Required"
+  const pubDate = body.pub_date
+  if (!pubDate) errors.pub_date = "Required"
+  const summary = body.summary
+  const url = body.url
   const keywords = body.keywords
     .split("\n")
     .map((keyword) => keyword.trim())
-    .filter(Boolean);
+    .filter(Boolean)
 
-  const modifyDate = new Date().toISOString();
-  const rawCategories = body.categories;
+  const modifyDate = new Date().toISOString()
+  const rawCategories = body.categories
   if (!rawCategories.length) {
-    errors.categories = "Required";
+    errors.categories = "Required"
   }
 
   if (Object.keys(errors).length) {
-    return HttpResponse.json({ errors }, { status: 400 });
+    return HttpResponse.json({ errors }, { status: 400 })
   }
 
   const categories = CATEGORIES().categories.filter((category) => {
-    return rawCategories.includes(`${category.id}`);
-  });
+    return rawCategories.includes(`${category.id}`)
+  })
 
   const blogitem: BlogitemFull = {
     id: getNextId(),
@@ -72,25 +72,25 @@ export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
     disallow_comments: false,
     hide_comments: false,
     open_graph_image: null,
-  };
-  addBlogitemFull(blogitem);
+  }
+  addBlogitemFull(blogitem)
 
-  return HttpResponse.json({ blogitem });
+  return HttpResponse.json({ blogitem })
 }
 
 export const BLOGITEMS = (params: URLSearchParams) => {
-  const showAll = params.get("show") === "all";
+  const showAll = params.get("show") === "all"
   if (showAll) {
     const blogitems = Object.values(getBlogitems()).map((item) => {
       return {
         id: item.id,
         oid: item.oid,
         title: item.title,
-      };
-    });
+      }
+    })
     return HttpResponse.json({
       blogitems,
-    });
+    })
   }
   const filtered = Object.values(getBlogitems()).filter((item) => {
     return (
@@ -98,19 +98,19 @@ export const BLOGITEMS = (params: URLSearchParams) => {
       item.title
         .toLowerCase()
         .includes((params.get("search") as string).toLowerCase())
-    );
-  });
+    )
+  })
   if (params.get("order") === "modify_date") {
     filtered.sort((a, b) => {
-      return b.modify_date.localeCompare(a.modify_date);
-    });
+      return b.modify_date.localeCompare(a.modify_date)
+    })
   } else if (params.get("order") === "pub_date") {
     filtered.sort((a, b) => {
-      return b.pub_date.localeCompare(a.pub_date);
-    });
+      return b.pub_date.localeCompare(a.pub_date)
+    })
   }
 
   return HttpResponse.json({
     blogitems: filtered,
-  });
-};
+  })
+}

@@ -8,21 +8,21 @@ import {
   LoadingOverlay,
   Table,
   TextInput,
-} from "@mantine/core";
-import type { BadgeProps } from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
-import { formatDistance, parseISO } from "date-fns";
-import { useState } from "react";
+} from "@mantine/core"
+import type { BadgeProps } from "@mantine/core"
+import { IconSearch } from "@tabler/icons-react"
+import { formatDistance, parseISO } from "date-fns"
+import { useState } from "react"
 
-import { useMediaQuery } from "@mantine/hooks";
-import { useSearchParams } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { thousands } from "../../number-formatter";
-import type { BlogitemsServerData } from "../../types";
-import { usePrefetchBlogitem } from "../api-utils";
-import { formatDistanceCompact } from "./format-distance-compact";
-import { SearchTips } from "./search-tips";
-import type { PageviewsByDate, PageviewsByOID } from "./types";
+import { useMediaQuery } from "@mantine/hooks"
+import { useSearchParams } from "react-router-dom"
+import { Link } from "react-router-dom"
+import { thousands } from "../../number-formatter"
+import type { BlogitemsServerData } from "../../types"
+import { usePrefetchBlogitem } from "../api-utils"
+import { formatDistanceCompact } from "./format-distance-compact"
+import { SearchTips } from "./search-tips"
+import type { PageviewsByDate, PageviewsByOID } from "./types"
 
 export function ListTable({
   search,
@@ -32,45 +32,45 @@ export function ListTable({
   isPending,
   pageviews,
 }: {
-  search: string;
-  orderBy: string;
-  data: BlogitemsServerData | undefined;
-  updateSearch: (s: string) => void;
-  isPending: boolean;
-  pageviews: PageviewsByOID;
+  search: string
+  orderBy: string
+  data: BlogitemsServerData | undefined
+  updateSearch: (s: string) => void
+  isPending: boolean
+  pageviews: PageviewsByOID
 }) {
-  const [value, setValue] = useState(search);
+  const [value, setValue] = useState(search)
 
   function toggleCategory(name: string) {
     const newSearch = /\s/.test(name)
       ? `category:"${name}"`
-      : `category:${name}`;
+      : `category:${name}`
 
     if (search.includes(newSearch)) {
-      setValue((v) => v.replace(newSearch, ""));
-      updateSearch(search.replace(newSearch, ""));
+      setValue((v) => v.replace(newSearch, ""))
+      updateSearch(search.replace(newSearch, ""))
     } else {
-      setValue((v) => `${v} ${newSearch}`.trim());
-      updateSearch(`${search} ${newSearch}`.trim());
+      setValue((v) => `${v} ${newSearch}`.trim())
+      updateSearch(`${search} ${newSearch}`.trim())
     }
   }
 
-  const [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams()
 
   function addQueryString(params: Record<string, string>) {
-    const sp = new URLSearchParams(searchParams);
+    const sp = new URLSearchParams(searchParams)
     for (const [key, value] of Object.entries(params)) {
-      sp.set(key, value);
+      sp.set(key, value)
     }
-    return `?${sp}`;
+    return `?${sp}`
   }
 
-  const matchesMobile = useMediaQuery("(max-width: 500px)");
+  const matchesMobile = useMediaQuery("(max-width: 500px)")
 
-  const [showTips, setShowTips] = useState(false);
+  const [showTips, setShowTips] = useState(false)
 
   const { prefetchBlogitemSoon, dontPrefetchBlogitemSoon } =
-    usePrefetchBlogitem();
+    usePrefetchBlogitem()
 
   return (
     <Box pos="relative" style={{ minHeight: 100 }}>
@@ -78,8 +78,8 @@ export function ListTable({
 
       <form
         onSubmit={(e) => {
-          e.preventDefault();
-          updateSearch(value.trim());
+          e.preventDefault()
+          updateSearch(value.trim())
         }}
       >
         <Table>
@@ -119,8 +119,8 @@ export function ListTable({
                 {search && (
                   <Button
                     onClick={() => {
-                      setValue("");
-                      updateSearch("");
+                      setValue("")
+                      updateSearch("")
                     }}
                   >
                     Clear
@@ -142,9 +142,9 @@ export function ListTable({
                   <SearchTips
                     append={(s: string) => {
                       setValue((v) => {
-                        if (v.includes(s)) return v.replace(s, "").trim();
-                        return `${v} ${s}`.trim();
-                      });
+                        if (v.includes(s)) return v.replace(s, "").trim()
+                        return `${v} ${s}`.trim()
+                      })
                     }}
                   />
                   <Button onClick={() => setShowTips(false)}>Close</Button>
@@ -179,7 +179,7 @@ export function ListTable({
                         ml={5}
                         style={{ textTransform: "none", pointer: "cursor" }}
                         onClick={() => {
-                          toggleCategory(category.name);
+                          toggleCategory(category.name)
                         }}
                       >
                         {category.name}
@@ -241,11 +241,11 @@ export function ListTable({
         {data && data.blogitems.length === 0 && <Alert>No items found</Alert>}
       </form>
     </Box>
-  );
+  )
 }
 
 function CustomBadge(props: BadgeProps) {
-  return <Badge ml={15} style={{ textTransform: "none" }} {...props} />;
+  return <Badge ml={15} style={{ textTransform: "none" }} {...props} />
 }
 
 export function DisplayDate({
@@ -253,15 +253,15 @@ export function DisplayDate({
   now,
   compact = false,
 }: {
-  date: string;
-  now?: string;
-  compact?: boolean;
+  date: string
+  now?: string
+  compact?: boolean
 }) {
   if (date === null) {
-    throw new Error("date is null");
+    throw new Error("date is null")
   }
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
-  const nowObj = now ? parseISO(now) : new Date();
+  const dateObj = typeof date === "string" ? parseISO(date) : date
+  const nowObj = now ? parseISO(now) : new Date()
 
   return (
     <span title={dateObj.toString()}>
@@ -269,45 +269,45 @@ export function DisplayDate({
         ? formatDistanceCompact(dateObj)
         : formatDistance(dateObj, nowObj, { addSuffix: true })}
     </span>
-  );
+  )
 }
 
 function Pageviews({ dates }: { dates: PageviewsByDate[] }) {
   if (dates.length === 0) {
-    return <span style={{ color: "gray" }}>n/a</span>;
+    return <span style={{ color: "gray" }}>n/a</span>
   }
   if (dates.length === 1) {
-    const first = dates[0];
-    return <span style={{ color: "green" }}>{largeNumber(first.count)}</span>;
+    const first = dates[0]
+    return <span style={{ color: "green" }}>{largeNumber(first.count)}</span>
   }
 
-  return <Delta first={dates[0]} second={dates[1]} />;
+  return <Delta first={dates[0]} second={dates[1]} />
 }
 
 function Delta({
   first,
   second,
 }: {
-  first: PageviewsByDate;
-  second: PageviewsByDate;
+  first: PageviewsByDate
+  second: PageviewsByDate
 }) {
-  const delta = first.count - second.count;
+  const delta = first.count - second.count
   if (delta === 0) {
-    return <span style={{ color: "gray" }}>±0</span>;
+    return <span style={{ color: "gray" }}>±0</span>
   }
   return (
     <span style={{ color: delta > 0 ? "green" : "red" }}>
       {largeNumber(second.count)} &rarr; {largeNumber(first.count)}
     </span>
-  );
+  )
 }
 
 function largeNumber(n: number) {
   if (n > 10_000) {
-    return `${(n / 1_000).toFixed(1)}k`;
+    return `${(n / 1_000).toFixed(1)}k`
   }
   if (n > 1_000) {
-    return thousands(n);
+    return thousands(n)
   }
-  return `${n}`;
+  return `${n}`
 }

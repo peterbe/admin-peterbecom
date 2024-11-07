@@ -8,23 +8,23 @@ import {
   LoadingOverlay,
   Table,
   Text,
-} from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { API_BASE } from "../../config";
-import type { SpamPattern } from "../../types";
-import { fetchSpamPatterns, spamPatternsQueryKey } from "../api-utils";
-import { DisplayDate } from "../blogitems/list-table";
+} from "@mantine/core"
+import { IconTrash } from "@tabler/icons-react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
+import { API_BASE } from "../../config"
+import type { SpamPattern } from "../../types"
+import { fetchSpamPatterns, spamPatternsQueryKey } from "../api-utils"
+import { DisplayDate } from "../blogitems/list-table"
 
 type ServerData = {
-  patterns: SpamPattern[];
-};
+  patterns: SpamPattern[]
+}
 export function ListPatterns() {
   const { data, error, isPending } = useQuery<ServerData>({
     queryKey: spamPatternsQueryKey(),
     queryFn: fetchSpamPatterns,
-  });
+  })
 
   return (
     <Box mb={50} pos="relative">
@@ -80,34 +80,34 @@ export function ListPatterns() {
                   <DeleteButton id={pattern.id} />
                 </Table.Td>
               </Table.Tr>
-            );
+            )
           })}
         </Table.Tbody>
       </Table>
     </Box>
-  );
+  )
 }
 
 function DeleteButton({ id }: { id: number }) {
-  const queryClient = useQueryClient();
-  const [confirmed, setConfirmed] = useState(false);
+  const queryClient = useQueryClient()
+  const [confirmed, setConfirmed] = useState(false)
   const { mutate, isPending, error } = useMutation({
     mutationKey: ["delete-pattern", id],
     mutationFn: async () => {
       const response = await fetch(`${API_BASE}/plog/spam/patterns?id=${id}`, {
         method: "DELETE",
-      });
+      })
       if (response.ok) {
-        return response.json();
+        return response.json()
       }
-      throw new Error(`${response.status} on ${response.url}`);
+      throw new Error(`${response.status} on ${response.url}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: spamPatternsQueryKey(),
-      });
+      })
     },
-  });
+  })
 
   return (
     <>
@@ -119,7 +119,7 @@ function DeleteButton({ id }: { id: number }) {
             size="sm"
             title="Delete"
             onClick={() => {
-              setConfirmed(true);
+              setConfirmed(true)
             }}
           >
             <IconTrash />
@@ -130,7 +130,7 @@ function DeleteButton({ id }: { id: number }) {
           <Button
             size="sm"
             onClick={() => {
-              setConfirmed(false);
+              setConfirmed(false)
             }}
           >
             Cancel
@@ -144,7 +144,7 @@ function DeleteButton({ id }: { id: number }) {
             disabled={isPending}
             loading={isPending}
             onClick={() => {
-              mutate();
+              mutate()
             }}
           >
             Yes, delete
@@ -152,5 +152,5 @@ function DeleteButton({ id }: { id: number }) {
         )}
       </Group>
     </>
-  );
+  )
 }

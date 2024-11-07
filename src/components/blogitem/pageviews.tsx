@@ -1,44 +1,44 @@
-import { LineChart } from "@mantine/charts";
-import { Alert, Box, LoadingOverlay, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { thousands } from "../../number-formatter";
-import type { EditBlogitemT, QueryResult } from "../../types";
-import { blogitemPageviewsQueryKey, fetchAnalyticsQuery } from "../api-utils";
+import { LineChart } from "@mantine/charts"
+import { Alert, Box, LoadingOverlay, Text } from "@mantine/core"
+import { useQuery } from "@tanstack/react-query"
+import { thousands } from "../../number-formatter"
+import type { EditBlogitemT, QueryResult } from "../../types"
+import { blogitemPageviewsQueryKey, fetchAnalyticsQuery } from "../api-utils"
 
-type Interval = "day" | "week" | "month";
+type Interval = "day" | "week" | "month"
 
 // From `select min(created) from analytics where type='pageview';`
-const ANALYTICS_INCEPTION_DATE = new Date("2024-07-15T00:00:00.000Z");
+const ANALYTICS_INCEPTION_DATE = new Date("2024-07-15T00:00:00.000Z")
 
 export default function PageviewsInner({
   blogitem,
 }: {
-  blogitem: EditBlogitemT;
+  blogitem: EditBlogitemT
 }) {
-  let days = 10;
-  let interval: Interval = "day";
-  const pubDate = new Date(blogitem.pub_date);
+  let days = 10
+  let interval: Interval = "day"
+  const pubDate = new Date(blogitem.pub_date)
   const ageDays =
     (new Date().getTime() -
       Math.max(pubDate.getTime(), ANALYTICS_INCEPTION_DATE.getTime())) /
     1000 /
     3600 /
-    24;
+    24
   if (ageDays > 365) {
-    interval = "month";
-    days = 365;
+    interval = "month"
+    days = 365
   } else if (ageDays > 90) {
-    interval = "week";
-    days = 90;
+    interval = "week"
+    days = 90
   } else if (ageDays > 30) {
-    interval = "week";
-    days = 30;
+    interval = "week"
+    days = 30
   }
 
   const analyticsThisWeek = useQuery<QueryResult>({
     queryKey: [...blogitemPageviewsQueryKey(blogitem.oid), interval, days],
     queryFn: async () => {
-      const pathname = `/plog/${blogitem.oid}`;
+      const pathname = `/plog/${blogitem.oid}`
       return fetchAnalyticsQuery(
         `
 SELECT
@@ -56,10 +56,10 @@ ORDER BY
     1 desc
 LIMIT 100
       `.trim(),
-      );
+      )
     },
     refetchOnWindowFocus: process.env.NODE_ENV === "development",
-  });
+  })
 
   return (
     <Box pos="relative" style={{ minHeight: 200 }}>
@@ -73,7 +73,7 @@ LIMIT 100
         <Graph data={analyticsThisWeek.data} interval={interval} />
       )}
     </Box>
-  );
+  )
 }
 
 function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
@@ -84,23 +84,23 @@ function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
           Not enough data to show a graph
         </Text>
       </div>
-    );
+    )
   }
 
   const dataX = data.rows.map((row) => {
-    let date = (row.date as string).split("T")[0];
+    let date = (row.date as string).split("T")[0]
     if (interval === "month") {
-      const dateObject = new Date(row.date as string);
+      const dateObject = new Date(row.date as string)
       date = dateObject.toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
-      });
+      })
     }
     return {
       date,
       count: row.count,
-    };
-  });
+    }
+  })
   return (
     <div>
       <LineChart
@@ -122,5 +122,5 @@ function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
         valueFormatter={(value) => thousands(value as number)}
       />
     </div>
-  );
+  )
 }

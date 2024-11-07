@@ -1,8 +1,8 @@
-import { Code, Table, Text } from "@mantine/core";
+import { Code, Table, Text } from "@mantine/core"
 
 type Props = {
-  append: (s: string) => void;
-};
+  append: (s: string) => void
+}
 export function SearchTips({ append }: Props) {
   const tips = [
     ["has:summary", "Exclusively those that have a non-empty summary"],
@@ -15,7 +15,7 @@ export function SearchTips({ append }: Props) {
     ["is:unpublished", "Those whose publish date is in the future"],
     ["cat:foo", "Those that belong to category 'foo'"],
     ["category:foo", "Those that belong to category 'foo'"],
-  ];
+  ]
   return (
     <Table>
       <Table.Thead>
@@ -35,9 +35,9 @@ export function SearchTips({ append }: Props) {
                 <Text>{explanation}</Text>
               </Table.Td>
             </Table.Tr>
-          );
+          )
         })}
       </Table.Tbody>
     </Table>
-  );
+  )
 }

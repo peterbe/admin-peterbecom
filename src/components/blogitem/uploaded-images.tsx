@@ -8,39 +8,39 @@ import {
   SegmentedControl,
   TextInput,
   Title,
-} from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
+} from "@mantine/core"
+import { useLocalStorage } from "@mantine/hooks"
 
-import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import type { ImageT } from "../../hooks/use-images";
-import { useUserData } from "../../whoami/use-userdata";
-import { JSONPost } from "../json-post";
-import { AbsoluteImage } from "./absolute-image";
+import { useForm } from "@mantine/form"
+import { notifications } from "@mantine/notifications"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useEffect, useState } from "react"
+import type { ImageT } from "../../hooks/use-images"
+import { useUserData } from "../../whoami/use-userdata"
+import { JSONPost } from "../json-post"
+import { AbsoluteImage } from "./absolute-image"
 
-type ImageSize = "small" | "big" | "bigger";
+type ImageSize = "small" | "big" | "bigger"
 
 export function UploadedImages({
   oid,
   images,
 }: {
-  oid: string;
-  images: ImageT[];
+  oid: string
+  images: ImageT[]
 }) {
-  const [imageBaseUrl, setImageBaseUrl] = useState("");
+  const [imageBaseUrl, setImageBaseUrl] = useState("")
   useEffect(() => {
     if (window.location.hostname === "localhost") {
-      setImageBaseUrl("http://localhost:8000");
+      setImageBaseUrl("http://localhost:8000")
     } else {
-      setImageBaseUrl("https://www.peterbe.com");
+      setImageBaseUrl("https://www.peterbe.com")
     }
-  }, []);
+  }, [])
   const [size, setSize] = useLocalStorage<ImageSize>({
     key: "admin-uploaded-images-size",
     defaultValue: "small",
-  });
+  })
 
   return (
     <Box mb={100} mt={50}>
@@ -72,7 +72,7 @@ export function UploadedImages({
         />
       )}
     </Box>
-  );
+  )
 }
 
 function UploadedImage({
@@ -81,55 +81,55 @@ function UploadedImage({
   size,
   imageBaseUrl,
 }: {
-  oid: string;
-  image: ImageT;
-  size: ImageSize;
-  imageBaseUrl: string;
+  oid: string
+  image: ImageT
+  size: ImageSize
+  imageBaseUrl: string
 }) {
-  const [asked, setAsked] = useState(false);
+  const [asked, setAsked] = useState(false)
 
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
       title: image[size].alt || "",
     },
-  });
+  })
 
-  const { userData } = useUserData();
-  const csrfToken = userData?.user?.csrfmiddlewaretoken || "";
-  const queryClient = useQueryClient();
+  const { userData } = useUserData()
+  const csrfToken = userData?.user?.csrfmiddlewaretoken || ""
+  const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationKey: ["images", oid, "image", image.full_url],
     mutationFn: async ({ title }: { title: string }) => {
-      const formData = new FormData();
-      formData.append("_update", "true");
-      formData.append("id", `${image.id}`);
-      formData.append("title", title);
+      const formData = new FormData()
+      formData.append("_update", "true")
+      formData.append("id", `${image.id}`)
+      formData.append("title", title)
 
       const response = await JSONPost(
         `/api/v0/plog/${oid}/images`,
         formData,
         csrfToken,
-      );
+      )
 
       if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      form.setValues({ title: title.trim() });
-      return response.json();
+      form.setValues({ title: title.trim() })
+      return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["images", oid] });
+      queryClient.invalidateQueries({ queryKey: ["images", oid] })
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationKey: ["images", oid, "image", "delete"],
     mutationFn: async () => {
-      const formData = new FormData();
-      formData.append("_delete", "true");
-      formData.append("id", `${image.id}`);
+      const formData = new FormData()
+      formData.append("_delete", "true")
+      formData.append("id", `${image.id}`)
       const response = await JSONPost(
         `/api/v0/plog/${oid}/images?${new URLSearchParams({
           id: `${image.id}`,
@@ -137,18 +137,18 @@ function UploadedImage({
         formData,
         csrfToken,
         { method: "DELETE" },
-      );
+      )
 
       if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      return response.json();
+      return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["images", oid] });
-      notifications.show({ message: "Image deleted", color: "green" });
+      queryClient.invalidateQueries({ queryKey: ["images", oid] })
+      notifications.show({ message: "Image deleted", color: "green" })
     },
-  });
+  })
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -167,7 +167,7 @@ function UploadedImage({
       <form
         onSubmit={form.onSubmit((data) => {
           if (data !== null) {
-            mutation.mutate(data);
+            mutation.mutate(data)
           }
         })}
       >
@@ -185,7 +185,7 @@ function UploadedImage({
                 disabled={deleteMutation.isPending}
                 loading={deleteMutation.isPending}
                 onClick={() => {
-                  deleteMutation.mutate();
+                  deleteMutation.mutate()
                 }}
               >
                 Delete
@@ -217,5 +217,5 @@ function UploadedImage({
         )}
       </form>
     </Card>
-  );
+  )
 }

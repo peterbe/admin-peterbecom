@@ -10,35 +10,31 @@ import {
   TextInput,
   Title,
   rem,
-} from "@mantine/core";
-import { useDocumentTitle } from "@mantine/hooks";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
-import { SignedIn } from "../signed-in";
-import { BlogitemLinks } from "./links";
-import "@mantine/dropzone/styles.css";
-import {
-  Dropzone,
-  type FileWithPath,
-  IMAGE_MIME_TYPE,
-} from "@mantine/dropzone";
-import { useForm } from "@mantine/form";
-import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
-import { useImages } from "../../hooks/use-images";
-import { useUserData } from "../../whoami/use-userdata";
-import { JSONPost } from "../json-post";
-import { UploadedImages } from "./uploaded-images";
+} from "@mantine/core"
+import { useDocumentTitle } from "@mantine/hooks"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useParams } from "react-router-dom"
+import { SignedIn } from "../signed-in"
+import { BlogitemLinks } from "./links"
+import "@mantine/dropzone/styles.css"
+import { Dropzone, type FileWithPath, IMAGE_MIME_TYPE } from "@mantine/dropzone"
+import { useForm } from "@mantine/form"
+import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react"
+import { useEffect, useState } from "react"
+import { useImages } from "../../hooks/use-images"
+import { useUserData } from "../../whoami/use-userdata"
+import { JSONPost } from "../json-post"
+import { UploadedImages } from "./uploaded-images"
 
 export function Component() {
-  const params = useParams();
-  const oid = params.oid as string;
-  const { userData } = useUserData();
-  const csrfToken = userData?.user?.csrfmiddlewaretoken || "";
+  const params = useParams()
+  const oid = params.oid as string
+  const { userData } = useUserData()
+  const csrfToken = userData?.user?.csrfmiddlewaretoken || ""
 
-  const { data, error, isPending } = useImages(oid);
+  const { data, error, isPending } = useImages(oid)
 
-  useDocumentTitle(`Images ${oid}`);
+  useDocumentTitle(`Images ${oid}`)
 
   return (
     <SignedIn>
@@ -55,46 +51,46 @@ export function Component() {
         </Box>
       </Container>
     </SignedIn>
-  );
+  )
 }
 
 function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationKey: ["images", oid],
     mutationFn: async ({
       file,
       title,
     }: {
-      file: FileWithPath;
-      title: string;
+      file: FileWithPath
+      title: string
     }) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("title", title);
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("title", title)
 
       const response = await JSONPost(
         `/api/v0/plog/${oid}/images`,
         formData,
         csrfToken,
-      );
+      )
 
       if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      return response.json();
+      return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["images", oid] });
-      setUploadedFile(null);
+      queryClient.invalidateQueries({ queryKey: ["images", oid] })
+      setUploadedFile(null)
     },
-  });
+  })
 
-  const [uploadedFile, setUploadedFile] = useState<FileWithPath | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<FileWithPath | null>(null)
 
   function uploadFiles(files: FileWithPath[]) {
     if (files.length > 0) {
-      setUploadedFile(files[0]);
+      setUploadedFile(files[0])
     }
   }
 
@@ -111,7 +107,7 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
       {uploadedFile && (
         <TitleForm
           onSubmitTitle={(title: string) => {
-            mutation.mutate({ file: uploadedFile, title });
+            mutation.mutate({ file: uploadedFile, title })
           }}
         />
       )}
@@ -172,27 +168,27 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
         </Group>
       </Dropzone>
     </Box>
-  );
+  )
 }
 
 function PreviewUploadedFile({ file }: { file: FileWithPath }) {
-  const [dataURI, setDataURI] = useState<string | ArrayBuffer | null>(null);
+  const [dataURI, setDataURI] = useState<string | ArrayBuffer | null>(null)
 
   useEffect(() => {
-    const reader = new FileReader();
+    const reader = new FileReader()
     function listener() {
-      setDataURI(reader.result);
+      setDataURI(reader.result)
     }
-    reader.addEventListener("load", listener, false);
-    reader.readAsDataURL(file);
+    reader.addEventListener("load", listener, false)
+    reader.readAsDataURL(file)
 
     return () => {
-      reader.removeEventListener("load", listener);
-    };
-  }, [file]);
+      reader.removeEventListener("load", listener)
+    }
+  }, [file])
 
   if (!dataURI) {
-    return null;
+    return null
   }
 
   return (
@@ -205,13 +201,13 @@ function PreviewUploadedFile({ file }: { file: FileWithPath }) {
         alt="preview of image"
       />
     </Box>
-  );
+  )
 }
 
 function TitleForm({
   onSubmitTitle,
 }: {
-  onSubmitTitle: (title: string) => void;
+  onSubmitTitle: (title: string) => void
 }) {
   const form = useForm({
     mode: "uncontrolled",
@@ -221,12 +217,12 @@ function TitleForm({
     validate: {
       title: (value: string) => (value.trim() ? null : "Required"),
     },
-  });
+  })
   return (
     <form
       onSubmit={form.onSubmit((values) => {
         if (values.title?.trim()) {
-          onSubmitTitle(values.title.trim());
+          onSubmitTitle(values.title.trim())
         }
       })}
     >
@@ -241,5 +237,5 @@ function TitleForm({
         <Button type="submit">Submit</Button>
       </Group>
     </form>
-  );
+  )
 }

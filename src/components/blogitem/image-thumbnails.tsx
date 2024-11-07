@@ -7,14 +7,14 @@ import {
   CopyButton,
   Group,
   Text,
-} from "@mantine/core";
-import { useState } from "react";
-import { type ImageT, useImages } from "../../hooks/use-images";
-import { AbsoluteImage } from "./absolute-image";
+} from "@mantine/core"
+import { useState } from "react"
+import { type ImageT, useImages } from "../../hooks/use-images"
+import { AbsoluteImage } from "./absolute-image"
 
 export function ImageThumbnails({ oid }: { oid: string }) {
-  const [show, setShow] = useState(false);
-  const images = useImages(oid);
+  const [show, setShow] = useState(false)
+  const images = useImages(oid)
   if (images.error) {
     return (
       <Container>
@@ -22,7 +22,7 @@ export function ImageThumbnails({ oid }: { oid: string }) {
           {images.error.message}
         </Alert>
       </Container>
-    );
+    )
   }
   if (images.data?.images.length) {
     if (show) {
@@ -39,7 +39,7 @@ export function ImageThumbnails({ oid }: { oid: string }) {
             </Group>
           </Group>
         </Container>
-      );
+      )
     }
     return (
       <Container>
@@ -49,25 +49,25 @@ export function ImageThumbnails({ oid }: { oid: string }) {
           </Button>
         </Group>
       </Container>
-    );
+    )
   }
-  return null;
+  return null
 }
 
 function ImageThumbnail({ image }: { image: ImageT }) {
-  const sizes = ["small", "big", "bigger"] as const;
+  const sizes = ["small", "big", "bigger"] as const
 
   return sizes.map((size) => {
-    const thumb = image[size];
+    const thumb = image[size]
     const imageTagHtml = `
     <img src="${thumb.url}" alt="${thumb.alt}" width="${thumb.width}" height="${thumb.height}">
-    `.trim();
+    `.trim()
     const aTagHtml = `
     <a href="${image.full_url}">${imageTagHtml.replace(
       "width=",
       'class="floatright" width=',
     )}</a>
-    `.trim();
+    `.trim()
 
     return (
       <Card key={size} shadow="sm" padding="lg" radius="md" withBorder>
@@ -132,6 +132,6 @@ function ImageThumbnail({ image }: { image: ImageT }) {
           </CopyButton>
         </Group>
       </Card>
-    );
-  });
+    )
+  })
 }

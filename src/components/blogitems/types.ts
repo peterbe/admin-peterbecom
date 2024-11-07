@@ -1,6 +1,6 @@
 export type PageviewsByDate = {
-  date: string;
-  count: number;
-};
+  date: string
+  count: number
+}
 
-export type PageviewsByOID = Map<string, PageviewsByDate[]>;
+export type PageviewsByOID = Map<string, PageviewsByDate[]>

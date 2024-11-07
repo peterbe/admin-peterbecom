@@ -1,39 +1,39 @@
-import { Alert, Box, Button, LoadingOverlay, Text } from "@mantine/core";
-import { useDocumentTitle } from "@mantine/hooks";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
-import { thousands } from "../../number-formatter";
+import { Alert, Box, Button, LoadingOverlay, Text } from "@mantine/core"
+import { useDocumentTitle } from "@mantine/hooks"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useSearchParams } from "react-router-dom"
+import { thousands } from "../../number-formatter"
 import {
   commentsCountQueryKey,
   commentsQueryKey,
   fetchComments,
-} from "../api-utils";
-import { BatchSubmit } from "./batch-submit";
-import { CommentsTree } from "./comments-tree";
-import { Filters } from "./filters";
-import { NoComments } from "./no-comments";
-import type { CommentsServerData } from "./types";
-import { useBatchSubmission } from "./use-batch-submission";
+} from "../api-utils"
+import { BatchSubmit } from "./batch-submit"
+import { CommentsTree } from "./comments-tree"
+import { Filters } from "./filters"
+import { NoComments } from "./no-comments"
+import type { CommentsServerData } from "./types"
+import { useBatchSubmission } from "./use-batch-submission"
 
 export function Tree() {
-  const [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams()
 
   const { data, error, isPending, isFetching, refetch } =
     useQuery<CommentsServerData>({
       queryKey: commentsQueryKey(searchParams),
       queryFn: () => fetchComments(searchParams),
       refetchOnWindowFocus: false,
-    });
+    })
 
-  let title = "Comments";
+  let title = "Comments"
   if (data) {
-    title = `(${thousands(data.count)}) Comment${data.count === 1 ? "" : "s"}`;
+    title = `(${thousands(data.count)}) Comment${data.count === 1 ? "" : "s"}`
   } else if (isPending) {
-    title = "Loading comments...";
+    title = "Loading comments..."
   }
-  useDocumentTitle(title);
+  useDocumentTitle(title)
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const {
     toApprove,
@@ -45,12 +45,12 @@ export function Tree() {
     setApproved,
     deleted,
     setDeleted,
-  } = useBatchSubmission();
+  } = useBatchSubmission()
 
   const isMutatatingBatchSubmit =
     queryClient.isMutating({
       mutationKey: ["batch-submit"],
-    }) > 0;
+    }) > 0
 
   return (
     <Box>
@@ -71,11 +71,11 @@ export function Tree() {
             setApproved={setApproved}
             setDeleted={setDeleted}
             reset={() => {
-              reset();
+              reset()
 
               queryClient.invalidateQueries({
                 queryKey: commentsCountQueryKey(),
-              });
+              })
             }}
           />
 
@@ -84,7 +84,7 @@ export function Tree() {
               variant="transparent"
               size="xs"
               onClick={() => {
-                refetch();
+                refetch()
               }}
             >
               Refetch
@@ -100,7 +100,7 @@ export function Tree() {
             refetchComments={() => {
               queryClient.invalidateQueries({
                 queryKey: commentsQueryKey(searchParams),
-              });
+              })
             }}
             toApprove={toApprove}
             toDelete={toDelete}
@@ -112,5 +112,5 @@ export function Tree() {
         </>
       )}
     </Box>
-  );
+  )
 }

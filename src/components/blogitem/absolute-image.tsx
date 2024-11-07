@@ -1,5 +1,5 @@
-import { Image } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { Image } from "@mantine/core"
+import { useEffect, useState } from "react"
 
 export function AbsoluteImage({
   src,
@@ -8,21 +8,21 @@ export function AbsoluteImage({
   w,
   h,
 }: {
-  src: string;
-  alt?: string;
-  radius?: "sm" | "md";
-  w?: number;
-  h?: number;
+  src: string
+  alt?: string
+  radius?: "sm" | "md"
+  w?: number
+  h?: number
 }) {
-  const [imageBaseUrl, setImageBaseUrl] = useState("");
+  const [imageBaseUrl, setImageBaseUrl] = useState("")
 
   useEffect(() => {
     if (window.location.hostname === "localhost") {
-      setImageBaseUrl("http://localhost:8000");
+      setImageBaseUrl("http://localhost:8000")
     } else {
-      setImageBaseUrl("https://www.peterbe.com");
+      setImageBaseUrl("https://www.peterbe.com")
     }
-  }, []);
+  }, [])
 
   return (
     <Image
@@ -32,5 +32,5 @@ export function AbsoluteImage({
       src={imageBaseUrl + src}
       alt={alt || ""}
     />
-  );
+  )
 }

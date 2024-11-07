@@ -4,15 +4,15 @@ export async function JSONPost(
   csrfToken: string,
   { method = "POST" } = {},
 ) {
-  const body = data instanceof FormData ? data : JSON.stringify(data);
+  const body = data instanceof FormData ? data : JSON.stringify(data)
 
   const headers = {
     "X-CSRFToken": csrfToken,
-  };
+  }
 
   return await fetch(url, {
     method,
     body,
     headers,
-  });
+  })
 }

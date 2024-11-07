@@ -1,45 +1,45 @@
-import { useDocumentTitle } from "@mantine/hooks";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useDocumentTitle } from "@mantine/hooks"
+import { useQuery } from "@tanstack/react-query"
+import { useParams } from "react-router-dom"
 
-import { Alert, Box, LoadingOverlay, Text } from "@mantine/core";
-import type { EditBlogitemT } from "../../types";
-import { DisplayDate } from "../blogitems/list-table";
-import { SignedIn } from "../signed-in";
-import { DangerZone } from "./danger-zone";
-import { Form } from "./edit-form";
-import { BlogitemLinks } from "./links";
+import { Alert, Box, LoadingOverlay, Text } from "@mantine/core"
+import type { EditBlogitemT } from "../../types"
+import { DisplayDate } from "../blogitems/list-table"
+import { SignedIn } from "../signed-in"
+import { DangerZone } from "./danger-zone"
+import { Form } from "./edit-form"
+import { BlogitemLinks } from "./links"
 
-import { blogitemQueryKey, fetchBlogitem } from "../api-utils";
-import { Pageviews } from "./pageviews-loader";
+import { blogitemQueryKey, fetchBlogitem } from "../api-utils"
+import { Pageviews } from "./pageviews-loader"
 
 export default function Blogitem() {
-  const params = useParams();
+  const params = useParams()
 
-  let oid: string | null = null;
+  let oid: string | null = null
   if ("oid" in params && typeof params.oid === "string") {
-    oid = params.oid;
+    oid = params.oid
   }
 
-  useDocumentTitle(oid ? `Edit ${oid}` : "Add new blogitem");
+  useDocumentTitle(oid ? `Edit ${oid}` : "Add new blogitem")
 
-  return <SignedIn>{oid ? <Edit oid={oid} /> : <Add />}</SignedIn>;
+  return <SignedIn>{oid ? <Edit oid={oid} /> : <Add />}</SignedIn>
 }
 
 type ServerData = {
-  blogitem?: EditBlogitemT;
-  notFound?: boolean;
-};
+  blogitem?: EditBlogitemT
+  notFound?: boolean
+}
 
 function Edit({ oid }: { oid: string | null }) {
   const { data, error, isPending, isFetching } = useQuery<ServerData>({
     queryKey: blogitemQueryKey(oid),
     queryFn: async () => {
-      if (!oid) return null;
-      return fetchBlogitem(oid);
+      if (!oid) return null
+      return fetchBlogitem(oid)
     },
     enabled: !!oid,
-  });
+  })
 
   return (
     <Box pos="relative" style={{ minHeight: 400 }}>
@@ -76,7 +76,7 @@ function Edit({ oid }: { oid: string | null }) {
       {data?.blogitem?.id && <Pageviews blogitem={data.blogitem} />}
       {data?.blogitem?.id && <DangerZone blogitem={data.blogitem} />}
     </Box>
-  );
+  )
 }
 
 function Add() {
@@ -98,7 +98,7 @@ function Add() {
     disallow_comments: true,
     open_graph_image: "",
     archived: null,
-  };
+  }
 
-  return <Form blogitem={blogitem} />;
+  return <Form blogitem={blogitem} />
 }

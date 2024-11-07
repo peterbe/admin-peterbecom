@@ -7,23 +7,23 @@ import {
   LoadingOverlay,
   Table,
   Text,
-} from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { API_BASE } from "../../config";
-import type { SpamSignature } from "../../types";
-import { fetchSpamSignatures, spamSignaturesQueryKey } from "../api-utils";
-import { DisplayDate } from "../blogitems/list-table";
+} from "@mantine/core"
+import { IconTrash } from "@tabler/icons-react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
+import { API_BASE } from "../../config"
+import type { SpamSignature } from "../../types"
+import { fetchSpamSignatures, spamSignaturesQueryKey } from "../api-utils"
+import { DisplayDate } from "../blogitems/list-table"
 
 type ServerData = {
-  signatures: SpamSignature[];
-};
+  signatures: SpamSignature[]
+}
 export function ListSignatures() {
   const { data, error, isPending } = useQuery<ServerData>({
     queryKey: spamSignaturesQueryKey(),
     queryFn: fetchSpamSignatures,
-  });
+  })
 
   return (
     <Box mb={50} pos="relative">
@@ -75,34 +75,34 @@ export function ListSignatures() {
                   <DeleteSignatureButton id={signature.id} />
                 </Table.Td>
               </Table.Tr>
-            );
+            )
           })}
         </Table.Tbody>
       </Table>
     </Box>
-  );
+  )
 }
 
 function DeleteSignatureButton({ id }: { id: number }) {
-  const queryClient = useQueryClient();
-  const [confirmed, setConfirmed] = useState(false);
+  const queryClient = useQueryClient()
+  const [confirmed, setConfirmed] = useState(false)
   const { mutate, isPending, error } = useMutation({
     mutationKey: ["delete-signature", id],
     mutationFn: async () => {
       const response = await fetch(`${API_BASE}/spam/signatures?id=${id}`, {
         method: "DELETE",
-      });
+      })
       if (response.ok) {
-        return response.json();
+        return response.json()
       }
-      throw new Error(`${response.status} on ${response.url}`);
+      throw new Error(`${response.status} on ${response.url}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: spamSignaturesQueryKey(),
-      });
+      })
     },
-  });
+  })
 
   return (
     <>
@@ -114,7 +114,7 @@ function DeleteSignatureButton({ id }: { id: number }) {
             size="sm"
             title="Delete"
             onClick={() => {
-              setConfirmed(true);
+              setConfirmed(true)
             }}
           >
             <IconTrash />
@@ -125,7 +125,7 @@ function DeleteSignatureButton({ id }: { id: number }) {
           <Button
             size="sm"
             onClick={() => {
-              setConfirmed(false);
+              setConfirmed(false)
             }}
           >
             Cancel
@@ -139,7 +139,7 @@ function DeleteSignatureButton({ id }: { id: number }) {
             disabled={isPending}
             loading={isPending}
             onClick={() => {
-              mutate();
+              mutate()
             }}
           >
             Yes, delete
@@ -147,5 +147,5 @@ function DeleteSignatureButton({ id }: { id: number }) {
         )}
       </Group>
     </>
-  );
+  )
 }
