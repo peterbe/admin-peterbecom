@@ -1,15 +1,23 @@
 import { Box, Button, Group } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
-import { Await, Link, useRouteLoaderData } from "react-router-dom";
+// import { Await, Link, useRouteLoaderData } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-import { Suspense } from "react";
-import type { RootLoaderData } from "../loaders/root";
+import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments";
+// import { Suspense } from "react";
+// import type { RootLoaderData } from "../loaders/root";
 import { SignedIn } from "./signed-in";
 
 export function Home() {
+  console.log("RENDERINH HOME COMPONENT", new Date());
+
   useDocumentTitle("Home");
 
-  const data = useRouteLoaderData("root") as RootLoaderData;
+  // const { countUnapprovedComments } = useRouteLoaderData(
+  //   "root"
+  // ) as RootLoaderData;
+  const { data } = useCountUnapprovedComments();
+  console.log("DATA", data);
 
   return (
     <SignedIn>
@@ -21,17 +29,18 @@ export function Home() {
           <Button size="xl" component={Link} to="/plog/add">
             Add blogitem
           </Button>
+          <CommentsButton count={data?.count} />
 
-          <Suspense fallback={<CommentsButton />}>
+          {/* <Suspense fallback={<CommentsButton />}>
             <Await
-              resolve={data.countUnapprovedComments}
+              resolve={countUnapprovedComments}
               errorElement={<CommentsButton />}
             >
               {(countUnapprovedComments) => (
                 <CommentsButton count={countUnapprovedComments.count} />
               )}
             </Await>
-          </Suspense>
+          </Suspense> */}
         </Group>
       </Box>
       <Box m={100}>

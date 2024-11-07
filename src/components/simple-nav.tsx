@@ -2,14 +2,17 @@ import { Avatar, Box, Burger, Divider, Drawer, Group } from "@mantine/core";
 
 import { useDisclosure } from "@mantine/hooks";
 import { IconHome } from "@tabler/icons-react";
-import { Suspense } from "react";
-import { Await, useRouteLoaderData } from "react-router-dom";
-import type { RootLoaderData } from "../loaders/root";
+import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments";
+// import { Suspense } from "react";
+// import { Await, useRouteLoaderData } from "react-router-dom";
+// import type { RootLoaderData } from "../loaders/root";
 import { useUserData } from "../whoami/use-userdata";
 import { NavigationSearch } from "./navigation-search";
 import { SmartAnchor } from "./smart-anchor";
 
 export function Nav() {
+  console.log("RENDERING NAV", new Date());
+
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const { userData } = useUserData();
@@ -81,20 +84,28 @@ export function Nav() {
 }
 
 function Links() {
-  const data = useRouteLoaderData("root") as RootLoaderData;
+  // const { countUnapprovedComments } = useRouteLoaderData(
+  //   "root"
+  // ) as RootLoaderData;
+
+  const { data } = useCountUnapprovedComments();
 
   return (
     <>
       <SmartAnchor href="/">Home</SmartAnchor>
       <SmartAnchor href="/plog">Blogitems</SmartAnchor>
       <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
-      <Suspense fallback={<CommentsLink />}>
-        <Await resolve={data} errorElement={<CommentsLink />}>
+      <CommentsLink count={data?.count} />
+      {/* <Suspense fallback={<CommentsLink />}>
+        <Await
+          resolve={countUnapprovedComments}
+          errorElement={<CommentsLink />}
+        >
           {(countUnapprovedComments) => (
             <CommentsLink count={countUnapprovedComments.count} />
           )}
         </Await>
-      </Suspense>
+      </Suspense> */}
     </>
   );
 }

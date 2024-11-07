@@ -12,12 +12,14 @@ import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { API_BASE } from "../../config";
+import { useCategories } from "../../hooks/use-categories";
 import type { EditBlogitemT } from "../../types";
 import "./highlight.js.css"; // for the preview
 import { useDebouncedValue, useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useLoaderData, useNavigate } from "react-router-dom";
-import type { BlogitemLoaderData } from "../../loaders/blogitem";
+import { useNavigate } from "react-router-dom";
+// import { useLoaderData, useNavigate } from "react-router-dom";
+// import type { BlogitemLoaderData } from "../../loaders/blogitem";
 import {
   blogitemQueryKey,
   blogitemsQueryKey,
@@ -53,7 +55,11 @@ type PostedError = {
 };
 
 export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
-  const { categories } = useLoaderData() as BlogitemLoaderData;
+  const {
+    categories,
+    isPending: categorisIsPending,
+    error: categoriesError,
+  } = useCategories();
 
   const initialValues = {
     oid: blogitem.oid,
@@ -282,11 +288,17 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           {...form.getInputProps("pub_date")}
         />
 
-        {/* {categoriesError && (
+        {categoriesError && (
           <Alert color="red">Failed to load categories</Alert>
-        )} */}
+        )}
         <MultiSelect
-          label="Categories"
+          label={
+            categoriesError
+              ? "Categories (errored!)"
+              : categorisIsPending
+                ? "Categories (loading)"
+                : "Categories"
+          }
           comboboxProps={{ shadow: "md" }}
           disabled={categories.length === 0}
           data={categories.map((category) => ({

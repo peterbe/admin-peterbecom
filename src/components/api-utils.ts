@@ -106,6 +106,8 @@ export async function fetchComments(search: URLSearchParams) {
     copy.delete("only");
   }
 
+  console.log("FETCHING COMMENTS", new Date());
+
   const response = await fetch(`${API_BASE}/plog/comments/?${copy}`);
   if (!response.ok) {
     throw new Error(`${response.status} on ${response.url}`);
