@@ -14,10 +14,10 @@ export function Home() {
     <SignedIn>
       <Box m={50}>
         <Group justify="center">
-          <Button size="xl" component={Link} to="/plog">
+          <Button size="xl" component={Link} to="/plog" viewTransition>
             Blogitems
           </Button>
-          <Button size="xl" component={Link} to="/plog/add">
+          <Button size="xl" component={Link} to="/plog/add" viewTransition>
             Add blogitem
           </Button>
           <CommentsButton count={data?.count} />
@@ -25,10 +25,15 @@ export function Home() {
       </Box>
       <Box m={100}>
         <Group justify="center">
-          <Button size="xl" component={Link} to="/spam/signatures">
+          <Button
+            size="xl"
+            component={Link}
+            to="/spam/signatures"
+            viewTransition
+          >
             Spam Comment Signatures
           </Button>
-          <Button size="xl" component={Link} to="/spam/patterns">
+          <Button size="xl" component={Link} to="/spam/patterns" viewTransition>
             Spam Comment Patterns
           </Button>
         </Group>
@@ -42,6 +47,7 @@ function CommentsButton({ count }: { count?: number }) {
     <Button
       size="xl"
       component={Link}
+      viewTransition
       to={count ? "/plog/comments?only=unapproved" : "/plog/comments"}
     >
       {count ? `Comments (${count})` : "Comments"}
