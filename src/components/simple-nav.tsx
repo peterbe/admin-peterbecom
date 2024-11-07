@@ -11,8 +11,6 @@ import { NavigationSearch } from "./navigation-search";
 import { SmartAnchor } from "./smart-anchor";
 
 export function Nav() {
-  console.log("RENDERING NAV", new Date());
-
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const { userData } = useUserData();
@@ -88,7 +86,8 @@ function Links() {
   //   "root"
   // ) as RootLoaderData;
 
-  const { data } = useCountUnapprovedComments();
+  const { data, isPending } = useCountUnapprovedComments();
+  console.log("RENDERING NAV LINKS", { data: !!data, isPending });
 
   return (
     <>

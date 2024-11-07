@@ -9,15 +9,13 @@ import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-commen
 import { SignedIn } from "./signed-in";
 
 export function Home() {
-  console.log("RENDERINH HOME COMPONENT", new Date());
-
   useDocumentTitle("Home");
 
   // const { countUnapprovedComments } = useRouteLoaderData(
   //   "root"
   // ) as RootLoaderData;
-  const { data } = useCountUnapprovedComments();
-  console.log("DATA", data);
+  const { data, isPending } = useCountUnapprovedComments();
+  console.log("RENDERING HOME COMPONENT", { data: !!data, isPending });
 
   return (
     <SignedIn>
