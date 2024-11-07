@@ -12,6 +12,5 @@ export function useCountUnapprovedComments() {
   return useQuery<Counts>({
     queryKey: commentsCountQueryKey(),
     queryFn: fetchCommentsCount,
-    retry: false,
   });
 }
