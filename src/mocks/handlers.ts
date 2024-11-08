@@ -12,7 +12,12 @@ import {
   addBlogItem,
 } from "./data/blogitems"
 import { COMMENTS } from "./data/comments"
-import { CATEGORIES } from "./data/db"
+import {
+  CATEGORIES,
+  type EditCategoryRequestBody,
+  deleteCategory,
+  editCategory,
+} from "./data/db"
 import {
   type EditBlogitemImagesRequestBody,
   IMAGES,
@@ -33,6 +38,20 @@ export const handlers = [
 
   http.get("/api/v0/categories", () => {
     return HttpResponse.json(CATEGORIES())
+  }),
+
+  http.post<PathParams, EditCategoryRequestBody>(
+    "/api/v0/categories",
+    async ({ request, cookies }) => {
+      if (!cookies.mocksessionid) return new HttpResponse(null, { status: 403 })
+      const body = await request.json()
+      return editCategory({ body })
+    },
+  ),
+  http.delete("/api/v0/categories", async ({ request, cookies }) => {
+    if (!cookies.mocksessionid) return new HttpResponse(null, { status: 403 })
+    const url = request.url
+    return deleteCategory(new URLSearchParams(new URL(url).search))
   }),
 
   http.post("/api/v0/plog/preview/", () => {

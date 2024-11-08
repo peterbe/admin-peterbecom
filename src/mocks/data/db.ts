@@ -1,16 +1,56 @@
+import { HttpResponse } from "msw"
+
 import type { Comment } from "../../components/comments/types"
 import type { CategoryT, EditBlogitemT } from "../../types"
+
+const categories: CategoryT[] = [
+  { id: 1, name: "Software", count: 0 },
+  { id: 2, name: "Hardware", count: 0 },
+  { id: 3, name: "Foodware", count: 0 },
+]
 
 export function CATEGORIES(): {
   categories: CategoryT[]
 } {
   return {
-    categories: [
-      { id: 1, name: "Software" },
-      { id: 2, name: "Hardware" },
-      { id: 3, name: "Foodware" },
-    ],
+    categories,
   }
+}
+
+export type EditCategoryRequestBody = {
+  name: string
+  category?: string
+}
+
+export function deleteCategory(params: URLSearchParams) {
+  const foundIndex = categories.findIndex(
+    (c) => c.id === Number(params.get("id")),
+  )
+  if (foundIndex === -1) {
+    return HttpResponse.json(
+      { ok: false, error: "Category not found" },
+      { status: 404 },
+    )
+  }
+  categories.splice(foundIndex, 1)
+  return HttpResponse.json({ ok: true })
+}
+
+export function editCategory({ body }: { body: EditCategoryRequestBody }) {
+  const found = categories.find(
+    (c) => body.category && c.id === Number(body.category),
+  )
+  if (found) {
+    found.name = body.name
+  } else {
+    categories.push({
+      id: Math.max(0, ...categories.map((b) => b.id)) + 1,
+      name: body.name,
+      count: 0,
+    })
+  }
+
+  return HttpResponse.json({ ok: true })
 }
 
 export type BlogitemFull = Omit<EditBlogitemT, "_published" | "_absolute_url">

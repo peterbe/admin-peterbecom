@@ -45,16 +45,16 @@ export function AddPattern() {
             Array.isArray(errors) ? errors.join(", ") : errors,
           )
         }
-      } else if (response.status === 200) {
-        notifications.show({
-          message: "Spam pattern added",
-          color: "green",
-        })
-      } else {
+      } else if (!response.ok) {
         throw new Error(`${response.status} on ${response.url}`)
       }
     },
     onSuccess: () => {
+      notifications.show({
+        message: "Spam pattern added",
+        color: "green",
+      })
+
       form.reset()
       form.setValues(initialValues)
 

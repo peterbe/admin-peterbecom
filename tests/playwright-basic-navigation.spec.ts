@@ -110,3 +110,26 @@ test("approve and delete comments", async ({ page }) => {
   await expect(page.getByText("Blabla")).toBeVisible()
   await expect(page.getByText("This has already been approved")).toBeVisible()
 })
+
+test("crud categories", async ({ page }) => {
+  await page.goto("/")
+  await expect(page).toHaveTitle(/Sign in/)
+  await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click()
+
+  await page.getByRole("link", { name: "Categories" }).click()
+  await page.getByRole("button", { name: "Edit" }).first().click()
+  await page.getByLabel("Name").click()
+  await page.getByLabel("Name").fill("Softwares")
+  await page.getByRole("button", { name: "Save" }).click()
+
+  await page.getByRole("button", { name: "Add new category" }).click()
+  await page.getByLabel("Name").click()
+  await page.getByLabel("Name").fill("New name")
+  await page.getByRole("button", { name: "Save" }).click()
+
+  await page.getByRole("button", { name: "Delete" }).nth(1).click()
+  await page.getByRole("button", { name: "Cancel" }).click()
+  await page.getByRole("button", { name: "Delete" }).nth(2).click()
+  await page.getByRole("button", { name: "Are you sure?" }).click()
+  await page.getByRole("button", { name: "Yes" }).click()
+})

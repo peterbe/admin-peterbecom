@@ -40,6 +40,14 @@ export function commentsCountQueryKey() {
   return ["count-unapproved-comments"]
 }
 
+export function categoriesQueryKey() {
+  return ["categories"]
+}
+
+export async function fetchCategories() {
+  return standardFetch(`${API_BASE}/categories`)
+}
+
 export async function fetchBlogitem(oid: string) {
   const response = await fetch(`${API_BASE}/plog/${oid}`)
   if (response.status === 404) {
@@ -106,9 +114,14 @@ export async function fetchComments(search: URLSearchParams) {
     copy.delete("only")
   }
 
-  console.log("FETCHING COMMENTS", new Date())
-
   const response = await fetch(`${API_BASE}/plog/comments/?${copy}`)
+  if (response.status === 403 && search.get("count") === "true") {
+    return {
+      count: 0,
+      comments: [],
+      oldest: "",
+    }
+  }
   if (!response.ok) {
     throw new Error(`${response.status} on ${response.url}`)
   }
