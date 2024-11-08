@@ -115,6 +115,13 @@ export async function fetchComments(search: URLSearchParams) {
   }
 
   const response = await fetch(`${API_BASE}/plog/comments/?${copy}`)
+  if (response.status === 403 && search.get("count") === "true") {
+    return {
+      count: 0,
+      comments: [],
+      oldest: "",
+    }
+  }
   if (!response.ok) {
     throw new Error(`${response.status} on ${response.url}`)
   }
