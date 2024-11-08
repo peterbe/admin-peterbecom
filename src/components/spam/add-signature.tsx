@@ -17,12 +17,20 @@ type PostedError = {
   errors: Record<string, string | string[]>
 }
 
-export function AddSignature() {
+export function AddSignature({
+  name,
+  email,
+  onSuccess,
+}: {
+  name?: string
+  email?: string
+  onSuccess?: () => void
+}) {
   const queryClient = useQueryClient()
   const { mutate, isPending, error } = useMutation({
     mutationKey: spamSignaturesQueryKey(),
     mutationFn: async (data: typeof form.values) => {
-      const url = `${API_BASE}/spam/signatures`
+      const url = `${API_BASE}/plog/spam/signatures`
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -61,13 +69,16 @@ export function AddSignature() {
       queryClient.invalidateQueries({
         queryKey: spamSignaturesQueryKey(),
       })
+      if (onSuccess) {
+        onSuccess()
+      }
     },
   })
 
   const initialValues = {
-    name: "",
+    name: name || "",
     name_null: false,
-    email: "",
+    email: email || "",
     email_null: false,
   }
 

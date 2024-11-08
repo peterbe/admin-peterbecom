@@ -27,6 +27,7 @@ import { ApprovalForm } from "./approval-form"
 import { ClassifyComment } from "./classify"
 import { DisplayClues } from "./clues"
 import { DisplayLocation } from "./location"
+import { SpamSignatureComment } from "./spam-signature"
 
 export function CommentsTree({
   comments,
@@ -139,6 +140,7 @@ function InnerComment({
 }) {
   const [editMode, setEditMode] = useState(false)
   const [classifyMode, setClassifyMode] = useState(false)
+  const [spamSignatureMode, setSpamSignatureMode] = useState(false)
 
   const form = useForm({
     mode: "uncontrolled",
@@ -251,6 +253,14 @@ function InnerComment({
                   {comment.name ? <b>{comment.name}</b> : <i>No name</i>}{" "}
                   {comment.email ? <b>{comment.email}</b> : <i>No email</i>}
                 </Text>
+                <Button
+                  title="Add as spam pattern?"
+                  size="sm"
+                  variant="subtle"
+                  onClick={() => setSpamSignatureMode(true)}
+                >
+                  Ban?
+                </Button>
                 {comment.location ? (
                   <DisplayLocation location={comment.location} />
                 ) : (
@@ -301,6 +311,18 @@ function InnerComment({
             comment={comment}
             onClose={() => {
               setClassifyMode(false)
+              queryClient.invalidateQueries({
+                queryKey: ["comments"],
+              })
+            }}
+          />
+        )}
+
+        {spamSignatureMode && (
+          <SpamSignatureComment
+            comment={comment}
+            onClose={() => {
+              setSpamSignatureMode(false)
               queryClient.invalidateQueries({
                 queryKey: ["comments"],
               })
