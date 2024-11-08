@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { API_BASE } from "../config"
+import { categoriesQueryKey, fetchCategories } from "../components/api-utils"
 import type { CategoryT } from "../types"
 
 type ServerData = {
@@ -16,14 +16,8 @@ export function useCategories(): {
   isPending: boolean
 } {
   const { data, error, isPending } = useQuery<ServerData>({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const response = await fetch(`${API_BASE}/categories`)
-      if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`)
-      }
-      return await response.json()
-    },
+    queryKey: categoriesQueryKey(),
+    queryFn: fetchCategories,
   })
 
   return { categories: data?.categories || [], error, isPending }

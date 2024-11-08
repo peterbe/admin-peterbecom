@@ -43,6 +43,10 @@ export const router = createBrowserRouter([
               { index: true, element: <Blogitems /> },
               { path: "add", element: <Blogitem /> },
               { path: "comments", element: <Comments /> },
+              {
+                path: "categories",
+                lazy: () => import("./components/categories"),
+              },
             ],
           },
           {

@@ -38,6 +38,18 @@ export function Home() {
           </Button>
         </Group>
       </Box>
+      <Box m={100}>
+        <Group justify="center">
+          <Button
+            size="xl"
+            component={Link}
+            to="/plog/categories"
+            viewTransition
+          >
+            Categories
+          </Button>
+        </Group>
+      </Box>
     </SignedIn>
   )
 }

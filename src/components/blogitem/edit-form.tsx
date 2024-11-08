@@ -18,8 +18,6 @@ import "./highlight.js.css" // for the preview
 import { useDebouncedValue, useHotkeys } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { useNavigate } from "react-router-dom"
-// import { useLoaderData, useNavigate } from "react-router-dom";
-// import type { BlogitemLoaderData } from "../../loaders/blogitem";
 import {
   blogitemQueryKey,
   blogitemsQueryKey,

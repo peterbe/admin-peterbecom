@@ -5,8 +5,6 @@ import type { QueryResult, QueryResultRow } from "../../types"
 function getQueryResult(query: string): QueryResult {
   const rows: QueryResultRow[] = []
 
-  console.log("QUERY:", query)
-
   // Example for a single
   // SELECT
   //   DATE_TRUNC('day', created) AS date,
