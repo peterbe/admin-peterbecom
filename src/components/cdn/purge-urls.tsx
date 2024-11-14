@@ -63,18 +63,18 @@ function URLTable({ data }: { data: PurgeURL[] }) {
               <Table.Td>{url.url}</Table.Td>
               <Table.Td>{url.attempts}</Table.Td>
               <Table.Td>
-                <DisplayDate date={url.created} />
+                <DisplayDate date={url.created} includeSeconds />
               </Table.Td>
               <Table.Td>
                 {url.processed ? (
-                  <DisplayDate date={url.processed} />
+                  <DisplayDate date={url.processed} includeSeconds />
                 ) : (
                   <i>n/a</i>
                 )}
               </Table.Td>
               <Table.Td>
                 {url.cancelled ? (
-                  <DisplayDate date={url.cancelled} />
+                  <DisplayDate date={url.cancelled} includeSeconds />
                 ) : (
                   <i>n/a</i>
                 )}
