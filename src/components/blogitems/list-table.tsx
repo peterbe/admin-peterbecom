@@ -252,10 +252,12 @@ export function DisplayDate({
   date,
   now,
   compact = false,
+  includeSeconds = false,
 }: {
-  date: string
+  date: string | Date
   now?: string
   compact?: boolean
+  includeSeconds?: boolean
 }) {
   if (date === null) {
     throw new Error("date is null")
@@ -267,7 +269,7 @@ export function DisplayDate({
     <span title={dateObj.toString()}>
       {compact
         ? formatDistanceCompact(dateObj)
-        : formatDistance(dateObj, nowObj, { addSuffix: true })}
+        : formatDistance(dateObj, nowObj, { addSuffix: true, includeSeconds })}
     </span>
   )
 }

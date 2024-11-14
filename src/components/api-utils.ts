@@ -44,6 +44,14 @@ export function categoriesQueryKey() {
   return ["categories"]
 }
 
+export function cdnProbeQueryKey(search: string) {
+  return ["cdn", "probe", search]
+}
+
+export function cdnPurgeURLsQueryKey() {
+  return ["cdn", "purge-urls"]
+}
+
 export async function fetchCategories() {
   return standardFetch(`${API_BASE}/categories`)
 }
@@ -69,6 +77,28 @@ export async function fetchSpamPatterns() {
 
 export async function fetchCommentClassification(oid: string) {
   return standardFetch(`${API_BASE}/plog/comments/${oid}/classify/`)
+}
+
+export async function fetchCDNProbe(url: string) {
+  return standardFetch(`${API_BASE}/cdn/probe?${new URLSearchParams({ url })}`)
+}
+export async function fetchCDNPurgeURLs() {
+  return standardFetch(`${API_BASE}/cdn/purge/urls`)
+}
+
+export async function fetchCDNPurge(urls: string[]) {
+  const formData = new FormData()
+  for (const url of urls) {
+    formData.append("urls", url)
+  }
+  const response = await fetch(`${API_BASE}/cdn/purge`, {
+    method: "POST",
+    body: formData,
+  })
+  if (!response.ok) {
+    throw new Error(`${response.status} on ${response.url}`)
+  }
+  return response.json()
 }
 
 async function standardFetch(url: string) {
