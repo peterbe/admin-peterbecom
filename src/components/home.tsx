@@ -48,6 +48,9 @@ export function Home() {
           >
             Categories
           </Button>
+          <Button size="xl" component={Link} to="/cdn" viewTransition>
+            CDN
+          </Button>
         </Group>
       </Box>
     </SignedIn>

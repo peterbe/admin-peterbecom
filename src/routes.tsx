@@ -57,6 +57,10 @@ export const router = createBrowserRouter([
             path: "spam/patterns",
             lazy: () => import("./components/spam/patterns"),
           },
+          {
+            path: "cdn",
+            lazy: () => import("./components/cdn"),
+          },
         ],
       },
     ],
