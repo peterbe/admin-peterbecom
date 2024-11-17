@@ -29,7 +29,7 @@ export function Lookup({ search }: { search: string }) {
       {error && <Alert color="red">Error: {error.message}</Alert>}
       {data && <Purge result={data} search={search} reload={() => refetch()} />}
 
-      {dataUpdatedAt && <LookedUp ts={dataUpdatedAt} />}
+      {dataUpdatedAt && dataUpdatedAt > 0 && <LookedUp ts={dataUpdatedAt} />}
 
       {data && <LookupResult data={data} />}
     </Box>
