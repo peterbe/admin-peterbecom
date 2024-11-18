@@ -11,15 +11,23 @@ import type { PreviewData } from "../../types"
 import "./highlight.js.css" // for the preview
 import "./preview.css" // for the preview
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { useEffect, useRef } from "react"
 import { postPreview } from "./post-preview"
 import { RefreshPreviewAreaHeight } from "./refresh-preview-area-height"
+
+type ScrollAreaProps = React.ComponentProps<typeof ScrollArea>
+type ScrollAreaOnScroll = ScrollAreaProps["onScrollPositionChange"]
 
 export function Preview({
   previewText,
   displayFormat,
+  onScroll,
+  scrollPosition,
 }: {
   previewText: string
   displayFormat: string
+  onScroll: ScrollAreaOnScroll
+  scrollPosition?: number
 }) {
   const { data, error, isFetching, isPending } = useQuery<PreviewData>({
     queryKey: ["preview", previewText, displayFormat],
@@ -33,6 +41,14 @@ export function Preview({
     },
     placeholderData: keepPreviousData,
   })
+
+  const viewport = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (viewport.current && scrollPosition !== null) {
+      // viewport.current.scrollTo({ top: scrollPosition, behavior: "smooth" })
+      viewport.current.scrollTo({ top: scrollPosition })
+    }
+  }, [scrollPosition])
 
   return (
     <Box pos="relative" style={{ minHeight: 100 }}>
@@ -61,6 +77,8 @@ export function Preview({
           pb={2}
           pl={10}
           pr={10}
+          viewportRef={viewport}
+          onScrollPositionChange={onScroll}
         >
           <div dangerouslySetInnerHTML={{ __html: data.blogitem.html }} />
         </ScrollArea>

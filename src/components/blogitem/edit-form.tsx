@@ -15,7 +15,11 @@ import { API_BASE } from "../../config"
 import { useCategories } from "../../hooks/use-categories"
 import type { EditBlogitemT } from "../../types"
 import "./highlight.js.css" // for the preview
-import { useDebouncedValue, useHotkeys } from "@mantine/hooks"
+import {
+  useDebouncedValue,
+  useHotkeys,
+  useThrottledCallback,
+} from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { useNavigate } from "react-router-dom"
 import {
@@ -209,6 +213,29 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
 
   useHotkeys([["mod+S", triggerSave]])
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [textareaScrollPosition, setTextareaScrollPosition] = useState<
+    null | number
+  >(null)
+  const throttledSetTextareaScrollPosition = useThrottledCallback(
+    (value) => setTextareaScrollPosition(value),
+    1050,
+  )
+
+  function textareaScrollHandler(event: React.UIEvent<HTMLTextAreaElement>) {
+    const { scrollHeight, scrollTop } = event.currentTarget
+    const offset = textareaRef.current?.clientHeight || 0 // height of textarea
+    if (scrollHeight <= Math.ceil(scrollTop + offset)) {
+      throttledSetTextareaScrollPosition(scrollTop + offset)
+    } else {
+      throttledSetTextareaScrollPosition(scrollTop)
+    }
+  }
+
+  function previewScrollHandler() {
+    setTextareaScrollPosition(null)
+  }
+
   return (
     <div>
       {mutation.isError && (
@@ -246,10 +273,12 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
             label="Text"
             className="markdown-textarea"
             key={form.key("text")}
+            ref={textareaRef}
             {...form.getInputProps("text")}
             onBlur={() => {
               setPreviewText(form.getValues().text.trim())
             }}
+            onScroll={textareaScrollHandler}
             autosize
             minRows={20}
             maxRows={35}
@@ -258,6 +287,12 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           <Preview
             previewText={debouchedPreviewText}
             displayFormat={form.getValues().display_format}
+            onScroll={previewScrollHandler}
+            scrollPosition={
+              textareaScrollPosition === null
+                ? undefined
+                : textareaScrollPosition
+            }
           />
         </SimpleGrid>
 
