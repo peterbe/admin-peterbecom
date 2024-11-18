@@ -51,13 +51,13 @@ export type PreviewData = {
   }
 }
 
-export type QueryMetaResult = {
+type QueryMetaResult = {
   took_seconds: number
   count_rows: number
   maxed_rows: boolean
 }
 
-export type QueryResultRowValue = string | null | number
+type QueryResultRowValue = string | null | number
 
 export type QueryResultRow = {
   [key: string]: QueryResultRowValue

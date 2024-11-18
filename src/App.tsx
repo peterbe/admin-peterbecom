@@ -19,14 +19,14 @@ export default function App() {
       <Notifications />
       <QueryClientProvider client={queryClient}>
         <UserDataProvider>
-          <BasicAppShell />
+          <AppShell />
         </UserDataProvider>
       </QueryClientProvider>
     </MantineProvider>
   )
 }
 
-export function BasicAppShell() {
+function AppShell() {
   return (
     <RouterProvider
       router={router}
