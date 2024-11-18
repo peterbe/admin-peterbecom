@@ -52,6 +52,14 @@ export function cdnPurgeURLsQueryKey() {
   return ["cdn", "purge-urls"]
 }
 
+export function imagesQueryKey(oid: string) {
+  return ["images", oid]
+}
+
+export function openGraphImagesQueryKey(oid: string) {
+  return ["open-graph-image", oid]
+}
+
 export async function fetchCategories() {
   return standardFetch(`${API_BASE}/categories`)
 }

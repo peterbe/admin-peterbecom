@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { openGraphImagesQueryKey } from "../components/api-utils"
 
 export type OpenGraphImageT = {
   label: string
@@ -14,7 +15,7 @@ type OpenGraphImages = {
 
 export function useOpenGraphImages(oid: string) {
   return useQuery<OpenGraphImages>({
-    queryKey: ["open-graph-image", oid],
+    queryKey: openGraphImagesQueryKey(oid),
     queryFn: async () => {
       const response = await fetch(`/api/v0/plog/${oid}/open-graph-image`)
       if (!response.ok) {

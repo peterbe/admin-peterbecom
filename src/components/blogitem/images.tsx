@@ -23,6 +23,7 @@ import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 import { useImages } from "../../hooks/use-images"
 import { useUserData } from "../../whoami/use-userdata"
+import { imagesQueryKey, openGraphImagesQueryKey } from "../api-utils"
 import { JSONPost } from "../json-post"
 import { UploadedImages } from "./uploaded-images"
 
@@ -81,7 +82,9 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
       return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["images", oid] })
+      queryClient.invalidateQueries({ queryKey: imagesQueryKey(oid) })
+      queryClient.invalidateQueries({ queryKey: openGraphImagesQueryKey(oid) })
+
       setUploadedFile(null)
     },
   })
