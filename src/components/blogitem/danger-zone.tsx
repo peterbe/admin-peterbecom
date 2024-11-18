@@ -10,7 +10,7 @@ export function DangerZone({ blogitem }: { blogitem: EditBlogitemT }) {
         <Title order={3}>Danger zone</Title>
         <Group>
           <DeleteBlogitem oid={blogitem.oid} />
-          <ArchiveBlogitem blogitem={blogitem} />
+          {blogitem._published && <ArchiveBlogitem blogitem={blogitem} />}
         </Group>
       </Paper>
     </Container>

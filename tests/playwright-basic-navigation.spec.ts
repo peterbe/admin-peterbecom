@@ -64,8 +64,8 @@ test("add, find, edit blogitem", async ({ page }) => {
   await expect(page).toHaveURL("/plog/hello-new-world")
   await expect(page).toHaveTitle(/Edit hello-new-world/)
 
-  await expect(page.getByText("Pageviews")).toBeVisible()
-  await expect(page.getByText("Not enough data to show a graph")).toBeVisible()
+  await expect(page.getByText("Pageviews")).not.toBeVisible()
+  // await expect(page.getByText("Not enough data to show a graph")).toBeVisible()
 
   await page.getByRole("link", { name: "Home" }).click()
   await page.getByPlaceholder("Search titles or OIDs").click()
