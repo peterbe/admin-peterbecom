@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { imagesQueryKey } from "../components/api-utils"
 
 export type ImageT = {
   id: number
@@ -29,7 +30,7 @@ type ServerImages = {
 
 export function useImages(oid: string) {
   return useQuery<ServerImages>({
-    queryKey: ["images", oid],
+    queryKey: imagesQueryKey(oid),
     queryFn: async () => {
       const response = await fetch(`/api/v0/plog/${oid}/images`)
       if (!response.ok) {
