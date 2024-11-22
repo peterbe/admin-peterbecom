@@ -122,7 +122,11 @@ function LookupResult({ data }: { data: ProbeServerData }) {
           <Table.Tr>
             <Table.Th>X-Cache</Table.Th>
             <Table.Td>
-              <Code>{data.http_1.x_cache}</Code>
+              {data.http_1.x_cache ? (
+                <Code>{data.http_1.x_cache}</Code>
+              ) : (
+                <i>n/a</i>
+              )}
             </Table.Td>
           </Table.Tr>
         </Table.Tbody>
@@ -146,7 +150,7 @@ function LookupResult({ data }: { data: ProbeServerData }) {
 
       <Table>
         <Table.Tbody>
-          {Object.entries(data.http_1.headers).map(([header, value]) => {
+          {Object.entries(data.http_1.headers || {}).map(([header, value]) => {
             return (
               <Table.Tr key={header}>
                 <Table.Th>{header}</Table.Th>

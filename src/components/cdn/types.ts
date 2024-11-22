@@ -1,8 +1,8 @@
 type HTTPLookup = {
   took: number
   status_code: number
-  x_cache: string
-  headers: {
+  x_cache?: string
+  headers?: {
     [key: string]: string
   }
 }
