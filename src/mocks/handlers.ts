@@ -65,7 +65,7 @@ export const handlers = [
   }),
 
   http.get("/api/v0/plog/:slug/images", ({ params }) => {
-    return IMAGES(params.slug)
+    return IMAGES(params.slug as string)
   }),
 
   http.post<SlugParams, EditBlogitemImagesRequestBody>(
@@ -78,12 +78,12 @@ export const handlers = [
   ),
 
   http.get("/api/v0/plog/:slug/open-graph-image", ({ params }) => {
-    return OPEN_GRAPH_IMAGE(params.slug)
+    return OPEN_GRAPH_IMAGE(params.slug as string)
   }),
 
   http.get("/api/v0/plog/:slug", ({ params }) => {
     const slug = params.slug
-    return BLOGITEM(slug)
+    return BLOGITEM(slug as string)
   }),
 
   http.post<SlugParams, EditBlogitemRequestBody>(
