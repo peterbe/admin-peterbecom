@@ -40,6 +40,10 @@ export function commentsCountQueryKey() {
   return ["count-unapproved-comments"]
 }
 
+export function whoamiQueryKey() {
+  return ["whoami"]
+}
+
 export function categoriesQueryKey() {
   return ["categories"]
 }
@@ -62,6 +66,10 @@ export function openGraphImagesQueryKey(oid: string) {
 
 export async function fetchCategories() {
   return standardFetch(`${API_BASE}/categories`)
+}
+
+export async function fetchWhoami() {
+  return standardFetch(`${API_BASE}/whoami`)
 }
 
 export async function fetchBlogitem(oid: string) {

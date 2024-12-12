@@ -45,6 +45,9 @@ export function Nav() {
                   size="md"
                   src={userData.user.picture_url}
                   alt={userData?.user.email || userData?.user.username}
+                  title={`Signed in as ${
+                    userData?.user.email || userData?.user.username
+                  }`}
                 />
               )}
             </Box>

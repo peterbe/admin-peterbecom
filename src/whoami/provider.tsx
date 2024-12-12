@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import type { ReactNode } from "react"
 import { useEffect } from "react"
+import { fetchWhoami, whoamiQueryKey } from "../components/api-utils"
 import { UserDataContext } from "./context"
 import type { UserContext, UserData } from "./types"
 
@@ -11,21 +12,23 @@ import type { UserContext, UserData } from "./types"
 // Also, localStorage doesn't go away. So if we decide to not do this stuff
 // anymore we won't have users who have that stuff stuck in their browser
 // "forever".
-const SESSION_STORAGE_KEY = "analytics-dashboard-peterbecom-whoami"
+const SESSION_STORAGE_KEY = "admin-peterbecom-whoami"
 
 function getSessionStorageData() {
   try {
     const data = sessionStorage.getItem(SESSION_STORAGE_KEY)
     if (data) {
       const parsed = JSON.parse(data)
-      // Because it was added late, if the stored value doesn't contain
-      // then following keys, consider the stored data stale.
-      if (!parsed.geo) {
-        // If we don't do this check, you might be returning stored data
-        // that doesn't match any of the new keys.
-        return false
+      // To avoid trusting in `as UserData` as a type, let's check it manually
+      if (parsed.user) {
+        for (const key of ["username", "email", "picture_url"]) {
+          if (typeof parsed.user[key] !== "string") {
+            return false
+          }
+        }
+        return parsed as UserData
       }
-      return parsed as UserData
+      return false
     }
   } catch (error) {
     console.warn("sessionStorage.getItem didn't work", error)
@@ -52,30 +55,24 @@ function setSessionStorageData(data: UserData) {
   }
 }
 
+type WhoamiResponse = UserData & {
+  is_authencated: true
+}
 export function UserDataProvider(props: { children: ReactNode }) {
-  const { data, error } = useQuery({
-    queryKey: ["whoami"],
-    queryFn: async () => {
-      const response = await fetch("/api/v0/whoami")
-      if (!response.ok) {
-        removeSessionStorageData()
-        throw new Error(`${response.status} on ${response.url}`)
-      }
-      const data = await response.json()
-      const { user } = data
-      return {
-        user,
-      }
-    },
+  const { data, error, isError } = useQuery<WhoamiResponse>({
+    queryKey: whoamiQueryKey(),
+    queryFn: fetchWhoami,
   })
 
   useEffect(() => {
-    if (data) {
+    if (isError) {
+      removeSessionStorageData()
+    } else if (data) {
       // At this point, the XHR request has set `data` to be an object.
       // The user is definitely signed in or not signed in.
       setSessionStorageData(data)
     }
-  }, [data])
+  }, [data, isError])
 
   const isServer = typeof window === "undefined"
 
