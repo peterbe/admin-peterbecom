@@ -12,7 +12,7 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { IconSearch } from "@tabler/icons-react"
 import { useState } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router"
 
 const CHOICES = [
   { label: "Any", value: "" },

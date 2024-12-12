@@ -10,7 +10,7 @@ import {
 } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams } from "react-router"
 import {
   type OpenGraphImageT,
   useOpenGraphImages,

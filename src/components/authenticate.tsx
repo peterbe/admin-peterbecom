@@ -1,7 +1,7 @@
 import { Alert, Container, Paper } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
 
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router"
 import { useUserData } from "../whoami/use-userdata"
 
 export function Authenticate() {

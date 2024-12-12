@@ -1,5 +1,5 @@
 import { Anchor, Box, Text, Title } from "@mantine/core"
-import { Link, useLocation, useSearchParams } from "react-router-dom"
+import { Link, useLocation, useSearchParams } from "react-router"
 
 export function NoComments() {
   const { pathname } = useLocation()

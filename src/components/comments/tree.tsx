@@ -1,7 +1,7 @@
 import { Alert, Box, Button, LoadingOverlay, Text } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router"
 import { thousands } from "../../number-formatter"
 import {
   commentsCountQueryKey,

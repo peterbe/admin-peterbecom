@@ -21,7 +21,7 @@ import {
   useThrottledCallback,
 } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import {
   blogitemQueryKey,
   blogitemsQueryKey,

@@ -13,7 +13,7 @@ import {
 } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router"
 import { SignedIn } from "../signed-in"
 import { BlogitemLinks } from "./links"
 import "@mantine/dropzone/styles.css"

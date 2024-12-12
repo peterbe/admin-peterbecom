@@ -1,7 +1,7 @@
 import { CloseButton, TextInput } from "@mantine/core"
 import { IconSearch } from "@tabler/icons-react"
 import { useState } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router"
 
 export function Search({ disabled }: { disabled?: boolean }) {
   const [searchParams, setSearchParams] = useSearchParams()

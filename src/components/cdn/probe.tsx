@@ -1,5 +1,5 @@
 import { Box } from "@mantine/core"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router"
 import { Lookup } from "./lookup"
 import { Search } from "./search"
 
