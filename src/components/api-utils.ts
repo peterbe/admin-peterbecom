@@ -69,8 +69,6 @@ export async function fetchCategories() {
 }
 
 export async function fetchWhoami() {
-  console.log("FETCHING WHOAMI")
-
   return standardFetch(`${API_BASE}/whoami`)
 }
 
