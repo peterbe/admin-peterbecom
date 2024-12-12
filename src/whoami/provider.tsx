@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import type { ReactNode } from "react"
 import { useEffect } from "react"
+import { whoamiQueryKey } from "../components/api-utils"
 import { UserDataContext } from "./context"
 import type { UserContext, UserData } from "./types"
 
@@ -54,7 +55,7 @@ function setSessionStorageData(data: UserData) {
 
 export function UserDataProvider(props: { children: ReactNode }) {
   const { data, error } = useQuery({
-    queryKey: ["whoami"],
+    queryKey: whoamiQueryKey(),
     queryFn: async () => {
       const response = await fetch("/api/v0/whoami")
       if (!response.ok) {
