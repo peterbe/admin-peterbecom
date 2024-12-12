@@ -12,7 +12,7 @@ import type { UserContext, UserData } from "./types"
 // Also, localStorage doesn't go away. So if we decide to not do this stuff
 // anymore we won't have users who have that stuff stuck in their browser
 // "forever".
-const SESSION_STORAGE_KEY = "analytics-dashboard-peterbecom-whoami"
+const SESSION_STORAGE_KEY = "admin-peterbecom-whoami"
 
 function getSessionStorageData() {
   try {
@@ -53,8 +53,11 @@ function setSessionStorageData(data: UserData) {
   }
 }
 
+type WhoamiResponse = UserData & {
+  is_authencated: true
+}
 export function UserDataProvider(props: { children: ReactNode }) {
-  const { data, error, isError } = useQuery({
+  const { data, error, isError } = useQuery<WhoamiResponse>({
     queryKey: whoamiQueryKey(),
     queryFn: fetchWhoami,
   })

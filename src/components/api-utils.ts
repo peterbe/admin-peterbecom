@@ -69,16 +69,9 @@ export async function fetchCategories() {
 }
 
 export async function fetchWhoami() {
-  const response = await fetch("/api/v0/whoami")
-  if (!response.ok) {
-    // removeSessionStorageData()
-    throw new Error(`${response.status} on ${response.url}`)
-  }
-  const data = await response.json()
-  const { user } = data
-  return {
-    user,
-  }
+  console.log("FETCHING WHOAMI")
+
+  return standardFetch(`${API_BASE}/whoami`)
 }
 
 export async function fetchBlogitem(oid: string) {

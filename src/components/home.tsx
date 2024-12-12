@@ -8,6 +8,8 @@ import { SignedIn } from "./signed-in"
 export function Home() {
   useDocumentTitle("Home")
 
+  console.log("RENDERING HOME COMPONENT")
+
   const { data } = useCountUnapprovedComments()
 
   return (
