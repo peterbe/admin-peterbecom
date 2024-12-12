@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import type { ReactNode } from "react"
 import { useEffect } from "react"
-import { whoamiQueryKey } from "../components/api-utils"
+import { fetchWhoami, whoamiQueryKey } from "../components/api-utils"
 import { UserDataContext } from "./context"
 import type { UserContext, UserData } from "./types"
 
@@ -54,29 +54,20 @@ function setSessionStorageData(data: UserData) {
 }
 
 export function UserDataProvider(props: { children: ReactNode }) {
-  const { data, error } = useQuery({
+  const { data, error, isError } = useQuery({
     queryKey: whoamiQueryKey(),
-    queryFn: async () => {
-      const response = await fetch("/api/v0/whoami")
-      if (!response.ok) {
-        removeSessionStorageData()
-        throw new Error(`${response.status} on ${response.url}`)
-      }
-      const data = await response.json()
-      const { user } = data
-      return {
-        user,
-      }
-    },
+    queryFn: fetchWhoami,
   })
 
   useEffect(() => {
-    if (data) {
+    if (isError) {
+      removeSessionStorageData()
+    } else if (data) {
       // At this point, the XHR request has set `data` to be an object.
       // The user is definitely signed in or not signed in.
       setSessionStorageData(data)
     }
-  }, [data])
+  }, [data, isError])
 
   const isServer = typeof window === "undefined"
 
