@@ -19,14 +19,16 @@ function getSessionStorageData() {
     const data = sessionStorage.getItem(SESSION_STORAGE_KEY)
     if (data) {
       const parsed = JSON.parse(data)
-      // Because it was added late, if the stored value doesn't contain
-      // then following keys, consider the stored data stale.
-      if (!parsed.geo) {
-        // If we don't do this check, you might be returning stored data
-        // that doesn't match any of the new keys.
-        return false
+      // To avoid trusting in `as UserData` as a type, let's check it manually
+      if (parsed.user) {
+        for (const key of ["username", "email", "picture_url"]) {
+          if (typeof parsed.user[key] !== "string") {
+            return false
+          }
+        }
+        return parsed as UserData
       }
-      return parsed as UserData
+      return false
     }
   } catch (error) {
     console.warn("sessionStorage.getItem didn't work", error)
