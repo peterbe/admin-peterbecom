@@ -2,7 +2,7 @@ import { Alert, Box } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 
 import { useLocalStorage } from "@mantine/hooks"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router"
 import { API_BASE } from "../../config"
 import type { BlogitemsServerData } from "../../types"
 import { ListTable } from "./list-table"

@@ -1,6 +1,6 @@
 import { useDocumentTitle } from "@mantine/hooks"
 import { useQuery } from "@tanstack/react-query"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router"
 
 import { Alert, Box, LoadingOverlay, Text } from "@mantine/core"
 import type { EditBlogitemT } from "../../types"

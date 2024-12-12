@@ -2,7 +2,7 @@ import { Box, Button, Group, LoadingOverlay, Text } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { API_BASE } from "../../config"
 import { blogitemsQueryKey } from "../api-utils"
 

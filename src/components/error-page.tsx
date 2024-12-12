@@ -1,6 +1,6 @@
 import { Button, Code, Container, Text, Title } from "@mantine/core"
 
-import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom"
+import { Link, isRouteErrorResponse, useRouteError } from "react-router"
 
 export default function ErrorPage() {
   const error = useRouteError()

@@ -11,7 +11,7 @@ import {
   Text,
   Title,
 } from "@mantine/core"
-import { Link } from "react-router-dom"
+import { Link } from "react-router"
 import { DisplayDate } from "../blogitems/list-table"
 import type { ProbeServerData } from "./types"
 import { useLookup } from "./use-lookup"

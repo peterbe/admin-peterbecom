@@ -1,5 +1,5 @@
 import { Container } from "@mantine/core"
-import { Outlet } from "react-router-dom"
+import { Outlet } from "react-router"
 import { Nav } from "../components/simple-nav"
 
 export function Root() {
