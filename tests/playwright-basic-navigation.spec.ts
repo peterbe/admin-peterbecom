@@ -133,3 +133,20 @@ test("crud categories", async ({ page }) => {
   await page.getByRole("button", { name: "Are you sure?" }).click()
   await page.getByRole("button", { name: "Yes" }).click()
 })
+
+test("analytics query", async ({ page }) => {
+  await page.goto("/")
+  await expect(page).toHaveTitle(/Sign in/)
+  await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click()
+
+  await page.getByRole("link", { name: "Analytics Query" }).click()
+  await page.getByPlaceholder("select * from analytics order").click()
+  await page
+    .getByPlaceholder("select * from analytics order")
+    .fill(
+      "select type, count(type) as c from analytics group by type order by 2 desc;",
+    )
+  await page.keyboard.press("Meta+Enter")
+  await page.getByRole("link", { name: "bar chart" }).click()
+  await page.getByRole("link", { name: "Close chart" }).click()
+})

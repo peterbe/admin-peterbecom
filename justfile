@@ -45,6 +45,9 @@ test-playwright:
     curl -s http://localhost:4001 > /dev/null
     PLAYWRIGHT_BASE_URL=http://localhost:4001 npx playwright test
 
+playwright-codegen:
+    npx playwright codegen
+
 test-manifest:
     npm run test-manifest -- http://localhost:4001
 

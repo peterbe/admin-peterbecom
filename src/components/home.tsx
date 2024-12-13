@@ -30,6 +30,7 @@ export function Home() {
             component={Link}
             to="/spam/signatures"
             viewTransition
+            prefetch="intent"
           >
             Spam Comment Signatures
           </Button>
@@ -45,11 +46,40 @@ export function Home() {
             component={Link}
             to="/plog/categories"
             viewTransition
+            prefetch="intent"
           >
             Categories
           </Button>
-          <Button size="xl" component={Link} to="/cdn" viewTransition>
+          <Button
+            size="xl"
+            component={Link}
+            to="/cdn"
+            viewTransition
+            prefetch="intent"
+          >
             CDN
+          </Button>
+        </Group>
+      </Box>
+      <Box m={100}>
+        <Group justify="center">
+          <Button
+            size="xl"
+            component={Link}
+            to="/analytics/query"
+            viewTransition
+            prefetch="intent"
+          >
+            Analytics Query
+          </Button>
+          <Button
+            size="xl"
+            component={Link}
+            to="/analytics/charts"
+            viewTransition
+            prefetch="intent"
+          >
+            Analytics Charts
           </Button>
         </Group>
       </Box>

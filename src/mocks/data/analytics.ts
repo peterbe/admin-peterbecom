@@ -70,6 +70,35 @@ function getQueryResult(query: string): QueryResult {
       })
       now.setDate(now.getDate() - 7)
     }
+  } else if (
+    query.includes(
+      "select type, count(type) as c from analytics group by type order by 2 desc",
+    )
+  ) {
+    rows.push(
+      ...[
+        {
+          type: "pageview",
+          c: 9672,
+        },
+        {
+          type: "error",
+          c: 20,
+        },
+        {
+          type: "search-error",
+          c: 12,
+        },
+        {
+          type: "search",
+          c: 6,
+        },
+      ],
+    )
+  } else {
+    console.warn(query)
+
+    throw new Error("Query not implemented")
   }
 
   const queryResult: QueryResult = {
