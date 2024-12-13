@@ -33,7 +33,7 @@ export function Component() {
   const { userData } = useUserData()
   const csrfToken = userData?.user?.csrfmiddlewaretoken || ""
 
-  const { data, error, isPending } = useImages(oid)
+  const { data, error, isPending, isRefetching } = useImages(oid)
 
   useDocumentTitle(`Images ${oid}`)
 
@@ -48,7 +48,13 @@ export function Component() {
 
           {csrfToken && <Upload oid={oid} csrfToken={csrfToken} />}
 
-          {data && <UploadedImages oid={oid} images={data.images} />}
+          {data && (
+            <UploadedImages
+              oid={oid}
+              images={data.images}
+              loading={isPending || isRefetching}
+            />
+          )}
         </Box>
       </Container>
     </SignedIn>
