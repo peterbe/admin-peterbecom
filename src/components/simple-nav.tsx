@@ -1,7 +1,17 @@
-import { Avatar, Box, Burger, Divider, Drawer, Group } from "@mantine/core"
+import {
+  Avatar,
+  Box,
+  Burger,
+  Button,
+  Divider,
+  Drawer,
+  Group,
+  Menu,
+} from "@mantine/core"
 
 import { useDisclosure } from "@mantine/hooks"
 import { IconHome } from "@tabler/icons-react"
+import { Link } from "react-router"
 import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments"
 import { useUserData } from "../whoami/use-userdata"
 import { NavigationSearch } from "./navigation-search"
@@ -90,6 +100,36 @@ function Links() {
       <SmartAnchor href="/plog">Blogitems</SmartAnchor>
       <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
       <CommentsLink count={data?.count} />
+      <Menu shadow="md" trigger="hover" openDelay={100} closeDelay={400}>
+        <Menu.Target>
+          <Button variant="subtle">Other</Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Label>Analytics</Menu.Label>
+          <Menu.Item component={Link} to="/analytics/query">
+            Analytics Query
+          </Menu.Item>
+          <Menu.Item component={Link} to="/analytics/charts">
+            Analytics Charts
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Label>Misc</Menu.Label>
+          <Menu.Item component={Link} to="/plog/categories">
+            Categories
+          </Menu.Item>
+          <Menu.Item component={Link} to="/cdn">
+            CDN
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Label>Spam</Menu.Label>
+          <Menu.Item component={Link} to="/spam/signatures">
+            Spam Signatures
+          </Menu.Item>
+          <Menu.Item component={Link} to="/spam/patterns">
+            Spam Patterns
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
     </>
   )
 }

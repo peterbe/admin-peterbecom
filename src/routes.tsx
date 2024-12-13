@@ -61,6 +61,14 @@ export const router = createBrowserRouter([
             path: "cdn",
             lazy: () => import("./components/cdn"),
           },
+          {
+            path: "analytics/query",
+            lazy: () => import("./components/analytics/query"),
+          },
+          {
+            path: "analytics/charts",
+            lazy: () => import("./components/analytics/charts"),
+          },
         ],
       },
     ],
