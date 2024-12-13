@@ -1,5 +1,5 @@
 import { useDocumentTitle } from "@mantine/hooks"
-import { useQuery } from "@tanstack/react-query"
+import { useIsMutating, useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router"
 
 import { Alert, Box, LoadingOverlay, Text } from "@mantine/core"
@@ -41,6 +41,10 @@ function Edit({ oid }: { oid: string | null }) {
     enabled: !!oid,
   })
 
+  const isSavingMutation = useIsMutating({
+    mutationKey: ["edit", data?.blogitem?.oid],
+  })
+
   return (
     <Box pos="relative" style={{ minHeight: 400 }}>
       <LoadingOverlay visible={isPending} />
@@ -63,7 +67,9 @@ function Edit({ oid }: { oid: string | null }) {
 
       {data?.blogitem?.id && (
         <Text size="xs" ta="right">
-          {isFetching ? (
+          {isSavingMutation ? (
+            "Saving..."
+          ) : isFetching ? (
             "Fetching..."
           ) : (
             <>

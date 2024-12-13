@@ -137,6 +137,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
+    mutationKey: ["edit", blogitem.oid],
     mutationFn: async (data: typeof form.values) => {
       const url = `${API_BASE}/plog/${blogitem.id ? blogitem.oid : ""}`
       const response = await fetch(url, {

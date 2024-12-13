@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   Group,
+  LoadingOverlay,
   SegmentedControl,
   TextInput,
   Title,
@@ -25,9 +26,11 @@ type ImageSize = "small" | "big" | "bigger"
 export function UploadedImages({
   oid,
   images,
+  loading,
 }: {
   oid: string
   images: ImageT[]
+  loading: boolean
 }) {
   const [imageBaseUrl, setImageBaseUrl] = useState("")
   useEffect(() => {
@@ -43,7 +46,8 @@ export function UploadedImages({
   })
 
   return (
-    <Box mb={100} mt={50}>
+    <Box mb={100} mt={50} pos="relative" style={{ minHeight: 200 }}>
+      <LoadingOverlay visible={loading} />
       <Title order={3}>
         {images.length} image{images.length === 1 ? "" : "s"} uploaded
       </Title>
