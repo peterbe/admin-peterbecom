@@ -116,11 +116,6 @@ function getQueryResult(query: string): QueryResult {
 
 export const ANALYTICS = (params: URLSearchParams) => {
   const query = params.get("query")
-  console.log("QUERY:", query)
-  // if (query) {
-  //   throw new Error("Query not implemented")
-  // }
-
   if (!query) {
     return new HttpResponse(null, {
       status: 400,
