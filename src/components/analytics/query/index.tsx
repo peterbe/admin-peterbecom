@@ -81,8 +81,6 @@ export function Component() {
           if (response.status === 400) {
             const json = await response.json()
             if (json.error) {
-              //   throw new Error(json.error)
-              // }
               return {
                 rows: [],
                 meta: {
