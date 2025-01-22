@@ -306,6 +306,23 @@ function InnerComment({
           />
         )}
 
+        {form.getValues().comment.includes("<br") && (
+          <Box ml={54}>
+            <Button
+              variant="light"
+              onClick={() => {
+                setEditMode(true)
+                form.setFieldValue(
+                  "comment",
+                  comment.comment.replace(/<br\s?\/?>/g, "\n"),
+                )
+              }}
+            >
+              Fix <code>&lt;br&gt;</code> breaks?
+            </Button>
+          </Box>
+        )}
+
         {classifyMode && (
           <ClassifyComment
             comment={comment}
