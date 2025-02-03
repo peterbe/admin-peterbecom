@@ -40,7 +40,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@eslint/js": "^9.16.0",
-    "@playwright/test": "^1.49.1",
+    "@playwright/test": "^1.50.1",
     "@tanstack/eslint-plugin-query": "^5.66.0",
     "@types/node": "^22.10.7",
     "@types/react": "^18.3.12",
