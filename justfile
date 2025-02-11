@@ -52,3 +52,6 @@ test-manifest:
     npm run test-manifest -- http://localhost:4001
 
 test: test-playwright test-manifest
+
+upgrade:
+     npx npm-check-updates --interactive
