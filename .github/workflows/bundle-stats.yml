@@ -66,9 +66,9 @@ jobs:
         run: |
 
           echo "This PR (size):"
-          du -sh build/client
+          du -sh dist/assets
           echo "Main (size):"
-          du -sh main/build/client
+          du -sh main/dist/assets
 
           echo ""
           markdown=$(npm run --silent compare-build-dirs -- main/build/client build/client)

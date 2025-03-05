@@ -15,7 +15,7 @@
     "tsc": "tsc",
     "prepare": "husky",
     "serve": "serve dist",
-    "test-manifest": "node script/test-manifest.mjs",
+    "test-manifest": "node scripts/test-manifest.mjs",
     "compare-build-dirs": "node --experimental-strip-types --no-warnings scripts/compare-build-dirs.ts"
   },
   "dependencies": {
