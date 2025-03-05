@@ -71,7 +71,7 @@ jobs:
           du -sh main/dist/assets
 
           echo ""
-          markdown=$(npm run --silent compare-build-dirs -- main/build/client build/client)
+          markdown=$(npm run --silent compare-build-dirs -- main/dist/assets dist/assets)
           echo "::set-output name=markdown::${markdown//$'\n'/%0A}"
 
       - name: Find Comment
