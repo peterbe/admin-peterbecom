@@ -10,12 +10,13 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
-    "pretty": "biome check src vite.config.ts",
-    "pretty:fix": "biome check --write src tests vite.config.ts eslint.config.js playwright.config.ts",
+    "pretty": "biome check src tests vite.config.ts scripts",
+    "pretty:fix": "biome check --write src tests scripts vite.config.ts eslint.config.js playwright.config.ts",
     "tsc": "tsc",
     "prepare": "husky",
     "serve": "serve dist",
-    "test-manifest": "node script/test-manifest.mjs"
+    "test-manifest": "node script/test-manifest.mjs",
+    "compare-build-dirs": "node --experimental-strip-types --no-warnings scripts/compare-build-dirs.ts"
   },
   "dependencies": {
     "@mantine/charts": "^7.17.1",
