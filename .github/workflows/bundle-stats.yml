@@ -1,0 +1,92 @@
+name: Bundle stats
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  bundle-stats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: cached-node_modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('package*.json') }}-${{ hashFiles('.github/workflows/bundle-stats.yml') }}
+
+      - name: Install
+        if: steps.cached-node_modules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build (and lint)
+        run: npm run build
+
+      - name: Compare with main
+        uses: actions/checkout@v4
+        with:
+            ref: main
+            path: main
+
+      - name: Cache node_modules in main
+        uses: actions/cache@v4
+        id: cached-node_modules-main
+        with:
+          path: main/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('main/package*.json') }}-${{ hashFiles('.github/workflows/bundle-stats.yml') }}
+
+      - name: Install from main
+        working-directory: main
+        if: steps.cached-node_modules-main.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build main
+        if: ${{ github.event_name == 'pull_request' }}
+        working-directory: main
+        run: npm run build
+
+      - name: Compare
+        id: set-markdown
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+
+          echo "This PR (size):"
+          du -sh build/client
+          echo "Main (size):"
+          du -sh main/build/client
+
+          echo ""
+          markdown=$(npm run --silent compare-build-dirs -- main/build/client build/client)
+          echo "::set-output name=markdown::${markdown//$'\n'/%0A}"
+
+      - name: Find Comment
+        if: ${{ github.event_name == 'pull_request' && steps.set-markdown.outputs.markdown != '' }}
+        uses: peter-evans/find-comment@v3
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "Total size of "
+
+      - name: Post comparison
+        if: ${{ github.event_name == 'pull_request' && steps.set-markdown.outputs.markdown != '' }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.number }}
+          body: ${{ steps.set-markdown.outputs.markdown }}
+          edit-mode: replace
