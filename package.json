@@ -17,12 +17,12 @@
     "compare-build-dirs": "node --experimental-strip-types --no-warnings scripts/compare-build-dirs.ts"
   },
   "dependencies": {
-    "@mantine/charts": "^7.17.3",
-    "@mantine/core": "^7.17.3",
-    "@mantine/dropzone": "^7.17.3",
-    "@mantine/form": "^7.17.3",
-    "@mantine/hooks": "^7.17.3",
-    "@mantine/notifications": "^7.17.3",
+    "@mantine/charts": "^7.17.4",
+    "@mantine/core": "^7.17.4",
+    "@mantine/dropzone": "^7.17.4",
+    "@mantine/form": "^7.17.4",
+    "@mantine/hooks": "^7.17.4",
+    "@mantine/notifications": "^7.17.4",
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/query-sync-storage-persister": "^5.74.6",
     "@tanstack/react-query": "^5.74.4",
