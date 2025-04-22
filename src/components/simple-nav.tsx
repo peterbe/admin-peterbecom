@@ -14,6 +14,7 @@ import { IconHome } from "@tabler/icons-react"
 import { Link } from "react-router"
 import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments"
 import { useUserData } from "../whoami/use-userdata"
+import { NavigationButtonLink } from "./navigation-button-link"
 import { NavigationSearch } from "./navigation-search"
 import { SmartAnchor } from "./smart-anchor"
 
@@ -67,7 +68,13 @@ export function Nav() {
       <Drawer opened={drawerOpened} onClose={closeDrawer} title="Navigation">
         <Divider my="sm" />
         <Group>
-          <Links />
+          <Links
+            onClicked={() => {
+              if (drawerOpened) {
+                closeDrawer()
+              }
+            }}
+          />
         </Group>
         <Divider my="sm" />
 
@@ -91,15 +98,26 @@ export function Nav() {
   )
 }
 
-function Links() {
+function Links({ onClicked }: { onClicked?: () => void }) {
   const { data } = useCountUnapprovedComments()
 
+  function onClickedContainer() {
+    if (onClicked) {
+      onClicked()
+    }
+  }
+
   return (
-    <>
-      <SmartAnchor href="/">Home</SmartAnchor>
-      <SmartAnchor href="/plog">Blogitems</SmartAnchor>
-      <SmartAnchor href="/plog/add">Add blogitem</SmartAnchor>
-      <CommentsLink count={data?.count} />
+    <div onClick={onClickedContainer} onKeyDown={onClickedContainer}>
+      <NavigationButtonLink to="/">Home</NavigationButtonLink>
+      <NavigationButtonLink to="/plog">Blogitems</NavigationButtonLink>
+      <NavigationButtonLink to="/plog/add">Add blogitem</NavigationButtonLink>
+      <NavigationButtonLink
+        to={data?.count ? "/plog/comments?only=unapproved" : "/plog/comments"}
+      >
+        {data?.count ? `Comments (${data.count})` : "Comments"}
+      </NavigationButtonLink>
+      <NavigationButtonLink to="/analytics/charts">Charts</NavigationButtonLink>
       <Menu shadow="md" trigger="hover" openDelay={100} closeDelay={400}>
         <Menu.Target>
           <Button variant="subtle">Other</Button>
@@ -130,16 +148,6 @@ function Links() {
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
-    </>
-  )
-}
-
-function CommentsLink({ count }: { count?: number }) {
-  return (
-    <SmartAnchor
-      href={count ? "/plog/comments?only=unapproved" : "/plog/comments"}
-    >
-      {count ? `Comments (${count})` : "Comments"}
-    </SmartAnchor>
+    </div>
   )
 }
