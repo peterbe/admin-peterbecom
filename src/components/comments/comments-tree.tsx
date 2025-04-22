@@ -18,6 +18,7 @@ import { DisplayDate } from "../blogitems/list-table"
 import classes from "./comments-tree.module.css"
 import type { Comment } from "./types"
 
+import { useMediaQuery } from "@mantine/hooks"
 import { API_BASE, PUBLIC_BASE_URL } from "../../config"
 import {
   commentClassificationQueryKey,
@@ -214,6 +215,9 @@ function InnerComment({
     }
   }
 
+  const matches = useMediaQuery("(max-width: 56.25em)")
+  const leftMargin = matches ? 0 : 54
+
   return (
     <Box>
       <form
@@ -286,7 +290,7 @@ function InnerComment({
         </Group>
         {editMode ? (
           <Textarea
-            ml={54}
+            ml={leftMargin}
             pt={12}
             mb={10}
             classNames={{ input: classes.input }}
@@ -299,7 +303,7 @@ function InnerComment({
           />
         ) : (
           <Text
-            pl={54}
+            pl={leftMargin}
             pt="sm"
             size="sm"
             dangerouslySetInnerHTML={{ __html: comment.rendered }}
@@ -307,7 +311,7 @@ function InnerComment({
         )}
 
         {form.getValues().comment.includes("<br") && (
-          <Box ml={54}>
+          <Box ml={leftMargin}>
             <Button
               variant="light"
               onClick={() => {
@@ -347,9 +351,9 @@ function InnerComment({
           />
         )}
 
-        <Group>
+        <Group mt={10}>
           <Button
-            ml={54}
+            ml={leftMargin}
             variant="light"
             onClick={() => {
               if (editMode) {
