@@ -27,7 +27,7 @@
     "@mantine/notifications": "^7.17.3",
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/query-sync-storage-persister": "^5.71.1",
-    "@tanstack/react-query": "^5.71.1",
+    "@tanstack/react-query": "^5.74.4",
     "@tanstack/react-query-persist-client": "^5.71.1",
     "date-fns": "^4.1.0",
     "flag-icons": "^7.3.2",
