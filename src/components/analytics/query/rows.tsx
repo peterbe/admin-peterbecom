@@ -56,7 +56,6 @@ export const Rows = memo(function Rows({ data }: { data: QueryResultRow[] }) {
         </Table.Thead>
         <Table.Tbody>
           {data.map((row, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: rows don't have a predictable ID
             <Table.Tr key={`${prefix}${i}`} id={`r${i + 1}`}>
               <Table.Td>
                 <a href={`#r${i + 1}`}>{i + 1}</a>
@@ -64,7 +63,6 @@ export const Rows = memo(function Rows({ data }: { data: QueryResultRow[] }) {
               {keys.map((key, j) => {
                 const value = row[key]
                 return (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: rows don't have a predictable ID
                   <Table.Td key={`${key}${j}`}>
                     <Text size="xs">
                       <Value value={value} column={key} />
