@@ -17,23 +17,20 @@ start-for-testing:
     NODE_ENV=test npm run build
     NODE_ENV=test npm run preview -- --port 4001
 
-pretty:
-    npm run pretty
-
 tsc:
     npm run tsc
 
-lint: pretty
+lint:
     npm run lint
     npm run tsc
 
-lintfix: prettyfix
+lintfix:
     npm run lint:fix
 
 prettyfix:
     npm run pretty:fix
 
-format: prettyfix lintfix
+format: lintfix
 
 install:
     npm install
