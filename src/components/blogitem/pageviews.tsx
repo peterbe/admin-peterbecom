@@ -1,6 +1,7 @@
 import { LineChart } from "@mantine/charts"
-import { Alert, Box, LoadingOverlay, Text } from "@mantine/core"
+import { Alert, Box, LoadingOverlay, Switch, Text } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
+import { useState } from "react"
 import { thousands } from "../../number-formatter"
 import type { EditBlogitemT, QueryResult } from "../../types"
 import { blogitemPageviewsQueryKey, fetchAnalyticsQuery } from "../api-utils"
@@ -77,6 +78,7 @@ LIMIT 100
 }
 
 function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
+  const [cummulative, setCummulative] = useState(false)
   if (data.rows.length === 0) {
     return (
       <div>
@@ -87,6 +89,7 @@ function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
     )
   }
 
+  let cummX = 0
   const dataX = data.rows.map((row) => {
     let date = (row.date as string).split("T")[0]
     if (interval === "month") {
@@ -96,11 +99,14 @@ function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
         month: "short",
       })
     }
+    // a bit naughty to do a side effect in a map function, but it works
+    cummX += row.count as number
     return {
       date,
-      count: row.count,
+      count: cummulative ? cummX : row.count,
     }
   })
+
   return (
     <div>
       <LineChart
@@ -117,10 +123,19 @@ function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
           { offset: 80, color: "cyan.5" },
           { offset: 100, color: "blue.5" },
         ]}
-        strokeWidth={4}
-        curveType="natural"
+        strokeWidth={5}
+        curveType={cummulative ? "stepAfter" : "natural"}
         valueFormatter={(value) => thousands(value as number)}
+        withPointLabels
       />
+
+      <Box mt={20}>
+        <Switch
+          checked={cummulative}
+          onChange={(event) => setCummulative(event.currentTarget.checked)}
+          label="Cummulative"
+        />
+      </Box>
     </div>
   )
 }
