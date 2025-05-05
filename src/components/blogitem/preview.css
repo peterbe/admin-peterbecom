@@ -13,3 +13,12 @@ img.floatleft {
   float: left;
   margin: 7px 7px 0 0;
 }
+
+a.toclink {
+  color: unset;
+  text-decoration: none;
+}
+
+a.toclink:hover {
+  text-decoration: underline dotted;
+}
