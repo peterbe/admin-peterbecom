@@ -127,7 +127,7 @@ function UploadedVideo({
       formData.append("id", `${video.id}`)
       const response = await JSONPost(
         `/api/v0/plog/${oid}/videos?${new URLSearchParams({
-          id: `${oid}`,
+          id: `${video.id}`,
         })}`,
         formData,
         csrfToken,
