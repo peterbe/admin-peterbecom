@@ -42,13 +42,9 @@ export function ImageThumbnails({ oid }: { oid: string }) {
       )
     }
     return (
-      <Container>
-        <Group justify="right">
-          <Button onClick={() => setShow(true)} size="xs">
-            Show image thumbnails ({images.data.images.length})
-          </Button>
-        </Group>
-      </Container>
+      <Button onClick={() => setShow(true)} size="xs">
+        Show image thumbnails ({images.data.images.length})
+      </Button>
     )
   }
   return null

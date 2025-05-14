@@ -38,6 +38,10 @@ export const router = createBrowserRouter([
                     path: "images",
                     lazy: () => import("./components/blogitem/images"),
                   },
+                  {
+                    path: "videos",
+                    lazy: () => import("./components/blogitem/videos"),
+                  },
                 ],
               },
               { index: true, element: <Blogitems /> },

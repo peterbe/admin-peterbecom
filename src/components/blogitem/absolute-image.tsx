@@ -1,5 +1,5 @@
 import { Image } from "@mantine/core"
-import { useEffect, useState } from "react"
+import { useAbsoluteBaseUrl } from "./use-absolute-base-url"
 
 export function AbsoluteImage({
   src,
@@ -14,15 +14,7 @@ export function AbsoluteImage({
   w?: number
   h?: number
 }) {
-  const [imageBaseUrl, setImageBaseUrl] = useState("")
-
-  useEffect(() => {
-    if (window.location.hostname === "localhost") {
-      setImageBaseUrl("http://localhost:8000")
-    } else {
-      setImageBaseUrl("https://www.peterbe.com")
-    }
-  }, [])
+  const imageBaseUrl = useAbsoluteBaseUrl()
 
   return (
     <Image
