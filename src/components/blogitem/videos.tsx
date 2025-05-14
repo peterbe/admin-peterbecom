@@ -224,19 +224,15 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
 
 function PreviewUploadedFile({ file }: { file: FileWithPath }) {
   const [dataURI, setDataURI] = useState<string | ArrayBuffer | null>(null)
+  const [previewError, setPreviewError] = useState<Error | null>(null)
 
   useEffect(() => {
-    createVideoThumbnail(file, {
-      maxWidth: 320,
-      maxHeight: 180,
-      quality: 0.8,
-      captureTime: 2.0, // Capture thumbnail at 2 seconds
-      format: "image/jpeg",
-    })
+    createVideoThumbnail(file)
       .then((dataURI) => {
         setDataURI(dataURI)
       })
       .catch((error) => {
+        if (error instanceof Error) setPreviewError(error)
         console.error("ERROR!", error)
       })
   }, [file])
@@ -247,6 +243,7 @@ function PreviewUploadedFile({ file }: { file: FileWithPath }) {
 
   return (
     <Box>
+      {previewError && <Alert color="red">{previewError.toString()}</Alert>}
       <Text>Preview of uploaded image</Text>
       <Image
         radius="md"
