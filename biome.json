@@ -21,7 +21,8 @@
       },
       "a11y": {
         "useSemanticElements": "error",
-        "useValidAnchor": "off"
+        "useValidAnchor": "off",
+        "useMediaCaption": "off"
       }
     }
   },

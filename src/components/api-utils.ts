@@ -60,6 +60,9 @@ export function imagesQueryKey(oid: string) {
   return ["images", oid]
 }
 
+export function videosQueryKey(oid: string) {
+  return ["videos", oid]
+}
 export function openGraphImagesQueryKey(oid: string) {
   return ["open-graph-image", oid]
 }

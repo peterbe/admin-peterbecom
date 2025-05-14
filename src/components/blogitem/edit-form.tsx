@@ -2,6 +2,7 @@ import {
   Alert,
   Box,
   Button,
+  Group,
   MultiSelect,
   SimpleGrid,
   TextInput,
@@ -10,7 +11,7 @@ import {
 } from "@mantine/core"
 import { useForm } from "@mantine/form"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useEffect, useRef, useState } from "react"
+import { memo, useCallback, useEffect, useRef, useState } from "react"
 import { API_BASE } from "../../config"
 import { useCategories } from "../../hooks/use-categories"
 import type { EditBlogitemT } from "../../types"
@@ -30,6 +31,9 @@ import {
 import classes from "./edit-form.module.css"
 import { ImageThumbnails } from "./image-thumbnails"
 import { Preview } from "./preview"
+import { VideoThumbnails } from "./video-thumbnails"
+
+const PreviewMemoed = memo(Preview)
 
 function list2string(list: string[]) {
   return list
@@ -233,9 +237,9 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     }
   }
 
-  function previewScrollHandler() {
+  const previewScrollHandler = useCallback(() => {
     setTextareaScrollPosition(null)
-  }
+  }, [])
 
   return (
     <div>
@@ -245,7 +249,9 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         </Alert>
       )}
 
-      {Boolean(blogitem.id) && <ImageThumbnails oid={blogitem.oid} />}
+      {Boolean(blogitem.id) && <Thumbnails oid={blogitem.oid} />}
+      {/* {Boolean(blogitem.id) && <ImageThumbnailsMemoed oid={blogitem.oid} />} */}
+      {/* {Boolean(blogitem.id) && <VideoThumbnailsMemoed oid={blogitem.oid} />} */}
 
       <form
         onSubmit={form.onSubmit((data) => {
@@ -285,7 +291,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
             maxRows={35}
             classNames={{ input: classes.input }}
           />
-          <Preview
+          <PreviewMemoed
             previewText={debouchedPreviewText}
             displayFormat={form.getValues().display_format}
             onScroll={previewScrollHandler}
@@ -389,3 +395,12 @@ function slugify(s: string) {
     .replace(/[@/'?<>!]/g, "")
     .toLowerCase()
 }
+
+const Thumbnails = memo(function Thumbnails({ oid }: { oid: string }) {
+  return (
+    <Group justify="flex-end">
+      <ImageThumbnails oid={oid} />
+      <VideoThumbnails oid={oid} />
+    </Group>
+  )
+})
