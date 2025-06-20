@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "lint": "npm run lint:biome && npm run lint:prettier",
     "lint:biome": "biome check src tests scripts vite.config.ts playwright.config.ts",
-    "lint:prettier": " prettier --write src *.json",
+    "lint:prettier": "prettier --write src *.json",
     "lint:fix": "npm run lint -- --write",
     "tsc": "tsc",
     "prepare": "husky",

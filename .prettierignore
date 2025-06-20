@@ -3,6 +3,8 @@ build
 coverage
 package-lock.json
 
+src/components/blogitem/highlight.js.css
+
 # Ignore all TypeScript files (biome handles them):
 **/*.ts
 **/*.tsx

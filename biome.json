@@ -44,7 +44,11 @@
     "indentStyle": "space"
   },
   "files": {
-    "includes": ["**", "!**/src/components/blogitem/highlight.js.css"]
+    "includes": [
+      "**",
+      "!**/src/components/blogitem/highlight.js.css",
+      "!**/src/**/*.module.css"
+    ]
   },
   "javascript": {
     "formatter": {
