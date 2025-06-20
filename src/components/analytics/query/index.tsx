@@ -9,12 +9,9 @@ import {
 } from "@mantine/core"
 import { useDocumentTitle, useLocalStorage } from "@mantine/hooks"
 import { useQuery } from "@tanstack/react-query"
-import { useEffect, useRef } from "react"
-import { useState } from "react"
-
-import classes from "./query.module.css"
-
+import { useEffect, useRef, useState } from "react"
 import type { QueryResult } from "../types"
+import classes from "./query.module.css"
 import { Show } from "./show"
 
 export function Component() {

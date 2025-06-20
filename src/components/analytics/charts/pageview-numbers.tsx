@@ -1,9 +1,8 @@
 import { Box, Group, Loader, Paper, SimpleGrid, Text } from "@mantine/core"
-
-import classes from "./StatsGrid.module.css"
 import { ChartContainer } from "./container"
 import { Loading } from "./loading"
 import { formatNumber } from "./number-format"
+import classes from "./StatsGrid.module.css"
 import { useQuery } from "./use-query"
 
 export function PageviewNumbers() {
@@ -48,8 +47,7 @@ function Inner() {
     select min(created) from analytics where type='pageview' `)
   const oldestCreated = oldestPageviewCreated.data?.rows[0]?.min || new Date()
   const oldestDays = Math.floor(
-    (new Date().getTime() - new Date(oldestCreated).getTime()) /
-      (1000 * 60 * 60 * 24),
+    (Date.now() - new Date(oldestCreated).getTime()) / (1000 * 60 * 60 * 24),
   )
 
   const today = useQuery(sqlQuery(1), { refresh: true })

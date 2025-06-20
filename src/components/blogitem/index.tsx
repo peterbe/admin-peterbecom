@@ -1,16 +1,14 @@
+import { Alert, Box, LoadingOverlay, Text } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
 import { useIsMutating, useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router"
-
-import { Alert, Box, LoadingOverlay, Text } from "@mantine/core"
 import type { EditBlogitemT } from "../../types"
+import { blogitemQueryKey, fetchBlogitem } from "../api-utils"
 import { DisplayDate } from "../blogitems/list-table"
 import { SignedIn } from "../signed-in"
 import { DangerZone } from "./danger-zone"
 import { Form } from "./edit-form"
 import { BlogitemLinks } from "./links"
-
-import { blogitemQueryKey, fetchBlogitem } from "../api-utils"
 import { Pageviews } from "./pageviews-loader"
 
 export default function Blogitem() {

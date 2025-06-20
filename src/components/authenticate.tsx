@@ -37,6 +37,7 @@ function SignIn() {
                   throw new Error(`${response.status} on ${response.url}`)
                 }
                 // This is hacky and I don't like it.
+                // biome-ignore lint/suspicious/noDocumentCookie: only used for automated testing
                 document.cookie = "mocksessionid=mruser"
                 window.location.href = "/?redirected=true"
               },

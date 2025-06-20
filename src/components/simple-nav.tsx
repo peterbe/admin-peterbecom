@@ -108,6 +108,7 @@ function Links({ onClicked }: { onClicked?: () => void }) {
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: it's fine
     <div onClick={onClickedContainer} onKeyDown={onClickedContainer}>
       <NavigationButtonLink to="/">Home</NavigationButtonLink>
       <NavigationButtonLink to="/plog">Blogitems</NavigationButtonLink>

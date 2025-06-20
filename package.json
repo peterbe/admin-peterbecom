@@ -8,7 +8,9 @@
     "dev-debug-transform": "vite --debug transform",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "biome check src tests scripts vite.config.ts playwright.config.ts",
+    "lint": "npm run lint:biome && npm run lint:prettier",
+    "lint:biome": "biome check src tests scripts vite.config.ts playwright.config.ts",
+    "lint:prettier": " prettier --write src *.json",
     "lint:fix": "npm run lint -- --write",
     "tsc": "tsc",
     "prepare": "husky",
@@ -37,7 +39,7 @@
     "valibot": "^1.1.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "2.0.0",
     "@playwright/test": "^1.53.0",
     "@types/node": "^22.15.29",
     "@types/react": "^18.3.12",
@@ -47,6 +49,7 @@
     "globals": "^16.2.0",
     "husky": "^9.1.7",
     "msw": "^2.10.2",
+    "prettier": "^3.5.3",
     "serve": "^14.2.4",
     "typescript": "^5.8.3",
     "vite": "^6.3.5"

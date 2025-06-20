@@ -10,9 +10,8 @@ import {
   TextInput,
   Title,
 } from "@mantine/core"
-import { useLocalStorage } from "@mantine/hooks"
-
 import { useForm } from "@mantine/form"
+import { useLocalStorage } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
@@ -181,43 +180,39 @@ function UploadedImage({
           {...form.getInputProps("title")}
         />
         {asked ? (
-          <>
-            <Group justify="flex-end" mt="md">
-              <Button
-                type="button"
-                color="red"
-                disabled={deleteMutation.isPending}
-                loading={deleteMutation.isPending}
-                onClick={() => {
-                  deleteMutation.mutate()
-                }}
-              >
-                Delete
-              </Button>
-              <Button
-                variant="light"
-                type="button"
-                color="orange"
-                onClick={() => setAsked(false)}
-              >
-                Cancel
-              </Button>
-            </Group>
-          </>
+          <Group justify="flex-end" mt="md">
+            <Button
+              type="button"
+              color="red"
+              disabled={deleteMutation.isPending}
+              loading={deleteMutation.isPending}
+              onClick={() => {
+                deleteMutation.mutate()
+              }}
+            >
+              Delete
+            </Button>
+            <Button
+              variant="light"
+              type="button"
+              color="orange"
+              onClick={() => setAsked(false)}
+            >
+              Cancel
+            </Button>
+          </Group>
         ) : (
-          <>
-            <Group justify="flex-end" mt="md">
-              <Button type="submit">Save</Button>
-              <Button
-                variant="light"
-                type="button"
-                color="orange"
-                onClick={() => setAsked(true)}
-              >
-                Delete
-              </Button>
-            </Group>
-          </>
+          <Group justify="flex-end" mt="md">
+            <Button type="submit">Save</Button>
+            <Button
+              variant="light"
+              type="button"
+              color="orange"
+              onClick={() => setAsked(true)}
+            >
+              Delete
+            </Button>
+          </Group>
         )}
       </form>
     </Card>
