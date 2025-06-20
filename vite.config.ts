@@ -1,6 +1,8 @@
 import react from "@vitejs/plugin-react-swc"
 import { defineConfig } from "vite"
 
+const API_TARGET = process.env.API_TARGET ?? "http://127.0.0.1:8000"
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -18,19 +20,19 @@ export default defineConfig({
     port: 4001,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:8000",
+        target: API_TARGET,
         changeOrigin: true,
         secure: false,
         ws: true,
       },
       "/oidc": {
-        target: "http://localhost:8000",
+        target: API_TARGET,
         changeOrigin: true,
         secure: false,
         ws: true,
       },
       "/cache/": {
-        target: "http://127.0.0.1:8000",
+        target: API_TARGET,
         changeOrigin: true,
         secure: false,
       },

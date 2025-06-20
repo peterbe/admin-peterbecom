@@ -7,8 +7,8 @@ import {
   Modal,
   SimpleGrid,
   Text,
-  TextInput,
   Textarea,
+  TextInput,
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"

@@ -1,5 +1,5 @@
 import { Container, Title } from "@mantine/core"
-import { Suspense, lazy } from "react"
+import { lazy, Suspense } from "react"
 import type { EditBlogitemT } from "../../types"
 
 const PageviewsInner = lazy(() => import("./pageviews"))

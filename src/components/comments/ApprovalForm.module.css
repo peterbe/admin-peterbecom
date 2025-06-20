@@ -4,8 +4,10 @@
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
   border-radius: var(--mantine-radius-md);
   font-weight: 500;
-  transition: color 100ms ease, background-color 100ms ease, border-color 100ms
-    ease;
+  transition:
+    color 100ms ease,
+    background-color 100ms ease,
+    border-color 100ms ease;
   cursor: pointer;
 
   &[data-checked] {
