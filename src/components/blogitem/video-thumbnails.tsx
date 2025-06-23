@@ -7,7 +7,7 @@ import {
   Group,
 } from "@mantine/core"
 import { useState } from "react"
-import { type VideoT, useVideos } from "../../hooks/use-videos"
+import { useVideos, type VideoT } from "../../hooks/use-videos"
 import { useAbsoluteBaseUrl } from "./use-absolute-base-url"
 
 export function VideoThumbnails({ oid }: { oid: string }) {

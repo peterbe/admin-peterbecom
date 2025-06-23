@@ -20,7 +20,7 @@ export default function PageviewsInner({
   let interval: Interval = "day"
   const pubDate = new Date(blogitem.pub_date)
   const ageDays =
-    (new Date().getTime() -
+    (Date.now() -
       Math.max(pubDate.getTime(), ANALYTICS_INCEPTION_DATE.getTime())) /
     1000 /
     3600 /

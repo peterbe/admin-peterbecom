@@ -15,9 +15,9 @@ export function createVideoThumbnail(
   } = {},
 ): Promise<string> {
   const {
-    maxWidth = 900,
-    maxHeight = 507,
-    quality = 0.85,
+    maxWidth = 3000,
+    maxHeight = 3000,
+    quality = 0.9,
     captureTime = 0.1,
     format = "image/jpeg",
   } = options

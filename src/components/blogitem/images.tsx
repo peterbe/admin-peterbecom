@@ -6,10 +6,10 @@ import {
   Group,
   Image,
   LoadingOverlay,
+  rem,
   Text,
   TextInput,
   Title,
-  rem,
 } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
