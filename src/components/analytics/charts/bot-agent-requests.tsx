@@ -11,12 +11,12 @@ import { useRows } from "./use-rows"
 
 const sqlQuery = ({ limit = 200, days = 30 } = {}) => `
 SELECT meta->'botAgent' AS agent, count(meta->'botAgent')
-FROM requestlog 
-WHERE 
-    created > NOW() - INTERVAL '${Number(days)} days' 
-    AND (meta->'isbot')::BOOLEAN 
+FROM requestlog
+WHERE
+    created > NOW() - INTERVAL '${Number(days)} days'
+    AND (meta->'isbot')::BOOLEAN
     AND meta->'botAgent' IS NOT NULL
-GROUP BY meta->'botAgent' 
+GROUP BY meta->'botAgent'
 ORDER BY 2 DESC
 LIMIT ${Number(limit)}
 `
@@ -76,7 +76,7 @@ function AgentsTable({ rows }: { rows: QueryResultRow[] }) {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {rows.map((row, i) => {
+          {rows.map((row) => {
             return (
               <Table.Tr key={row.agent}>
                 <Table.Td>{row.agent}</Table.Td>
