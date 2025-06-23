@@ -4,6 +4,7 @@ import { QueryClient } from "@tanstack/react-query"
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
 
 import { SignedIn } from "../../signed-in"
+import { BotAgentRequests } from "./bot-agent-requests"
 import { GeoLocations } from "./geo-locations"
 import { LyricsFeatureflag } from "./lyrics-featureflag"
 import { MinimizeContext } from "./minimize-context"
@@ -37,6 +38,7 @@ export function Component() {
         <MinimizeContext.Provider value={{ minimized, toggleMinimized }}>
           <PageviewNumbers />
           <Pageviews />
+          <BotAgentRequests />
           <LyricsFeatureflag />
           <PageviewEvents />
           <GeoLocations />
