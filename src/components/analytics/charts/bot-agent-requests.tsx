@@ -16,7 +16,6 @@ const sqlQuery = ({ limit = 200, days = 30, back = 0 } = {}) => `
 SELECT meta->>'botAgent' AS agent, count(meta->>'botAgent')
 FROM requestlog
 WHERE
---    created > NOW() - INTERVAL '${Number(days)} days'
     ${createdRange(days, back)}
     AND (meta->'isbot')::BOOLEAN
     AND (meta->>'botAgent') IS NOT NULL

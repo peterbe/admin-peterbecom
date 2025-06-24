@@ -73,10 +73,6 @@ export const router = createBrowserRouter([
             path: "analytics/charts",
             lazy: () => import("./components/analytics/charts"),
           },
-          // {
-          //   path: "requestlog/charts",
-          //   lazy: () => import("./components/requestlog/charts"),
-          // },
         ],
       },
     ],

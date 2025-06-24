@@ -24,7 +24,6 @@ export function ChartContainer({
           {!minimized.includes(id) && (
             <Button
               variant="transparent"
-              size="xs"
               title="Refresh"
               onClick={() => {
                 setRefresh(id)
