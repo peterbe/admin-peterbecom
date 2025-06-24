@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "npm run lint:biome && npm run lint:prettier",
-    "lint:biome": "biome check src tests scripts vite.config.ts playwright.config.ts",
+    "lint:biome": "biome check --write src tests scripts vite.config.ts playwright.config.ts",
     "lint:prettier": "prettier --write src *.json",
     "lint:fix": "npm run lint -- --write",
     "tsc": "tsc",

@@ -1,5 +1,6 @@
 import { Box, Group, Loader, Paper, SimpleGrid, Text } from "@mantine/core"
 import { ChartContainer } from "./container"
+import { createdRange } from "./created-range"
 import { Loading } from "./loading"
 import { formatNumber } from "./number-format"
 import classes from "./StatsGrid.module.css"
@@ -32,15 +33,6 @@ WHERE
   type='pageview'
   and ${createdRange(days, back)}
 `
-
-function createdRange(days: number, back: number) {
-  const ranges: string[] = []
-  ranges.push(`created > now() - interval '${days} days'`)
-  if (back) {
-    ranges.push(`created < (now() - interval '${back} days')`)
-  }
-  return ranges.join(" and ")
-}
 
 function Inner() {
   const oldestPageviewCreated = useQuery(`
