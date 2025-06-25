@@ -7,7 +7,7 @@ import { Loading } from "./loading"
 import { UrlFilterOptions } from "./options"
 import { urlFilterToSQL } from "./url-filter-to-sql"
 import { useInterval } from "./use-interval"
-import { useQuery } from "./use-query"
+import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useURLFilter } from "./use-url-filter"
 import { addDays } from "./utils"
 
@@ -53,6 +53,9 @@ ORDER BY
 `
 
 function Inner() {
+  const useQuery = (sql: string, options?: QueryOptions) =>
+    useSQLQuery(sql, { prefix: "pageviews", ...options })
+
   const [intervalDays, setIntervalDays] = useInterval("pageviews")
   const [urlFilter, setURLField] = useURLFilter("pageviews", "")
 

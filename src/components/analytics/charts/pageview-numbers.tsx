@@ -4,7 +4,7 @@ import { createdRange } from "./created-range"
 import { Loading } from "./loading"
 import { formatNumber } from "./number-format"
 import classes from "./StatsGrid.module.css"
-import { useQuery } from "./use-query"
+import { type QueryOptions, useSQLQuery } from "./use-query"
 
 export function PageviewNumbers() {
   return (
@@ -35,6 +35,9 @@ WHERE
 `
 
 function Inner() {
+  const useQuery = (sql: string, options?: QueryOptions) =>
+    useSQLQuery(sql, { prefix: "pageview-numbers", ...options })
+
   const oldestPageviewCreated = useQuery(`
     select min(created) from analytics where type='pageview' `)
   const oldestCreated = oldestPageviewCreated.data?.rows[0]?.min || new Date()

@@ -1,15 +1,17 @@
+import { PieChart } from "@mantine/charts"
 import { Box, Grid, Table } from "@mantine/core"
-import { useContext, useEffect, useState } from "react"
+import { useState } from "react"
 import type { QueryResultRow } from "../types"
 import { DisplayError, DisplayWarning } from "./alerts"
 import { ChartContainer } from "./container"
 import { createdRange } from "./created-range"
+import { DisplayType } from "./display-type"
 import { IntervalOptions } from "./interval-options"
 import { Loading } from "./loading"
-import { RefreshContainerContext } from "./refresh-context"
 import { RowsOptions } from "./rows-options"
+import { useDisplayType } from "./use-display-type"
 import { useInterval } from "./use-interval"
-import { useQuery } from "./use-query"
+import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
 
 const sqlQuery = ({ limit = 200, days = 30, back = 0 } = {}) => `
@@ -32,7 +34,8 @@ export function BotAgentRequests() {
   )
 }
 function Inner() {
-  const { refresh } = useContext(RefreshContainerContext)
+  const useQuery = (sql: string, options?: QueryOptions) =>
+    useSQLQuery(sql, { prefix: "bot-agent-requests", ...options })
 
   const [intervalDays, setIntervalDays] = useInterval("bot-agent-requests")
   const [rows, setRows] = useRows("bot-agent-requests", 10)
@@ -47,33 +50,106 @@ function Inner() {
     }),
   )
 
-  useEffect(() => {
-    if (refresh === "bot-agent-requests") {
-      current.refetch()
-      past.refetch()
-    }
-  }, [refresh, current.refetch, past.refetch])
+  const [displayType] = useDisplayType("bot-agent-requests")
 
   return (
     <>
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading || past.isLoading} />
 
-        {current.data && past.data && (
-          <AgentsTable rows={current.data.rows} previous={past.data.rows} />
-        )}
+        {current.data &&
+          past.data &&
+          (displayType === "pie" ? (
+            <AgentsPie rows={current.data.rows} />
+          ) : (
+            <AgentsTable rows={current.data.rows} previous={past.data.rows} />
+          ))}
       </Box>
       <Grid>
-        <Grid.Col span={6}>
+        <Grid.Col span={4}>
           <IntervalOptions value={intervalDays} onChange={setIntervalDays} />
         </Grid.Col>
-        <Grid.Col span={6}>
+        <Grid.Col span={4}>
           <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <DisplayType id="bot-agent-requests" choices={["table", "pie"]} />
         </Grid.Col>
       </Grid>
 
       <DisplayError error={current.error || past.error} />
     </>
+  )
+}
+function AgentsPie({ rows }: { rows: QueryResultRow[] }) {
+  if (rows.length === 0) {
+    return (
+      <DisplayWarning warning="No data points">
+        There are no data points left to display. ({rows.length} rows)
+      </DisplayWarning>
+    )
+  }
+
+  const data: {
+    name: string
+    value: number
+    color: string
+  }[] = []
+  const MAX_SEGMENTS = 8
+  const colors = [
+    "#e6f7ff",
+    "#d3eafb",
+    "#a9d2f1",
+    "#7bb9e9",
+    "#56a4e1",
+    "#3e97dd",
+    "#2f90dc",
+    "#1f7dc4",
+    "#0f6fb0",
+    "#00609d",
+  ].reverse()
+  if (colors.length < MAX_SEGMENTS) throw new Error("too few colors")
+
+  let remaining = 0
+  for (const row of rows.toSorted(
+    (b, a) => (a.count as number) - (b.count as number),
+  )) {
+    if (data.length < MAX_SEGMENTS - 1) {
+      const color = colors.shift()
+      if (!color) continue
+      data.push({
+        name: row.agent as string,
+        value: row.count as number,
+        color,
+      })
+    } else {
+      remaining += row.count as number
+    }
+  }
+  if (remaining) {
+    const color = colors.shift()
+    if (color) {
+      data.push({
+        name: "Rest",
+        value: remaining,
+        color,
+      })
+    }
+  }
+
+  return (
+    <div>
+      <PieChart
+        withLabelsLine
+        labelsPosition="outside"
+        labelsType="percent"
+        withLabels
+        withTooltip
+        tooltipDataSource="segment"
+        data={data}
+        size={300}
+      />
+    </div>
   )
 }
 
@@ -119,50 +195,50 @@ function AgentsTable({
     }
   }
 
-  return (
-    <>
-      {!rows.length && (
-        <DisplayWarning warning="No data points">
-          There are no data points left to display. ({rows.length} rows)
-        </DisplayWarning>
-      )}
+  if (rows.length === 0) {
+    return (
+      <DisplayWarning warning="No data points">
+        There are no data points left to display. ({rows.length} rows)
+      </DisplayWarning>
+    )
+  }
 
-      <Table mb={30}>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th onClick={() => changeSort("agent")}>Bot Agent</Table.Th>
-            <Table.Th
-              style={{ textAlign: "right" }}
-              onClick={() => changeSort("count")}
-            >
-              Count
-            </Table.Th>
-            <Table.Th
-              style={{ textAlign: "right" }}
-              onClick={() => changeSort("percent")}
-            >
-              Increase
-            </Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {combined.map((row) => {
-            return (
-              <Table.Tr key={row.agent}>
-                <Table.Td>{row.agent}</Table.Td>
-                <Table.Td style={{ textAlign: "right" }}>
-                  {numberFormat.format(row.count)}
-                </Table.Td>
-                <Table.Td style={{ textAlign: "right" }}>
-                  <span style={{ color: row.delta > 0 ? "green" : "red" }}>
-                    {row.percent.toFixed(0)}%
-                  </span>
-                </Table.Td>
-              </Table.Tr>
-            )
-          })}
-        </Table.Tbody>
-      </Table>
-    </>
+  return (
+    <Table mb={30}>
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th onClick={() => changeSort("agent")}>Bot Agent</Table.Th>
+          <Table.Th
+            style={{ textAlign: "right" }}
+            onClick={() => changeSort("count")}
+          >
+            Count
+          </Table.Th>
+          <Table.Th
+            style={{ textAlign: "right" }}
+            onClick={() => changeSort("percent")}
+          >
+            Increase
+          </Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>
+        {combined.map((row) => {
+          return (
+            <Table.Tr key={row.agent}>
+              <Table.Td>{row.agent}</Table.Td>
+              <Table.Td style={{ textAlign: "right" }}>
+                {numberFormat.format(row.count)}
+              </Table.Td>
+              <Table.Td style={{ textAlign: "right" }}>
+                <span style={{ color: row.delta > 0 ? "green" : "red" }}>
+                  {row.percent.toFixed(0)}%
+                </span>
+              </Table.Td>
+            </Table.Tr>
+          )
+        })}
+      </Table.Tbody>
+    </Table>
   )
 }
