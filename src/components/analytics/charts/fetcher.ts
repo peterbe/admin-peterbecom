@@ -13,7 +13,6 @@ export async function fetcher(url: string) {
 }
 
 export const refreshingFetchOptions = {
-  refetchOnWindowFocus: true, // already default actually
   refetchInterval: 5 * 60 * 1000,
 }
 

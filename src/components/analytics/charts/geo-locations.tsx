@@ -8,7 +8,7 @@ import { IntervalOptions } from "./interval-options"
 import { Loading } from "./loading"
 import { RowsOptions } from "./rows-options"
 import { useInterval } from "./use-interval"
-import { useQuery } from "./use-query"
+import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
 
 export function GeoLocations() {
@@ -43,6 +43,9 @@ LIMIT ${Number(limit)}
 `
 
 function Inner() {
+  const useQuery = (sql: string, options?: QueryOptions) =>
+    useSQLQuery(sql, { prefix: "geo-locations", ...options })
+
   const [intervalDays, setIntervalDays] = useInterval("geo-locations")
   const [rows, setRows] = useRows("geo-locations", 10)
 

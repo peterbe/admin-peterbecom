@@ -8,7 +8,7 @@ import { UrlFilterOptions } from "./options"
 import { RowsOptions } from "./rows-options"
 import { urlFilterToSQL } from "./url-filter-to-sql"
 import { useInterval } from "./use-interval"
-import { useQuery } from "./use-query"
+import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
 import { useURLFilter } from "./use-url-filter"
 
@@ -45,6 +45,9 @@ LIMIT ${Number(limit)}
 `
 
 function Inner() {
+  const useQuery = (sql: string, options?: QueryOptions) =>
+    useSQLQuery(sql, { prefix: "pageview-events", ...options })
+
   const [intervalDays, setIntervalDays] = useInterval("pageview-events")
   const [rows, setRows] = useRows("pageview-events", 10)
   const [urlFilter, setURLField] = useURLFilter("pageview-events", "")

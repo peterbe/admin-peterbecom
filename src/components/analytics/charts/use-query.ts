@@ -1,5 +1,4 @@
-import { useQuery as tanstack_useQuery } from "@tanstack/react-query"
-
+import { useQuery } from "@tanstack/react-query"
 import type { QueryResult } from "../types"
 import {
   apiPrefix,
@@ -8,16 +7,17 @@ import {
   refreshingFetchOptions,
 } from "./fetcher"
 
-type QueryOptions = {
+export type QueryOptions = {
   refresh?: boolean
+  prefix?: string
 }
 
-export function useQuery(
+export function useSQLQuery(
   query: string,
-  { refresh = false }: QueryOptions = {},
+  { refresh = false, prefix = "" }: QueryOptions = {},
 ) {
-  return tanstack_useQuery<QueryResult>({
-    queryKey: ["use-query", query],
+  return useQuery<QueryResult>({
+    queryKey: ["use-query", prefix, query],
     queryFn: async () => {
       return fetcher(`${apiPrefix}${new URLSearchParams({ query })}`)
     },

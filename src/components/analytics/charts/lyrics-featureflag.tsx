@@ -7,7 +7,7 @@ import { IntervalOptions } from "./interval-options"
 import type { DataSerie } from "./line-chart"
 import { Loading } from "./loading"
 import { useInterval } from "./use-interval"
-import { useQuery } from "./use-query"
+import { type QueryOptions, useSQLQuery } from "./use-query"
 
 export function LyricsFeatureflag() {
   return (
@@ -34,6 +34,9 @@ ORDER BY day
 `
 
 function Inner() {
+  const useQuery = (sql: string, options?: QueryOptions) =>
+    useSQLQuery(sql, { prefix: "lyrics-featureflag", ...options })
+
   const [intervalDays, setIntervalDays] = useInterval("lyrics-featureflag")
   const [percentMode, setPercentMode] = useState("")
 

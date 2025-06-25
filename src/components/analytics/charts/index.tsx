@@ -1,8 +1,8 @@
 import { useDocumentTitle } from "@mantine/hooks"
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister"
-import { QueryClient } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
-
+import { queryClient } from "../../../query-client"
 import { SignedIn } from "../../signed-in"
 import { BotAgentRequests } from "./bot-agent-requests"
 import { GeoLocations } from "./geo-locations"
@@ -14,14 +14,6 @@ import { Pageviews } from "./pageviews"
 import { RefreshContainerContext } from "./refresh-context"
 import { useMinimized } from "./use-minimized"
 import { useRefreshContainer } from "./use-refresh-container"
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      gcTime: 1000 * 60 * 60 * 24, // 24 hours
-    },
-  },
-})
 
 const persister = createSyncStoragePersister({
   storage: window.localStorage,
@@ -46,6 +38,7 @@ export function Component() {
             <LyricsFeatureflag />
             <PageviewEvents />
             <GeoLocations />
+            <ReactQueryDevtools initialIsOpen={false} />
           </RefreshContainerContext.Provider>
         </MinimizeContext.Provider>
       </PersistQueryClientProvider>
