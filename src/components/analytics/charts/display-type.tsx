@@ -1,7 +1,7 @@
 import { SegmentedControl } from "@mantine/core"
 import { useDisplayType } from "./use-display-type"
 
-type DisplayTypes = "table" | "pie"
+type DisplayTypes = "table" | "pie" | "line"
 export function DisplayType({
   id,
   choices,
