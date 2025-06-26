@@ -1,4 +1,4 @@
-import { PieChart } from "@mantine/charts"
+import { LineChart } from "@mantine/charts"
 import { Box, Grid, Table } from "@mantine/core"
 import { useState } from "react"
 import type { QueryResultRow } from "../types"
@@ -15,22 +15,21 @@ import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
 
 const sqlQuery = ({ limit = 200, days = 30, back = 0 } = {}) => `
-SELECT meta->>'botAgent' AS agent, count(meta->>'botAgent')
-FROM requestlog
-WHERE
-    ${createdRange(days, back)}
-    AND (meta->'isbot')::BOOLEAN
-    AND (meta->>'botAgent') IS NOT NULL
-GROUP BY meta->>'botAgent'
-ORDER BY 2 DESC
-LIMIT ${Number(limit)}
+  SELECT
+    date_trunc('day', created) AS day,
+    COUNT(*) AS count
+  FROM requestlog
+  WHERE ${createdRange(days, back)}
+  GROUP BY 1
+  ORDER BY 1 DESC
+  LIMIT ${Number(limit)}
 `
 
-const ID = "bot-agent-requests"
+const ID = "requests-per-day"
 
-export function BotAgentRequests() {
+export function RequestsPerDay() {
   return (
-    <ChartContainer id={ID} title="Bot Agent Requests">
+    <ChartContainer id={ID} title="Requests per day">
       <Inner />
     </ChartContainer>
   )
@@ -61,10 +60,10 @@ function Inner() {
 
         {current.data &&
           past.data &&
-          (displayType === "pie" ? (
-            <AgentsPie rows={current.data.rows} />
+          (displayType === "line" ? (
+            <RequestsLine rows={current.data.rows} />
           ) : (
-            <AgentsTable rows={current.data.rows} previous={past.data.rows} />
+            <RequestsTable rows={current.data.rows} previous={past.data.rows} />
           ))}
       </Box>
       <Grid>
@@ -75,7 +74,7 @@ function Inner() {
           <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
         </Grid.Col>
         <Grid.Col span={4}>
-          <DisplayType id={ID} choices={["table", "pie"]} />
+          <DisplayType id={ID} choices={["line", "table"]} />
         </Grid.Col>
       </Grid>
 
@@ -83,7 +82,8 @@ function Inner() {
     </>
   )
 }
-function AgentsPie({ rows }: { rows: QueryResultRow[] }) {
+
+function RequestsLine({ rows }: { rows: QueryResultRow[] }) {
   if (rows.length === 0) {
     return (
       <DisplayWarning warning="No data points">
@@ -91,78 +91,62 @@ function AgentsPie({ rows }: { rows: QueryResultRow[] }) {
       </DisplayWarning>
     )
   }
-
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+  })
   const data: {
-    name: string
-    value: number
-    color: string
+    day: string
+    requests: number
   }[] = []
-  const MAX_SEGMENTS = 8
-  const colors = [
-    "#e6f7ff",
-    "#d3eafb",
-    "#a9d2f1",
-    "#7bb9e9",
-    "#56a4e1",
-    "#3e97dd",
-    "#2f90dc",
-    "#1f7dc4",
-    "#0f6fb0",
-    "#00609d",
-  ].reverse()
-  if (colors.length < MAX_SEGMENTS) throw new Error("too few colors")
 
-  let remaining = 0
-  for (const row of rows.toSorted(
-    (b, a) => (a.count as number) - (b.count as number),
-  )) {
-    if (data.length < MAX_SEGMENTS - 1) {
-      const color = colors.shift()
-      if (!color) continue
-      data.push({
-        name: row.agent as string,
-        value: row.count as number,
-        color,
-      })
-    } else {
-      remaining += row.count as number
-    }
-  }
-  if (remaining) {
-    const color = colors.shift()
-    if (color) {
-      data.push({
-        name: "Rest",
-        value: remaining,
-        color,
-      })
-    }
+  for (const row of rows) {
+    const dayDate = new Date(row.day as string)
+    data.unshift({
+      day: formatter.format(dayDate),
+      requests: row.count as number,
+    })
   }
 
   return (
-    <div>
-      <PieChart
-        withLabelsLine
-        labelsPosition="outside"
-        labelsType="percent"
-        withLabels
-        withTooltip
-        tooltipDataSource="segment"
-        data={data}
-        size={300}
-      />
-    </div>
+    <LineChart
+      h={400}
+      data={data}
+      series={[{ name: "requests", label: "Requests" }]}
+      dataKey="day"
+      type="gradient"
+      gradientStops={[
+        { offset: 0, color: "red.6" },
+        { offset: 20, color: "orange.6" },
+        { offset: 40, color: "yellow.5" },
+        { offset: 70, color: "lime.5" },
+        { offset: 80, color: "cyan.5" },
+        { offset: 100, color: "blue.5" },
+      ]}
+      strokeWidth={3}
+      curveType="natural"
+      tooltipAnimationDuration={200}
+      yAxisProps={{
+        tickFormatter: (value) => {
+          if (value > 1_000) {
+            return `${new Intl.NumberFormat("en-US").format(value / 1000)}k`
+          }
+          return new Intl.NumberFormat("en-US").format(value)
+        },
+      }}
+      valueFormatter={(value) => new Intl.NumberFormat("en-US").format(value)}
+    />
   )
 }
 
-function AgentsTable({
+function RequestsTable({
   rows,
   previous,
 }: {
   rows: QueryResultRow[]
   previous: QueryResultRow[]
 }) {
-  type Sorts = "percent" | "count" | "agent"
+  type Sorts = "percent" | "count" | "day"
   const [sortBy, setSortBy] = useState<Sorts>("percent")
   const [sortReverse, setSortReverse] = useState(false)
   const hash = new Map<string, number>(
@@ -173,20 +157,22 @@ function AgentsTable({
   const combined = rows
     .map((row) => {
       const count = row.count as number
-      const previous = hash.get(row.agent as string) || 0
+      const previous = hash.get(row.day as string) || 0
       const delta = count - previous
       const percent = (100 * delta) / count
-      return { agent: row.agent as string, count, previous, delta, percent }
+      return { day: row.day as string, count, previous, delta, percent }
     })
     .sort(
       (a, b) =>
         (sortReverse ? -1 : 1) *
-        (sortBy === "agent"
-          ? a.agent.localeCompare(b.agent)
-          : b[sortBy] - a[sortBy]),
+        (sortBy === "day" ? a.day.localeCompare(b.day) : b[sortBy] - a[sortBy]),
     )
 
-  const numberFormat = new Intl.NumberFormat("en-US")
+  const numberFormatter = new Intl.NumberFormat("en-US")
+  const dayFormatter = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "long",
+  })
 
   function changeSort(sort: Sorts) {
     if (sort === sortBy) {
@@ -209,7 +195,7 @@ function AgentsTable({
     <Table mb={30}>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th onClick={() => changeSort("agent")}>Bot Agent</Table.Th>
+          <Table.Th onClick={() => changeSort("day")}>Day</Table.Th>
           <Table.Th
             style={{ textAlign: "right" }}
             onClick={() => changeSort("count")}
@@ -227,10 +213,10 @@ function AgentsTable({
       <Table.Tbody>
         {combined.map((row) => {
           return (
-            <Table.Tr key={row.agent}>
-              <Table.Td>{row.agent}</Table.Td>
+            <Table.Tr key={row.day}>
+              <Table.Td>{dayFormatter.format(new Date(row.day))}</Table.Td>
               <Table.Td style={{ textAlign: "right" }}>
-                {numberFormat.format(row.count)}
+                {numberFormatter.format(row.count)}
               </Table.Td>
               <Table.Td style={{ textAlign: "right" }}>
                 <span style={{ color: row.delta > 0 ? "green" : "red" }}>

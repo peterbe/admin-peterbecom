@@ -12,6 +12,7 @@ import { PageviewEvents } from "./pageview-events"
 import { PageviewNumbers } from "./pageview-numbers"
 import { Pageviews } from "./pageviews"
 import { RefreshContainerContext } from "./refresh-context"
+import { RequestsPerDay } from "./requests-per-day"
 import { useMinimized } from "./use-minimized"
 import { useRefreshContainer } from "./use-refresh-container"
 
@@ -35,6 +36,7 @@ export function Component() {
             <PageviewNumbers />
             <Pageviews />
             <BotAgentRequests />
+            <RequestsPerDay />
             <LyricsFeatureflag />
             <PageviewEvents />
             <GeoLocations />
