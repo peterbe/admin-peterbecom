@@ -15,13 +15,14 @@ import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
 
 const sqlQuery = ({ limit = 200, days = 30, back = 0 } = {}) => `
-SELECT date_trunc('day', created) AS day,
-       COUNT(*) AS count
-FROM requestlog
-WHERE  ${createdRange(days, back)}
-GROUP BY 1 
-ORDER BY 1 DESC
-LIMIT ${Number(limit)}
+  SELECT
+    date_trunc('day', created) AS day,
+    COUNT(*) AS count
+  FROM requestlog
+  WHERE ${createdRange(days, back)}
+  GROUP BY 1
+  ORDER BY 1 DESC
+  LIMIT ${Number(limit)}
 `
 
 const ID = "requests-per-day"
@@ -73,7 +74,7 @@ function Inner() {
           <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
         </Grid.Col>
         <Grid.Col span={4}>
-          <DisplayType id="bot-agent-requests" choices={["line", "table"]} />
+          <DisplayType id={ID} choices={["line", "table"]} />
         </Grid.Col>
       </Grid>
 
@@ -90,27 +91,29 @@ function RequestsLine({ rows }: { rows: QueryResultRow[] }) {
       </DisplayWarning>
     )
   }
-  const data = [
-    { date: "Jan", temperature: -25 },
-    { date: "Feb", temperature: -10 },
-    { date: "Mar", temperature: 5 },
-    { date: "Apr", temperature: 15 },
-    { date: "May", temperature: 30 },
-    { date: "Jun", temperature: 15 },
-    { date: "Jul", temperature: 30 },
-    { date: "Aug", temperature: 40 },
-    { date: "Sep", temperature: 15 },
-    { date: "Oct", temperature: 20 },
-    { date: "Nov", temperature: 0 },
-    { date: "Dec", temperature: -10 },
-  ]
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+  })
+  const data: {
+    day: string
+    requests: number
+  }[] = []
+
+  for (const row of rows) {
+    const dayDate = new Date(row.day as string)
+    data.unshift({
+      day: formatter.format(dayDate),
+      requests: row.count as number,
+    })
+  }
 
   return (
     <LineChart
-      h={300}
+      h={400}
       data={data}
-      series={[{ name: "temperature", label: "Avg. Temperature" }]}
-      dataKey="date"
+      series={[{ name: "requests", label: "Requests" }]}
+      dataKey="day"
       type="gradient"
       gradientStops={[
         { offset: 0, color: "red.6" },
@@ -120,74 +123,20 @@ function RequestsLine({ rows }: { rows: QueryResultRow[] }) {
         { offset: 80, color: "cyan.5" },
         { offset: 100, color: "blue.5" },
       ]}
-      strokeWidth={5}
+      strokeWidth={3}
       curveType="natural"
-      yAxisProps={{ domain: [-25, 40] }}
-      valueFormatter={(value) => `${value}°C`}
+      tooltipAnimationDuration={200}
+      yAxisProps={{
+        tickFormatter: (value) => {
+          if (value > 1_000) {
+            return `${new Intl.NumberFormat("en-US").format(value / 1000)}k`
+          }
+          return new Intl.NumberFormat("en-US").format(value)
+        },
+      }}
+      valueFormatter={(value) => new Intl.NumberFormat("en-US").format(value)}
     />
   )
-
-  //   const data: {
-  //     name: string
-  //     value: number
-  //     color: string
-  //   }[] = []
-  //   const MAX_SEGMENTS = 8
-  //   const colors = [
-  //     "#e6f7ff",
-  //     "#d3eafb",
-  //     "#a9d2f1",
-  //     "#7bb9e9",
-  //     "#56a4e1",
-  //     "#3e97dd",
-  //     "#2f90dc",
-  //     "#1f7dc4",
-  //     "#0f6fb0",
-  //     "#00609d",
-  //   ].reverse()
-  //   if (colors.length < MAX_SEGMENTS) throw new Error("too few colors")
-
-  //   let remaining = 0
-  //   for (const row of rows.toSorted(
-  //     (b, a) => (a.count as number) - (b.count as number),
-  //   )) {
-  //     if (data.length < MAX_SEGMENTS - 1) {
-  //       const color = colors.shift()
-  //       if (!color) continue
-  //       data.push({
-  //         name: row.agent as string,
-  //         value: row.count as number,
-  //         color,
-  //       })
-  //     } else {
-  //       remaining += row.count as number
-  //     }
-  //   }
-  //   if (remaining) {
-  //     const color = colors.shift()
-  //     if (color) {
-  //       data.push({
-  //         name: "Rest",
-  //         value: remaining,
-  //         color,
-  //       })
-  //     }
-  //   }
-
-  //   return (
-  //     <div>
-  //       <PieChart
-  //         withLabelsLine
-  //         labelsPosition="outside"
-  //         labelsType="percent"
-  //         withLabels
-  //         withTooltip
-  //         tooltipDataSource="segment"
-  //         data={data}
-  //         size={300}
-  //       />
-  //     </div>
-  //   )
 }
 
 function RequestsTable({
@@ -219,7 +168,11 @@ function RequestsTable({
         (sortBy === "day" ? a.day.localeCompare(b.day) : b[sortBy] - a[sortBy]),
     )
 
-  const numberFormat = new Intl.NumberFormat("en-US")
+  const numberFormatter = new Intl.NumberFormat("en-US")
+  const dayFormatter = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "long",
+  })
 
   function changeSort(sort: Sorts) {
     if (sort === sortBy) {
@@ -261,9 +214,9 @@ function RequestsTable({
         {combined.map((row) => {
           return (
             <Table.Tr key={row.day}>
-              <Table.Td>{row.day}</Table.Td>
+              <Table.Td>{dayFormatter.format(new Date(row.day))}</Table.Td>
               <Table.Td style={{ textAlign: "right" }}>
-                {numberFormat.format(row.count)}
+                {numberFormatter.format(row.count)}
               </Table.Td>
               <Table.Td style={{ textAlign: "right" }}>
                 <span style={{ color: row.delta > 0 ? "green" : "red" }}>

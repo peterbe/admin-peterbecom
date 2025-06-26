@@ -75,7 +75,7 @@ function Inner() {
           <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
         </Grid.Col>
         <Grid.Col span={4}>
-          <DisplayType id="bot-agent-requests" choices={["table", "pie"]} />
+          <DisplayType id={ID} choices={["table", "pie"]} />
         </Grid.Col>
       </Grid>
 

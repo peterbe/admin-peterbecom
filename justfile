@@ -16,6 +16,9 @@ build:
 start: build
     npm run preview -- --port 4001
 
+start-with-proxy: build
+    API_TARGET=https://admin.peterbe.com npm run preview -- --port 4001
+
 start-for-testing:
     NODE_ENV=test npm run build
     NODE_ENV=test npm run preview -- --port 4001
