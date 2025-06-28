@@ -13,6 +13,7 @@ import { PageviewNumbers } from "./pageview-numbers"
 import { Pageviews } from "./pageviews"
 import { RefreshContainerContext } from "./refresh-context"
 import { RequestsPerDay } from "./requests-per-day"
+import { RequestsVaryingQuerystring } from "./requests-varying-querystring"
 import { useMinimized } from "./use-minimized"
 import { useRefreshContainer } from "./use-refresh-container"
 
@@ -37,6 +38,7 @@ export function Component() {
             <Pageviews />
             <BotAgentRequests />
             <RequestsPerDay />
+            <RequestsVaryingQuerystring />
             <LyricsFeatureflag />
             <PageviewEvents />
             <GeoLocations />
