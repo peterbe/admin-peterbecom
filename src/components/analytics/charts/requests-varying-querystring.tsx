@@ -201,7 +201,6 @@ function URLsTable({ rows }: { rows: QueryResultRow[] }) {
   }
   const numberFormat = new Intl.NumberFormat("en-US")
 
-  const _statusCodes = new Map<string, number>()
   const counts = new Map<number, number>()
   let countAll = 0
   for (const row of rows) {
