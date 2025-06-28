@@ -5,11 +5,9 @@ import type { QueryResultRow } from "../types"
 import { DisplayError, DisplayWarning } from "./alerts"
 import { ChartContainer } from "./container"
 import { createdRange } from "./created-range"
-import { DisplayType } from "./display-type"
 import { IntervalOptions } from "./interval-options"
 import { Loading } from "./loading"
 import { RowsOptions } from "./rows-options"
-import { useDisplayType } from "./use-display-type"
 import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
@@ -52,20 +50,21 @@ function Inner() {
     }),
   )
 
-  const [displayType] = useDisplayType(ID)
-
   return (
     <>
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading || past.isLoading} />
 
-        {current.data &&
-          past.data &&
-          (displayType === "pie" ? (
-            <AgentsPie rows={current.data.rows} />
-          ) : (
-            <AgentsTable rows={current.data.rows} previous={past.data.rows} />
-          ))}
+        {current.data && past.data && (
+          <Grid>
+            <Grid.Col span={8}>
+              <AgentsTable rows={current.data.rows} previous={past.data.rows} />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <AgentsPie rows={current.data.rows} />
+            </Grid.Col>
+          </Grid>
+        )}
       </Box>
       <Grid>
         <Grid.Col span={4}>
@@ -73,9 +72,6 @@ function Inner() {
         </Grid.Col>
         <Grid.Col span={4}>
           <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <DisplayType id={ID} choices={["table", "pie"]} />
         </Grid.Col>
       </Grid>
 
