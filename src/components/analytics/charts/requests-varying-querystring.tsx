@@ -1,7 +1,17 @@
-import { Box, Button, Code, Grid, Select, Table, Text } from "@mantine/core"
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Code,
+  Grid,
+  Select,
+  Table,
+  Text,
+} from "@mantine/core"
 import { useClipboard } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { useQuery as tsq_useQuery } from "@tanstack/react-query"
+import { IconStethoscope } from "@tabler/icons-react"
+import { useQuery as tsq_useQuery, useMutation } from "@tanstack/react-query"
 import escapeString from "escape-sql-string"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
@@ -174,12 +184,64 @@ function PathsTable({ rows }: { rows: QueryResultRow[] }) {
   )
 }
 
+type ProbeURLResponse = {
+  request: {
+    url: string
+    method: string
+    user_agent: string
+  }
+  response: {
+    status_code: number
+    location?: string
+    body?: string
+  }
+}
 function URLsTable({ rows }: { rows: QueryResultRow[] }) {
   const clipboard = useClipboard({ timeout: 500 })
   const [clickedUrl, setClickedUrl] = useState("")
 
   const [searchParams, setSearchParams] = useSearchParams()
   const searchStatusCode = searchParams.get("searchStatusCode")
+
+  const { mutate } = useMutation({
+    mutationKey: ["probe-url"],
+    mutationFn: async (path: string) => {
+      const probeBaseUrl =
+        window.location.host === "localhost:4001"
+          ? "http://localhost:3000"
+          : "https://www.peterbe.com"
+      const url = `${probeBaseUrl}${path}`
+      const response = await fetch("/api/v0/probe/url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url }),
+      })
+      if (!response.ok) {
+        throw new Error(`${response.status} on ${response.url}`)
+      }
+      return (await response.json()) as ProbeURLResponse
+    },
+    onSuccess: (data) => {
+      let message = `Status code: ${data.response.status_code}`
+      if (data.response.location) {
+        message += `\nLocation: ${data.response.location}`
+      }
+      notifications.show({
+        title: "Probe response",
+        message,
+        autoClose: 10_000,
+      })
+    },
+    onError: (err) => {
+      notifications.show({
+        title: "Probe failed",
+        message: err.toString(),
+        color: "red",
+      })
+    },
+  })
 
   useEffect(() => {
     if (clickedUrl) {
@@ -264,6 +326,7 @@ function URLsTable({ rows }: { rows: QueryResultRow[] }) {
           <Table.Tr>
             <Table.Th style={{ textAlign: "right" }}>Count</Table.Th>
             <Table.Th>Status</Table.Th>
+            <Table.Th>Probe</Table.Th>
             <Table.Th>URL</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -279,6 +342,20 @@ function URLsTable({ rows }: { rows: QueryResultRow[] }) {
                   {numberFormat.format(count)}
                 </Table.Td>
                 <Table.Td>{statusCode}</Table.Td>
+                <Table.Td>
+                  <ActionIcon
+                    variant="default"
+                    aria-label="Settings"
+                    onClick={() => {
+                      mutate(row.url as string)
+                    }}
+                  >
+                    <IconStethoscope
+                      style={{ width: "70%", height: "70%" }}
+                      stroke={1.5}
+                    />
+                  </ActionIcon>
+                </Table.Td>
                 <Table.Td onClick={() => setClickedUrl(url)}>
                   {row.url}
                 </Table.Td>
