@@ -27,7 +27,7 @@
     "@tanstack/query-sync-storage-persister": "^5.81.2",
     "@tanstack/react-query": "^5.81.2",
     "@tanstack/react-query-devtools": "^5.81.2",
-    "@tanstack/react-query-persist-client": "^5.81.2",
+    "@tanstack/react-query-persist-client": "^5.81.5",
     "date-fns": "^4.1.0",
     "escape-sql-string": "^1.2.2",
     "flag-icons": "^7.5.0",
