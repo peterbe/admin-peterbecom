@@ -20,6 +20,7 @@ const sqlQuery = ({
   days = 30,
   back = 0,
   excludePosts = false,
+  exclude200 = false,
 } = {}) => `
   SELECT
     date_trunc('day', created) AS day,
@@ -27,6 +28,7 @@ const sqlQuery = ({
   FROM requestlog
   WHERE ${createdRange(days, back)}
   ${excludePosts ? "AND request->>'method' <> 'POST'" : ""}
+   ${exclude200 ? "AND status_code <> 200" : ""}
   GROUP BY 1
   ORDER BY 1 DESC
   LIMIT ${Number(limit)}
@@ -79,13 +81,20 @@ function Inner() {
           excludePosts,
           exclude200,
         })
-      : sqlQuery({ limit: Number(rows), days: Number(intervalDays) }),
+      : sqlQuery({
+          limit: Number(rows),
+          days: Number(intervalDays),
+          excludePosts,
+          exclude200,
+        }),
   )
   const past = useQuery(
     sqlQuery({
       limit: Number(rows),
       days: Number(intervalDays) * 2,
       back: Number(intervalDays),
+      excludePosts,
+      exclude200,
     }),
     { enabled: !splitByStatus },
   )
@@ -216,6 +225,7 @@ function RequestsLine({
         ...numbers,
       })
     }
+    data.reverse()
     const colors = [
       "red.6",
       "orange.6",
