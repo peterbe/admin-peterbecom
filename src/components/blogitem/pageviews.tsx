@@ -90,7 +90,8 @@ function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
   }
 
   let cummX = 0
-  const dataX = data.rows.map((row) => {
+  const rows = data.rows.toReversed()
+  const dataX = rows.map((row) => {
     let date = (row.date as string).split("T")[0]
     if (interval === "month") {
       const dateObject = new Date(row.date as string)
