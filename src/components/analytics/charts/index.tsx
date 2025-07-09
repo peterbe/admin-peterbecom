@@ -16,6 +16,7 @@ import { RequestsPerDay } from "./requests-per-day"
 import { RequestsVaryingQuerystring } from "./requests-varying-querystring"
 import { useMinimized } from "./use-minimized"
 import { useRefreshContainer } from "./use-refresh-container"
+import { UserAgents } from "./user-agents"
 
 const persister = createSyncStoragePersister({
   storage: window.localStorage,
@@ -36,6 +37,7 @@ export function Component() {
           <RefreshContainerContext.Provider value={{ refresh, setRefresh }}>
             <PageviewNumbers />
             <Pageviews />
+            <UserAgents />
             <BotAgentRequests />
             <RequestsPerDay />
             <RequestsVaryingQuerystring />
