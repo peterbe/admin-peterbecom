@@ -46,13 +46,35 @@ GROUP BY ${field}
 ORDER BY 2 DESC
 LIMIT ${limit}
 `
+const sqlQueryRequests = (
+  field: string,
+  days = 0,
+  back = 0,
+  { limit = 100 }: { limit?: number } = {},
+) => `
+SELECT
+    ${field} AS field, count(*) AS count
+FROM
+    requestlog
+WHERE
+  ${createdRange(days, back)}
+  and request->>'method' = 'GET'
+GROUP BY ${field}
+ORDER BY 2 DESC
+LIMIT ${limit}
+`
 
 function Inner() {
   const useQuery = (sql: string, options?: QueryOptions) =>
     useSQLQuery(sql, { prefix: ID, ...options })
 
   const isBots = useQuery(sqlQuery("data->>'is_bot'", 1))
-  const isBotsPast = useQuery(sqlQuery("data->>'is_bot'", 2, 1))
+  const isBotsPast = useQuery(sqlQuery("data->>'is_bot'", 2 + 7, 1 + 7))
+
+  const isBotsRequests = useQuery(sqlQueryRequests("meta->>'isbot'", 1))
+  const isBotsRequestsPast = useQuery(
+    sqlQueryRequests("meta->>'isbot'", 2 + 7, 1 + 7),
+  )
 
   const popularBotAgents = useQuery(
     sqlQuery("data->>'bot_agent'", 1, 0, { isBot: true }),
@@ -71,8 +93,8 @@ function Inner() {
         {isBots.data && isBotsPast.data && (
           <GridItem
             value={getPercentTrue(isBots.data.rows)}
-            title="Is Bot"
-            // note=""
+            title="Is Bot (pageviews)"
+            note="Compared to a week ago"
             largeNumber={true}
             isFetching={isBots.isFetching || isBotsPast.isFetching}
             diffPercentage={
@@ -82,7 +104,26 @@ function Inner() {
                   100
                 : undefined
             }
-            percentSF={2}
+            percentSF={1}
+          />
+        )}
+        {isBotsRequests.data && isBotsRequestsPast.data && (
+          <GridItem
+            value={getPercentTrue(isBotsRequests.data.rows)}
+            title="Is Bot (requests)"
+            note="Compared to a week ago"
+            largeNumber={true}
+            isFetching={
+              isBotsRequests.isFetching || isBotsRequestsPast.isFetching
+            }
+            diffPercentage={
+              getPercentTrue(isBotsRequestsPast.data.rows) > 0
+                ? (100 * getPercentTrue(isBotsRequests.data.rows)) /
+                    getPercentTrue(isBotsRequestsPast.data.rows) -
+                  100
+                : undefined
+            }
+            percentSF={1}
           />
         )}
       </SimpleGrid>
