@@ -5,6 +5,7 @@ import {
   Code,
   Grid,
   Select,
+  Switch,
   Table,
   Text,
 } from "@mantine/core"
@@ -27,14 +28,22 @@ import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
 
-const sqlQuery = ({ limit = 200, days = 30, back = 0 } = {}) => `
+const sqlQuery = ({
+  limit = 200,
+  days = 30,
+  back = 0,
+  only200s = false,
+  includeManifest = false,
+} = {}) => `
 SELECT request->>'path' AS path, COUNT(*) AS count
-FROM requestlog 
-where 
+FROM requestlog
+where
     ${createdRange(days, back)}
-    AND url != request->>'path' 
+    AND url != request->>'path'
+    ${only200s ? "AND status_code = 200" : ""}
+    ${includeManifest ? "" : "AND request->>'path' <> '/__manifest'"}
 GROUP BY request->>'path'
-ORDER BY 2 desc 
+ORDER BY 2 desc
 LIMIT ${Number(limit)}
 `
 
@@ -53,13 +62,13 @@ const sqlSearchQuery = (
   } = {},
 ) => `
 SELECT url, status_code, COUNT(*) AS count
-FROM requestlog 
-where 
+FROM requestlog
+where
     ${createdRange(days, back)}
     AND request->>'path' = ${escapeString(path)}
     ${statusCode === null ? "" : `AND status_code = ${escapeString(statusCode)}`}
 GROUP BY url, status_code
-ORDER BY 3 desc 
+ORDER BY 3 desc
 LIMIT ${Number(limit)}
 `
 
@@ -72,27 +81,36 @@ export function RequestsVaryingQuerystring() {
     </ChartContainer>
   )
 }
+
 function Inner() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const only200s = searchParams.get("only200s") === "1"
+  const includeManifest = searchParams.get("includeManifest") === "1"
+
   const useQuery = (sql: string, options?: QueryOptions) =>
     useSQLQuery(sql, { prefix: ID, ...options })
 
   const [intervalDays, setIntervalDays] = useInterval(ID)
   const [rows, setRows] = useRows(ID, 10)
   const current = useQuery(
-    sqlQuery({ limit: Number(rows), days: Number(intervalDays) }),
+    sqlQuery({
+      limit: Number(rows),
+      days: Number(intervalDays),
+      only200s,
+      includeManifest,
+    }),
   )
 
-  const [searchParams] = useSearchParams()
   const searchPath = searchParams.get("searchPath")
   const searchStatusCode = searchParams.get("searchStatusCode")
   const searchQuery = tsq_useQuery<QueryResult>({
-    queryKey: ["search-query", ID, searchPath, searchStatusCode],
+    queryKey: ["search-query", ID, searchPath, searchStatusCode, only200s],
     queryFn: async () => {
       if (!searchPath) throw new Error("not selected")
       const query = sqlSearchQuery(searchPath, {
         limit: Number(rows),
         days: Number(intervalDays),
-        statusCode: searchStatusCode,
+        statusCode: only200s ? "200" : searchStatusCode,
       })
       return fetcher(`${apiPrefix}${new URLSearchParams({ query })}`)
     },
@@ -103,7 +121,7 @@ function Inner() {
   return (
     <>
       <Box pos="relative" mt={25} mb={50}>
-        <Loading visible={current.isLoading} />
+        <Loading visible={current.isLoading || searchQuery.isLoading} />
 
         {current.data && (
           <Grid>
@@ -120,12 +138,46 @@ function Inner() {
           </Grid>
         )}
       </Box>
-      <Grid>
+      <Grid mb={10}>
         <Grid.Col span={4}>
           <IntervalOptions value={intervalDays} onChange={setIntervalDays} />
         </Grid.Col>
         <Grid.Col span={4}>
           <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
+        </Grid.Col>
+      </Grid>
+
+      <Grid>
+        <Grid.Col span={4}>
+          <Switch
+            checked={only200s}
+            onChange={(event) => {
+              const sp = new URLSearchParams(searchParams)
+              if (event.currentTarget.checked) {
+                sp.set("only200s", "1")
+              } else {
+                sp.delete("only200s")
+              }
+              setSearchParams(sp)
+            }}
+            label="Only 200 OKs"
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          {/* <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} /> */}
+          <Switch
+            checked={includeManifest}
+            onChange={(event) => {
+              const sp = new URLSearchParams(searchParams)
+              if (event.currentTarget.checked) {
+                sp.set("includeManifest", "1")
+              } else {
+                sp.delete("includeManifest")
+              }
+              setSearchParams(sp)
+            }}
+            label="Include /__manifest"
+          />
         </Grid.Col>
       </Grid>
 
@@ -164,11 +216,14 @@ function PathsTable({ rows }: { rows: QueryResultRow[] }) {
             >
               <Table.Td
                 onClick={() => {
+                  const sp = new URLSearchParams(searchParams)
                   if (row.path === searchPath) {
                     setSearchParams({ searchPath: "" })
+                    sp.delete("searchPath")
                   } else {
-                    setSearchParams({ searchPath: row.path as string })
+                    sp.set("searchPath", row.path as string)
                   }
+                  setSearchParams(sp)
                 }}
               >
                 {row.path}
