@@ -99,8 +99,6 @@ function Inner() {
     { enabled: !splitByStatus },
   )
 
-  console.log({ current: current.data, past: past.data })
-
   const [displayType] = useDisplayType(ID)
 
   return (
