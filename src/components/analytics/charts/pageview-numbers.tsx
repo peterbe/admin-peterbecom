@@ -6,9 +6,10 @@ import { formatNumber } from "./number-format"
 import classes from "./StatsGrid.module.css"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 
+const ID = "pageview-numbers"
 export function PageviewNumbers() {
   return (
-    <ChartContainer id="pageview-numbers" title="Pageview Numbers">
+    <ChartContainer id={ID} title="Pageview Numbers">
       <Inner />
     </ChartContainer>
   )
@@ -36,7 +37,7 @@ WHERE
 
 function Inner() {
   const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: "pageview-numbers", ...options })
+    useSQLQuery(sql, { prefix: ID, ...options })
 
   const oldestPageviewCreated = useQuery(`
     select min(created) from analytics where type='pageview' `)

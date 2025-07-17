@@ -1,6 +1,5 @@
 import { LineChart } from "@mantine/charts"
 import { Box, Grid, Switch, Table, Text } from "@mantine/core"
-import { useState } from "react"
 import { useSearchParams } from "react-router"
 import type { QueryResultRow } from "../types"
 import { DisplayError, DisplayWarning } from "./alerts"
@@ -14,6 +13,7 @@ import { useDisplayType } from "./use-display-type"
 import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
+import { addDays } from "./utils"
 
 const sqlQuery = ({
   limit = 200,
@@ -116,7 +116,11 @@ function Inner() {
           past.data &&
           displayType === "table" &&
           !splitByStatus && (
-            <RequestsTable rows={current.data.rows} previous={past.data.rows} />
+            <RequestsTable
+              rows={current.data.rows}
+              previous={past.data.rows}
+              intervalDays={Number(intervalDays)}
+            />
           )}
         {current.data && displayType === "table" && splitByStatus && (
           <RequestsByStatusTable rows={current.data.rows} />
@@ -305,46 +309,34 @@ function RequestsLine({
 function RequestsTable({
   rows,
   previous,
+  intervalDays,
 }: {
   rows: QueryResultRow[]
   previous: QueryResultRow[]
+  intervalDays: number
 }) {
-  type Sorts = "percent" | "count" | "day"
-  const [sortBy, setSortBy] = useState<Sorts>("percent")
-  const [sortReverse, setSortReverse] = useState(false)
   const hash = new Map<string, number>(
     previous.map((row) => {
-      return [row.agent as string, row.count as number]
+      const d = addDays(new Date(row.day as string), intervalDays)
+      const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`
+      return [k, row.count as number]
     }),
   )
-  const combined = rows
-    .map((row) => {
-      const count = row.count as number
-      const previous = hash.get(row.day as string) || 0
-      const delta = count - previous
-      const percent = (100 * delta) / count
-      return { day: row.day as string, count, previous, delta, percent }
-    })
-    .sort(
-      (a, b) =>
-        (sortReverse ? -1 : 1) *
-        (sortBy === "day" ? a.day.localeCompare(b.day) : b[sortBy] - a[sortBy]),
-    )
+  const combined = rows.map((row) => {
+    const count = row.count as number
+    const d = new Date(row.day as string)
+    const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`
+    const previous = hash.get(k) || 0
+    const delta = count - previous
+    const percent = (100 * delta) / count
+    return { day: row.day as string, count, previous, delta, percent }
+  })
 
   const numberFormatter = new Intl.NumberFormat("en-US")
   const dayFormatter = new Intl.DateTimeFormat("en-US", {
     day: "numeric",
     month: "long",
   })
-
-  function changeSort(sort: Sorts) {
-    if (sort === sortBy) {
-      setSortReverse((prev) => !prev)
-    } else {
-      setSortBy(sort)
-      setSortReverse(false)
-    }
-  }
 
   if (rows.length === 0) {
     return (
@@ -358,19 +350,9 @@ function RequestsTable({
     <Table mb={30}>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th onClick={() => changeSort("day")}>Day</Table.Th>
-          <Table.Th
-            style={{ textAlign: "right" }}
-            onClick={() => changeSort("count")}
-          >
-            Count
-          </Table.Th>
-          <Table.Th
-            style={{ textAlign: "right" }}
-            onClick={() => changeSort("percent")}
-          >
-            Increase
-          </Table.Th>
+          <Table.Th>Day</Table.Th>
+          <Table.Th style={{ textAlign: "right" }}>Count</Table.Th>
+          <Table.Th style={{ textAlign: "right" }}>Increase</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
