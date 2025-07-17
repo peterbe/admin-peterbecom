@@ -11,9 +11,10 @@ import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useURLFilter } from "./use-url-filter"
 import { addDays } from "./utils"
 
+const ID = "pageviews"
 export function Pageviews() {
   return (
-    <ChartContainer id="pageviews" title="Pageviews">
+    <ChartContainer id={ID} title="Pageviews">
       <Inner />
     </ChartContainer>
   )
@@ -28,7 +29,7 @@ FROM
 WHERE
     type='pageview'
     and created > now() - interval '${days + 1} days'
-    and created < DATE_TRUNC('day', now() - interval '1 day')
+    and created < DATE_TRUNC('day', now())
     ${urlFilterToSQL(urlFilter)}
 GROUP BY
     day
@@ -54,10 +55,10 @@ ORDER BY
 
 function Inner() {
   const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: "pageviews", ...options })
+    useSQLQuery(sql, { prefix: ID, ...options })
 
-  const [intervalDays, setIntervalDays] = useInterval("pageviews")
-  const [urlFilter, setURLField] = useURLFilter("pageviews", "")
+  const [intervalDays, setIntervalDays] = useInterval(ID)
+  const [urlFilter, setURLField] = useURLFilter(ID, "")
 
   const current = useQuery(sqlQuery(Number(intervalDays), urlFilter))
   const previous = useQuery(sqlQueryPrevious(Number(intervalDays), urlFilter))
