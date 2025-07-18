@@ -11,6 +11,8 @@ import { MinimizeContext } from "./minimize-context"
 import { PageviewEvents } from "./pageview-events"
 import { PageviewNumbers } from "./pageview-numbers"
 import { Pageviews } from "./pageviews"
+import { PublicAPIPageviews } from "./publicapi-pageviews"
+import { PublicAPIPageviewsDurations } from "./publicapi-pageviews-durations"
 import { RefreshContainerContext } from "./refresh-context"
 import { RequestsPerDay } from "./requests-per-day"
 import { RequestsVaryingQuerystring } from "./requests-varying-querystring"
@@ -37,6 +39,8 @@ export function Component() {
           <RefreshContainerContext.Provider value={{ refresh, setRefresh }}>
             <PageviewNumbers />
             <Pageviews />
+            <PublicAPIPageviews />
+            <PublicAPIPageviewsDurations />
             <UserAgents />
             <BotAgentRequests />
             <RequestsPerDay />
