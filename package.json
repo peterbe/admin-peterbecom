@@ -17,7 +17,7 @@
     "compare-build-dirs": "node --experimental-strip-types --no-warnings scripts/compare-build-dirs.ts"
   },
   "dependencies": {
-    "@mantine/charts": "^8.1.3",
+    "@mantine/charts": "^8.2.2",
     "@mantine/core": "^8.1.3",
     "@mantine/dropzone": "^8.1.3",
     "@mantine/form": "^8.1.3",
