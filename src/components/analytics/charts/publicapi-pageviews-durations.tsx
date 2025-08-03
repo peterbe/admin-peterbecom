@@ -85,17 +85,17 @@ function Inner({ id }: { id: string }) {
       </Box>
 
       <Grid>
-        <Grid.Col span={4}>
+        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
           <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
         </Grid.Col>
-        <Grid.Col span={4}>
+        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
           <IntervalOptions
             value={intervalDays}
             onChange={setIntervalDays}
             range={[3, 7, 28]}
           />
         </Grid.Col>
-        <Grid.Col span={4}>
+        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
           <SegmentedControl
             value={primaryKey}
             onChange={(x) => {
