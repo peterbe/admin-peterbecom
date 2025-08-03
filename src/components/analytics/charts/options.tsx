@@ -1,4 +1,4 @@
-import { Box, SegmentedControl, Text } from "@mantine/core"
+import { Box, SegmentedControl } from "@mantine/core"
 
 const DEFAULT_URLFILTER_VALUES = {
   "": "Any page",
@@ -22,7 +22,6 @@ export function UrlFilterOptions({
   }))
   return (
     <Box>
-      <Text span>Filter...</Text>
       <SegmentedControl
         value={value}
         onChange={onChange}

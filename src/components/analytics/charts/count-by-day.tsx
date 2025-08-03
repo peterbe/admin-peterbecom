@@ -112,10 +112,10 @@ export function CountByDay({
       </Box>
 
       <Grid>
-        <Grid.Col span={6}>
+        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
           <IntervalOptions value={intervalDays} onChange={setIntervalDays} />
         </Grid.Col>
-        <Grid.Col span={6}>
+        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
           <UrlFilterOptions value={urlFilter} onChange={setURLField} />
         </Grid.Col>
       </Grid>

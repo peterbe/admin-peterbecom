@@ -1,4 +1,4 @@
-import { Box, SegmentedControl, Text } from "@mantine/core"
+import { Box, SegmentedControl } from "@mantine/core"
 
 export function RowsOptions({
   value,
@@ -14,7 +14,6 @@ export function RowsOptions({
   })
   return (
     <Box>
-      <Text span>Rows...</Text>
       <SegmentedControl
         value={value}
         onChange={onChange}
