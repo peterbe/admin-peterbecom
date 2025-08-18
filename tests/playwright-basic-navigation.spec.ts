@@ -19,6 +19,8 @@ test("add, find, edit blogitem", async ({ page }) => {
   await page.getByLabel("Summary").fill("This is the summary")
   await page.getByLabel("URL").click()
   await page.getByLabel("URL").fill(" https://www.peterbe.com ")
+  await page.getByLabel("Keywords").click()
+  await page.getByLabel("Keywords").fill("one\n\n two \n  ")
   await page
     .locator("div")
     .filter({ hasText: /^Categories$/ })
@@ -27,8 +29,6 @@ test("add, find, edit blogitem", async ({ page }) => {
     .click()
   await page.getByText("Hardware").click()
   await page.getByText("Software").click()
-  await page.getByLabel("Keywords").click()
-  await page.getByLabel("Keywords").fill("one\n\n two \n  ")
 
   const button = page.getByRole("button", { name: "Save" })
   const isDisabled = await button.evaluate(

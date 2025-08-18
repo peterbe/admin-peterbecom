@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
@@ -9,7 +9,8 @@
         "noDangerouslySetInnerHtml": "off"
       },
       "correctness": {
-        "noUnusedImports": "error"
+        "noUnusedImports": "error",
+        "useUniqueElementIds": "off"
       },
       "complexity": {
         "noForEach": "off"
@@ -22,9 +23,7 @@
         "useValidAnchor": "off",
         "useMediaCaption": "off"
       },
-      "nursery": {
-        "useUniqueElementIds": "off"
-      },
+      "nursery": {},
       "style": {
         "noParameterAssign": "error",
         "useAsConstAssertion": "error",
