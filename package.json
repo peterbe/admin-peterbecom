@@ -18,12 +18,12 @@
     "postinstall": "npx @biomejs/biome migrate --write"
   },
   "dependencies": {
-    "@mantine/charts": "^8.2.4",
-    "@mantine/core": "^8.2.4",
-    "@mantine/dropzone": "^8.2.4",
-    "@mantine/form": "^8.2.4",
-    "@mantine/hooks": "^8.2.4",
-    "@mantine/notifications": "^8.2.4",
+    "@mantine/charts": "^8.2.5",
+    "@mantine/core": "^8.2.5",
+    "@mantine/dropzone": "^8.2.5",
+    "@mantine/form": "^8.2.5",
+    "@mantine/hooks": "^8.2.5",
+    "@mantine/notifications": "^8.2.5",
     "@tabler/icons-react": "^3.34.1",
     "@tanstack/query-sync-storage-persister": "^5.85.3",
     "@tanstack/react-query": "^5.85.3",
