@@ -22,7 +22,7 @@ export function AddPattern() {
   const { mutate, isPending, error } = useMutation({
     mutationKey: spamPatternsQueryKey(),
     mutationFn: async (data: typeof form.values) => {
-      const url = `${API_BASE}/spam/patterns`
+      const url = `${API_BASE}/plog/spam/patterns`
       const response = await fetch(url, {
         method: "POST",
         headers: {
