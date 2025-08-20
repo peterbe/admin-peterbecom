@@ -8,7 +8,10 @@ import {
   Textarea,
 } from "@mantine/core"
 import { useDocumentTitle, useLocalStorage } from "@mantine/hooks"
+import Editor from "@monaco-editor/react"
 import { useQuery } from "@tanstack/react-query"
+import type { editor } from "monaco-editor"
+import { KeyCode, KeyMod } from "monaco-editor"
 import { useEffect, useRef, useState } from "react"
 import type { QueryResult } from "../types"
 import classes from "./query.module.css"
@@ -106,8 +109,55 @@ export function Component() {
   }
   useDocumentTitle(title)
 
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+  // useEffect(() => {
+  //   if (editorRef.current) {
+  //     editorRef.current.addCommand(KeyCode.Enter | KeyMod.CtrlCmd, () => {
+  //       // Your code to execute when Ctrl/Cmd + Enter is pressed
+  //       console.log("Ctrl/Cmd + Enter pressed!")
+  //       // You can perform actions like submitting code, running a test, etc.
+  //     })
+  //   }
+  // })
+
+  const monacoEditor = editorRef.current
+
+  if (monacoEditor) {
+    monacoEditor.addCommand(KeyCode.Enter | KeyMod.CtrlCmd, () => {
+      // Your code to execute when Ctrl/Cmd + Enter is pressed
+      console.log("Ctrl/Cmd + Enter pressed!")
+      if (!typedQuery.trim()) {
+        console.warn("No typed query yet")
+        return
+      }
+
+      if (editorRef.current) {
+        const extracted = extractActiveQuery_Monaco(typedQuery, monacoEditor)
+        console.log({ extracted })
+      }
+
+      // You can perform actions like submitting code, running a test, etc.
+    })
+  }
+
   return (
     <div>
+      <Editor
+        height="25vh"
+        // width="70vw"
+        language="sql"
+        // theme={theme.colorScheme === "dark" ? "vs-dark" : "light"}
+        defaultValue="select * from analytics order by created desc limit 20"
+        value={typedQuery}
+        onChange={(value) => {
+          if (value !== undefined) setTypedQuery(value)
+          // console.log({ VALUE: value })
+        }}
+        onMount={(editor) => {
+          editorRef.current = editor
+        }}
+      />
+
       <Textarea
         placeholder="select * from analytics order by created desc limit 20"
         label="SQL Query"
@@ -175,4 +225,35 @@ function extractActiveQuery(typedQuery: string, textarea: HTMLTextAreaElement) {
     b++
   }
   return typedQuery.substring(a, b)
+}
+
+function extractActiveQuery_Monaco(
+  typedQuery: string,
+  editor: editor.IStandaloneCodeEditor,
+) {
+  const selection = editor.getSelection()
+  if (selection) {
+    let a = selection.selectionStartLineNumber
+    let b = selection.selectionStartColumn
+    const _c = selection.getSelectionStart()
+    // let d = selection.get
+    console.log(`Selection starts at Line: ${a}, Column: ${b}`)
+    // console.log(c.lineNumber, c.column)
+    while (a) {
+      const here = typedQuery.substring(a - 2, a)
+      console.log({ here })
+      if (here === "\n\n") {
+        break
+      }
+      a--
+    }
+    while (b < typedQuery.length) {
+      const here = typedQuery.substring(b, b + 2)
+      if (here === "\n\n") {
+        break
+      }
+      b++
+    }
+    return typedQuery.substring(a, b)
+  }
 }
