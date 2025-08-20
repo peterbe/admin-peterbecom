@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   LoadingOverlay,
+  Stack,
   TextInput,
   Title,
 } from "@mantine/core"
@@ -89,35 +90,37 @@ export function AddPattern() {
           }
         })}
       >
-        <TextInput
-          label="Pattern"
-          placeholder="Pattern"
-          key={form.key("pattern")}
-          {...form.getInputProps("pattern")}
-        />
+        <Stack>
+          <TextInput
+            label="Pattern"
+            placeholder="Pattern"
+            key={form.key("pattern")}
+            {...form.getInputProps("pattern")}
+          />
 
-        <Checkbox
-          label="Regex?"
-          key={form.key("is_regex")}
-          {...form.getInputProps("is_regex")}
-        />
+          <Checkbox
+            label="Regex?"
+            key={form.key("is_regex")}
+            {...form.getInputProps("is_regex")}
+          />
 
-        <Checkbox
-          label="URL pattern?"
-          key={form.key("is_url_pattern")}
-          {...form.getInputProps("is_url_pattern")}
-        />
+          <Checkbox
+            label="URL pattern?"
+            key={form.key("is_url_pattern")}
+            {...form.getInputProps("is_url_pattern")}
+          />
 
-        <Box mt={10}>
-          <Button
-            type="submit"
-            fullWidth
-            disabled={isPending}
-            loading={isPending}
-          >
-            Save
-          </Button>
-        </Box>
+          <Box mt={10}>
+            <Button
+              type="submit"
+              fullWidth
+              disabled={isPending}
+              loading={isPending}
+            >
+              Save
+            </Button>
+          </Box>
+        </Stack>
       </form>
     </Box>
   )
