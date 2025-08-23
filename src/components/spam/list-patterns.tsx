@@ -115,13 +115,22 @@ function ExecuteButton({ id }: { id: number }) {
     },
     onSuccess: (data) => {
       const anyMatchedNotApproved = data.executions.filter(
-        (e) => e.matched && e.approved,
+        (e) => e.matched && !e.approved,
       )
       const anyMatchedApproved = data.executions.filter(
         (e) => e.matched && e.approved,
       )
       notifications.show({
-        message: `Tested ${data.limit} most recent comments and found ${anyMatchedNotApproved.length} matches on NOT approved (${anyMatchedApproved.length} matches on approved) comments.`,
+        message: (
+          <>
+            Tested {new Intl.NumberFormat("en-US").format(data.limit)} comments.
+            <br />
+            Found <b>{anyMatchedNotApproved.length}</b> match
+            {anyMatchedNotApproved.length === 1 ? "" : "es"} on <i>not</i>{" "}
+            approved comments.
+            <br />({anyMatchedApproved.length} matches on approved)
+          </>
+        ),
       })
     },
   })
