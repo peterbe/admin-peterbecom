@@ -1,5 +1,5 @@
 import { Box, Grid, Table } from "@mantine/core"
-
+import { createdRange } from "./created-range"
 import { IntervalOptions } from "./interval-options"
 import { BasicLineChart, type DataRow, type DataSerie } from "./line-chart"
 import { Loading } from "./loading"
@@ -10,7 +10,7 @@ import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useURLFilter } from "./use-url-filter"
 import { addDays } from "./utils"
 
-const sqlQuery = (type: string, days = 7, urlFilter = "") => `
+const sqlQuery = (type: string, days = 0, back = 0, urlFilter = "") => `
 SELECT
     DATE_TRUNC('day', created) AS day,
     COUNT(url) AS count
@@ -18,24 +18,8 @@ FROM
     analytics
 WHERE
     type='${type}'
-    and created > now() - interval '${days + 1} days'
+    and ${createdRange(days, back)}
     and created < DATE_TRUNC('day', now())
-    ${urlFilterToSQL(urlFilter)}
-GROUP BY
-    day
-ORDER BY
-    day;
-`
-const sqlQueryPrevious = (type: string, days = 7, urlFilter = "") => `
-SELECT
-    DATE_TRUNC('day', created) AS day,
-    COUNT(url) AS count
-FROM
-    analytics
-WHERE
-    type='${type}'
-    and created < now() - interval '${days + 1} days'
-    and created > now() - interval '${days + days + 1} days'
     ${urlFilterToSQL(urlFilter)}
 GROUP BY
     day
@@ -56,9 +40,9 @@ export function CountByDay({
   const [intervalDays, setIntervalDays] = useInterval(id)
   const [urlFilter, setURLField] = useURLFilter(id, "")
 
-  const current = useQuery(sqlQuery(type, Number(intervalDays), urlFilter))
+  const current = useQuery(sqlQuery(type, Number(intervalDays), 0, urlFilter))
   const previous = useQuery(
-    sqlQueryPrevious(type, Number(intervalDays), urlFilter),
+    sqlQuery(type, Number(intervalDays) * 2, Number(intervalDays), urlFilter),
   )
 
   const dataX: DataRow[] = []
