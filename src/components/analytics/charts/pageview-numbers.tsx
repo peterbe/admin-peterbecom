@@ -24,6 +24,15 @@ WHERE
     type='pageview'
     and ${createdRange(days, back)}
 `
+const sqlQueryRollup = (days = 0, back = 0) => `
+SELECT
+    SUM(count) AS count
+FROM
+    analyticsrollupsdaily
+WHERE
+    type='pageview'
+    and ${createdRange(days, back, "day")}
+`
 
 const sqlQueryUsers = (days = 0, back = 0) => `
 SELECT
@@ -47,13 +56,13 @@ function Inner() {
   )
 
   const today = useQuery(sqlQuery(1), { refresh: true })
-  const yesterday = useQuery(sqlQuery(2, 1))
+  const yesterday = useQuery(sqlQueryRollup(2, 1))
 
-  const thisWeek = useQuery(sqlQuery(7))
-  const lastWeek = useQuery(sqlQuery(14, 7))
+  const thisWeek = useQuery(sqlQueryRollup(7 + 1, 1))
+  const lastWeek = useQuery(sqlQueryRollup(14 + 1, 7 + 1))
 
-  const thisMonth = useQuery(sqlQuery(28))
-  const lastMonth = useQuery(sqlQuery(28 * 2, 28))
+  const thisMonth = useQuery(sqlQueryRollup(28 + 1, 1))
+  const lastMonth = useQuery(sqlQueryRollup(28 * 2 + 1, 28 + 1))
 
   const usersToday = useQuery(sqlQueryUsers(1), { refresh: true })
   const usersYesterday = useQuery(sqlQueryUsers(2, 1))
