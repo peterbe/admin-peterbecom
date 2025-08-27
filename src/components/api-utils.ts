@@ -129,9 +129,10 @@ async function standardFetch(url: string) {
 }
 
 export async function fetchAnalyticsQuery(query: string) {
-  const response = await fetch(
-    `${API_BASE}/analytics/query?${new URLSearchParams({ query })}`,
-  )
+  const response = await fetch(`${API_BASE}/analytics/query`, {
+    method: "POST",
+    body: JSON.stringify({ query }),
+  })
   if (!response.ok) {
     throw new Error(`${response.status} on ${response.url}`)
   }
