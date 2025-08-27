@@ -56,7 +56,7 @@ function Inner() {
   )
 
   const today = useQuery(sqlQuery(1), { refresh: true })
-  const yesterday = useQuery(sqlQueryRollup(2, 1))
+  const yesterday = useQuery(sqlQuery(2, 1))
 
   const thisWeek = useQuery(sqlQueryRollup(7 + 1, 1))
   const lastWeek = useQuery(sqlQueryRollup(14 + 1, 7 + 1))
