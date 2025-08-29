@@ -43,19 +43,16 @@ export default function PageviewsInner({
       return fetchAnalyticsQuery(
         `
 SELECT
-    DATE_TRUNC('${interval}', created) AS date,
-    COUNT(*) AS count
+    DATE_TRUNC('${interval}', day) AS date,
+    SUM(count) AS count
 FROM
-    analytics
+    analyticsrollupspathnamedaily
 WHERE
     type = 'pageview'
-    AND created > now() - interval '${days} days'
-    AND (data->>'pathname') = '${pathname}'
-GROUP BY
-    date
-ORDER BY
-    1 desc
-LIMIT 100
+    AND pathname = '${pathname}'
+    AND day > now() - interval '${days} days'
+GROUP BY date
+ORDER BY 1 desc
       `.trim(),
       )
     },
@@ -124,8 +121,8 @@ function Graph({ data, interval }: { data: QueryResult; interval: Interval }) {
           { offset: 80, color: "cyan.5" },
           { offset: 100, color: "blue.5" },
         ]}
-        strokeWidth={5}
-        curveType={cummulative ? "stepAfter" : "natural"}
+        strokeWidth={4}
+        curveType={cummulative ? "stepAfter" : "monotone"}
         valueFormatter={(value) => thousands(value as number)}
         withPointLabels
       />
