@@ -27,22 +27,20 @@ export function useRecentPageviews(
       const pathnamesArray = pathnames.map((p) => `'${p}'`).join(", ")
       return fetchAnalyticsQuery(
         `
-    SELECT
-        DATE_TRUNC('${interval}', created) AS date,
-        data->>'pathname' AS pathname,
-        COUNT(*) AS count
-    FROM
-        analytics
-    WHERE
-        type = 'pageview'
-        AND created > now() - interval '${days} days'
-        AND (data->>'pathname') IN (${pathnamesArray})
-    GROUP BY
-        data->>'pathname',
-        date
-    ORDER BY
-        1 desc
-    LIMIT 1000
+      SELECT
+          DATE_TRUNC('${interval}', day) AS date,
+          pathname,
+          SUM(count) AS count
+      FROM
+          analyticsrollupspathnamedaily
+      WHERE
+          type = 'pageview'
+          AND day > now() - interval '${days} days'
+          AND pathname IN (${pathnamesArray})
+      GROUP BY
+          pathname,
+          date
+      ORDER BY 1 DESC
           `.trim(),
       )
     },
