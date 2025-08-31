@@ -21,6 +21,7 @@ import {
   fetchCommentClassification,
 } from "../api-utils"
 import { DisplayDate } from "../blogitems/list-table"
+import { fixAllCaps, isAllCaps } from "./all-caps"
 import { ApprovalForm } from "./approval-form"
 import { ClassifyComment } from "./classify"
 import { DisplayClues } from "./clues"
@@ -322,6 +323,20 @@ function InnerComment({
               }}
             >
               Fix <code>&lt;br&gt;</code> breaks?
+            </Button>
+          </Box>
+        )}
+
+        {isAllCaps(form.getValues().comment) && (
+          <Box ml={leftMargin}>
+            <Button
+              variant="light"
+              onClick={() => {
+                setEditMode(true)
+                form.setFieldValue("comment", fixAllCaps(comment.comment))
+              }}
+            >
+              Fix ALL CAPS?
             </Button>
           </Box>
         )}
