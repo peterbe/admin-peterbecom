@@ -4,6 +4,7 @@ import {
   Badge,
   Box,
   Button,
+  CloseButton,
   Highlight,
   LoadingOverlay,
   Table,
@@ -40,9 +41,9 @@ export function ListTable({
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const search = searchParams.get("search") || ""
-  const [value, setValue] = useState(search)
+  // const [value, setValue] = useState(search)
 
-  function updateSearch(s: string) {
+  function _updateSearch(s: string) {
     const sp = new URLSearchParams(searchParams)
     const existing = sp.get("search")
     if (s.trim() && s !== existing) {
@@ -83,28 +84,88 @@ export function ListTable({
   const { prefetchBlogitemSoon, dontPrefetchBlogitemSoon } =
     usePrefetchBlogitem()
 
-  // const schema: Schema = {
-  //   title: { type: "string", alias: "t" },
-  //   modify_date: { type: "string" },
-  //   pub_date: { type: "string" },
-  //   // year: { type: "number", alias: "y" },
-  //   // monitored: { type: "boolean", alias: "m" },
-  //   // rating: { type: "number" },
-  //   // genre: { type: "string" },
-  // }
+  let freeFormSearch = search
 
-  // const filterql = new FilterQL({
-  //   schema,
-  //   // options: {
-  //   //   allowUnknownFields: false,
-  //   // },
-  // })
-  // console.log({ search })
+  let requireSummary: null | boolean = null
+  const summaryRegex = search.match(/\b(has|no):summary\b/i)
+  if (summaryRegex) {
+    requireSummary = summaryRegex[1].toLowerCase() === "has"
+    freeFormSearch = freeFormSearch.replace(summaryRegex[0], "").trim()
+  }
+
+  let requireArchived: null | boolean = null
+  const archivedRegex = search.match(/\b(is|not):archived\b/i)
+  if (archivedRegex) {
+    requireArchived = archivedRegex[1].toLowerCase() === "is"
+    freeFormSearch = freeFormSearch.replace(archivedRegex[0], "").trim()
+  }
+
+  let isFuture: null | boolean = null
+  const futureRegex = search.match(/\b(is|not):future\b/i)
+  if (futureRegex) {
+    isFuture = futureRegex[1].toLowerCase() === "is"
+    freeFormSearch = freeFormSearch.replace(/\b(is|not):future\b/i, "").trim()
+  }
+
+  let requirePublished: null | boolean = null
+  const publishedRegex = search.match(/\b(is|not):published\b/i)
+  if (publishedRegex) {
+    requirePublished = publishedRegex[1].toLowerCase() === "is"
+    freeFormSearch = freeFormSearch.replace(publishedRegex[0], "").trim()
+  }
+
+  const categories: string[] = []
+  const categoryRegex = /\bcat(?:egory)?:(".*?"|\S+)\b/gi
+  let m: RegExpExecArray | null = categoryRegex.exec(search)
+  while (m) {
+    let cat = m[1]
+    if (cat.startsWith('"') && cat.endsWith('"')) {
+      cat = cat.slice(1, -1)
+    }
+    categories.push(cat.replaceAll("+", " "))
+    freeFormSearch = freeFormSearch.replace(m[0], "").trim()
+    m = categoryRegex.exec(search)
+  }
+
   const orderBy = searchParams.get("orderBy") || "modify_date"
-  const searchRegex = new RegExp(`\\b${search}`, "i")
-  // const filteredBlogitems = filterql.query(data?.blogitems || [], search)
+  const searchRegex = freeFormSearch.trim()
+    ? new RegExp(`\\b${freeFormSearch.trim()}`, "i")
+    : null
+
   const filteredBlogitems = (data?.blogitems || [])
     .filter((item) => {
+      if (requireSummary !== null) {
+        if (requireSummary && !item.summary) return false
+        if (!requireSummary && item.summary) return false
+      }
+
+      if (requireArchived !== null) {
+        if (requireArchived && !item.archived) return false
+        if (!requireArchived && item.archived) return false
+      }
+
+      if (requirePublished !== null) {
+        if (requirePublished && !item._is_published) return false
+        if (!requirePublished && item._is_published) return false
+      }
+      if (categories.length > 0) {
+        if (
+          !categoryOverlap(
+            categories,
+            item.categories.map((c) => c.name),
+          )
+        ) {
+          return false
+        }
+      }
+
+      if (isFuture !== null) {
+        const pubDate = new Date(item.pub_date)
+        const now = new Date()
+        if (isFuture && pubDate <= now) return false
+        if (!isFuture && pubDate > now) return false
+      }
+
       if (searchRegex) {
         return searchRegex.test(item.title)
       }
@@ -123,171 +184,205 @@ export function ListTable({
     <Box pos="relative" style={{ minHeight: 100 }}>
       <LoadingOverlay visible={isPending} />
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          updateSearch(value.trim())
-        }}
-      >
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Title</Table.Th>
-              <Table.Th>Pageviews</Table.Th>
-              <Table.Th
-                // For long date displays like "about 2 months ago"
-                style={!matchesMobile ? { minWidth: 170 } : undefined}
-              >
-                {orderBy === "pub_date" && (
-                  <Link to={addQueryString({ orderBy: "modify_date" })}>
-                    Published
-                  </Link>
-                )}
-                {orderBy === "modify_date" && (
-                  <Link to={addQueryString({ orderBy: "pub_date" })}>
-                    Modified
-                  </Link>
-                )}
-              </Table.Th>
-            </Table.Tr>
-            <Table.Tr>
-              <Table.Td colSpan={2}>
-                <TextInput
-                  placeholder="Search"
-                  aria-label="Search"
-                  value={value}
-                  onChange={(event) => setValue(event.currentTarget.value)}
-                  radius="xl"
-                  rightSection={<IconSearch />}
-                  disabled={isPending}
-                />
-              </Table.Td>
-              <Table.Th>
-                {search && (
-                  <Button
-                    onClick={() => {
-                      setValue("")
-                      updateSearch("")
-                    }}
-                  >
-                    Clear
-                  </Button>
-                )}
+      <Table>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Title</Table.Th>
+            <Table.Th>Pageviews</Table.Th>
+            <Table.Th
+              // For long date displays like "about 2 months ago"
+              style={!matchesMobile ? { minWidth: 170 } : undefined}
+            >
+              {orderBy === "pub_date" && (
+                <Link to={addQueryString({ orderBy: "modify_date" })}>
+                  Published
+                </Link>
+              )}
+              {orderBy === "modify_date" && (
+                <Link to={addQueryString({ orderBy: "pub_date" })}>
+                  Modified
+                </Link>
+              )}
+            </Table.Th>
+          </Table.Tr>
+          <Table.Tr>
+            <Table.Td colSpan={2}>
+              <SearchInput disabled={isPending} key={search} />
+            </Table.Td>
+            <Table.Th>
+              {/* {search && (
                 <Button
-                  variant="default"
-                  onClick={() => setShowTips((p) => !p)}
+                  onClick={() => {
+                    // setValue("")
+                    updateSearch("")
+                  }}
                 >
-                  Search tips
+                  Clear
                 </Button>
-              </Table.Th>
+              )} */}
+              <Button variant="default" onClick={() => setShowTips((p) => !p)}>
+                Search tips
+              </Button>
+            </Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        {showTips && (
+          <Table.Tbody>
+            <Table.Tr>
+              <Table.Td colSpan={3}>
+                <SearchTips
+                  append={(s: string) => {
+                    console.warn("Not implemented", { s })
+                    // setValue((v) => {
+                    //   if (v.includes(s)) return v.replace(s, "").trim()
+                    //   return `${v} ${s}`.trim()
+                    // })
+                  }}
+                />
+                <Button onClick={() => setShowTips(false)}>Close</Button>
+              </Table.Td>
             </Table.Tr>
-          </Table.Thead>
-          {showTips && (
-            <Table.Tbody>
-              <Table.Tr>
-                <Table.Td colSpan={3}>
-                  <SearchTips
-                    append={(s: string) => {
-                      setValue((v) => {
-                        if (v.includes(s)) return v.replace(s, "").trim()
-                        return `${v} ${s}`.trim()
-                      })
-                    }}
-                  />
-                  <Button onClick={() => setShowTips(false)}>Close</Button>
-                </Table.Td>
-              </Table.Tr>
-            </Table.Tbody>
-          )}
-          {data && (
-            <Table.Tbody>
-              {filteredBlogitems.slice(0, paginationSize).map((item) => (
-                <Table.Tr key={item.id}>
-                  <Table.Td>
-                    <Link
-                      to={`/plog/${item.oid}`}
-                      onMouseOver={() => prefetchBlogitemSoon(item.oid)}
-                      onMouseOut={() => dontPrefetchBlogitemSoon(item.oid)}
+          </Table.Tbody>
+        )}
+        {data && (
+          <Table.Tbody>
+            {filteredBlogitems.slice(0, paginationSize).map((item) => (
+              <Table.Tr key={item.id}>
+                <Table.Td>
+                  <Link
+                    to={`/plog/${item.oid}`}
+                    onMouseOver={() => prefetchBlogitemSoon(item.oid)}
+                    onMouseOut={() => dontPrefetchBlogitemSoon(item.oid)}
+                  >
+                    {search ? (
+                      <Highlight highlight={freeFormSearch} component="span">
+                        {item.title}
+                      </Highlight>
+                    ) : (
+                      item.title
+                    )}
+                  </Link>
+
+                  {item.categories.map((category) => (
+                    <Badge
+                      key={category.id}
+                      variant="light"
+                      color="gray"
+                      ml={5}
+                      style={{ textTransform: "none", pointer: "cursor" }}
+                      onClick={() => {
+                        toggleCategory(category.name)
+                      }}
                     >
-                      {search ? (
-                        <Highlight highlight={search} component="span">
-                          {item.title}
-                        </Highlight>
-                      ) : (
-                        item.title
-                      )}
-                    </Link>
+                      {category.name}
+                    </Badge>
+                  ))}
 
-                    {item.categories.map((category) => (
-                      <Badge
-                        key={category.id}
-                        variant="light"
-                        color="gray"
-                        ml={5}
-                        style={{ textTransform: "none", pointer: "cursor" }}
-                        onClick={() => {
-                          toggleCategory(category.name)
-                        }}
-                      >
-                        {category.name}
-                      </Badge>
-                    ))}
+                  {!item.summary && (
+                    <CustomBadge
+                      variant="default"
+                      ml={15}
+                      style={{ textTransform: "none" }}
+                    >
+                      No summary
+                    </CustomBadge>
+                  )}
 
-                    {!item.summary && (
-                      <CustomBadge
-                        variant="default"
-                        ml={15}
-                        style={{ textTransform: "none" }}
-                      >
-                        No summary
-                      </CustomBadge>
-                    )}
+                  {item.archived && (
+                    <CustomBadge color="red">Archived</CustomBadge>
+                  )}
 
-                    {item.archived && (
-                      <CustomBadge color="red">Archived</CustomBadge>
-                    )}
-                    {!item.has_split && (
-                      <CustomBadge color="yellow">No split</CustomBadge>
-                    )}
-
-                    {!item._is_published ? (
-                      <CustomBadge color="orange">
-                        Published{" "}
-                        <DisplayDate
-                          date={item.pub_date}
-                          compact={matchesMobile}
-                        />
-                      </CustomBadge>
-                    ) : null}
-                  </Table.Td>
-                  <Table.Td>
-                    {/* {(pageviews.get(item.oid) || []).length > 0 ? (
+                  {!item._is_published ? (
+                    <CustomBadge color="orange">
+                      Published{" "}
+                      <DisplayDate
+                        date={item.pub_date}
+                        compact={matchesMobile}
+                      />
+                    </CustomBadge>
+                  ) : null}
+                </Table.Td>
+                <Table.Td>
+                  {/* {(pageviews.get(item.oid) || []).length > 0 ? (
                       <Pageviews
                         dates={pageviews.get(item.oid) as PageviewsByDate[]}
                       />
                     ) : (
                       <Loader color="blue" size="xs" type="dots" />
                     )} */}
-                  </Table.Td>
-                  <Table.Td>
-                    <DisplayDate
-                      date={
-                        orderBy === "pub_date"
-                          ? item.pub_date
-                          : item.modify_date
-                      }
-                      compact={matchesMobile}
-                    />
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          )}
-        </Table>
+                </Table.Td>
+                <Table.Td>
+                  <DisplayDate
+                    date={
+                      orderBy === "pub_date" ? item.pub_date : item.modify_date
+                    }
+                    compact={matchesMobile}
+                  />
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        )}
+      </Table>
 
-        {data && data.blogitems.length === 0 && <Alert>No items found</Alert>}
-      </form>
+      {data && data.blogitems.length === 0 && <Alert>No items found</Alert>}
     </Box>
+  )
+}
+
+function categoryOverlap(searchCategories: string[], itemCategories: string[]) {
+  for (const cat of searchCategories) {
+    for (const itemCat of itemCategories) {
+      if (itemCat.toLowerCase().startsWith(cat.toLowerCase())) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+function SearchInput({ disabled }: { disabled: boolean }) {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const search = searchParams.get("search") || ""
+  const [value, setValue] = useState(search)
+  function updateSearch(s: string) {
+    const sp = new URLSearchParams(searchParams)
+    const existing = sp.get("search")
+    if (s.trim() && s !== existing) {
+      sp.set("search", s)
+    } else {
+      sp.delete("search")
+    }
+    setSearchParams(sp)
+  }
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        updateSearch(value.trim())
+      }}
+    >
+      <TextInput
+        placeholder="Search"
+        aria-label="Search"
+        value={value}
+        onChange={(event) => setValue(event.currentTarget.value)}
+        radius="xl"
+        // rightSection={<IconSearch />}
+        disabled={disabled}
+        rightSection={
+          search ? (
+            <CloseButton
+              aria-label="Clear input"
+              onClick={() => updateSearch("")}
+              // style={{ display: value ? undefined : "none" }}
+            />
+          ) : (
+            <IconSearch />
+          )
+        }
+      />
+    </form>
   )
 }
 

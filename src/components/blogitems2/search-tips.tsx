@@ -7,14 +7,15 @@ export function SearchTips({ append }: Props) {
   const tips = [
     ["has:summary", "Exclusively those that have a non-empty summary"],
     ["no:summary", "Exclusively those that have no summary"],
-    ["has:split", "Those that contain a <!--split-->"],
-    ["no:split", "Those that have no <!--split-->"],
     ["is:archived", "Those that are archived"],
     ["is:future", "Those whose publish date is in the future"],
     ["is:published", "Those whose publish date is in the past"],
-    ["is:unpublished", "Those whose publish date is in the future"],
-    ["cat:foo", "Those that belong to category 'foo'"],
-    ["category:foo", "Those that belong to category 'foo'"],
+    ["not:published", "Those whose publish date is in the future"],
+    ["cat:foo", "Those that belong to category 'Foo'"],
+    [
+      "category:web+performance",
+      "Those that belong to category 'Web Performance'",
+    ],
   ]
   return (
     <Table>
