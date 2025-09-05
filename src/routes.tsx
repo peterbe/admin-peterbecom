@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router"
 import Blogitem from "./components/blogitem"
 import Blogitems from "./components/blogitems"
-import Blogitems2 from "./components/blogitems2"
 import Comments from "./components/comments"
 import ErrorPage from "./components/error-page"
 import { Home } from "./components/home"
@@ -46,7 +45,6 @@ export const router = createBrowserRouter([
                 ],
               },
               { index: true, element: <Blogitems /> },
-              { path: "2", element: <Blogitems2 /> },
               { path: "add", element: <Blogitem /> },
               { path: "comments", element: <Comments /> },
               {

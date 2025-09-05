@@ -4,7 +4,7 @@ import { SignedIn } from "../signed-in"
 import { List } from "./list"
 
 export default function Blogitems() {
-  useDocumentTitle("Blogitems2")
+  useDocumentTitle("Blogitems")
 
   return (
     <SignedIn>
