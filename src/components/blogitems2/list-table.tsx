@@ -6,6 +6,7 @@ import {
   Button,
   CloseButton,
   Highlight,
+  Loader,
   LoadingOverlay,
   Table,
   TextInput,
@@ -21,29 +22,21 @@ import { usePrefetchBlogitem } from "../api-utils"
 import { formatDistanceCompact } from "./format-distance-compact"
 import { SearchTips } from "./search-tips"
 import type { PageviewsByDate } from "./types"
+import { useRecentPageviews } from "./use-pageviews"
 
 export function ListTable({
-  // search,
-  // orderBy,
   data,
-  // updateSearch,
   isPending,
-  // pageviews,
   paginationSize,
 }: {
-  // search: string
-  // orderBy: string
   data: BlogitemsServerData | undefined
-  // updateSearch: (s: string) => void
   isPending: boolean
-  // pageviews: PageviewsByOID
   paginationSize: number
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const search = searchParams.get("search") || ""
-  // const [value, setValue] = useState(search)
 
-  function _updateSearch(s: string) {
+  function updateSearch(s: string) {
     const sp = new URLSearchParams(searchParams)
     const existing = sp.get("search")
     if (s.trim() && s !== existing) {
@@ -55,18 +48,15 @@ export function ListTable({
   }
 
   function toggleCategory(name: string) {
-    console.log("TOGGLE CATEGORY", name)
-    //   const newSearch = /\s/.test(name)
-    //     ? `category:"${name}"`
-    //     : `category:${name}`
+    const newSearch = /\s/.test(name)
+      ? `category:"${name}"`
+      : `category:${name}`
 
-    //   if (search.includes(newSearch)) {
-    //     setValue((v) => v.replace(newSearch, ""))
-    //     updateSearch(search.replace(newSearch, ""))
-    //   } else {
-    //     setValue((v) => `${v} ${newSearch}`.trim())
-    //     updateSearch(`${search} ${newSearch}`.trim())
-    //   }
+    if (search.includes(newSearch)) {
+      updateSearch(search.replace(newSearch, ""))
+    } else {
+      updateSearch(`${search} ${newSearch}`.trim())
+    }
   }
 
   function addQueryString(params: Record<string, string>) {
@@ -115,14 +105,11 @@ export function ListTable({
   }
 
   const categories: string[] = []
-  const categoryRegex = /\bcat(?:egory)?:(".*?"|\S+)\b/gi
+  const categoryRegex = /\bcat(?:egory)?:(?:"([^"]*)"|(\S+))/g
   let m: RegExpExecArray | null = categoryRegex.exec(search)
+
   while (m) {
-    let cat = m[1]
-    if (cat.startsWith('"') && cat.endsWith('"')) {
-      cat = cat.slice(1, -1)
-    }
-    categories.push(cat.replaceAll("+", " "))
+    categories.push(m[1] || m[2])
     freeFormSearch = freeFormSearch.replace(m[0], "").trim()
     m = categoryRegex.exec(search)
   }
@@ -172,13 +159,21 @@ export function ListTable({
       return true
     })
     .toSorted((a, b) => {
-      if (orderBy === "pub_date") {
-        return new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()
+      const reverse = orderBy.startsWith("-") ? -1 : 1
+      if (orderBy.endsWith("pub_date")) {
+        return (
+          (new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()) *
+          reverse
+        )
       }
       return (
-        new Date(b.modify_date).getTime() - new Date(a.modify_date).getTime()
+        (new Date(b.modify_date).getTime() -
+          new Date(a.modify_date).getTime()) *
+        reverse
       )
     })
+
+  const pageviews = useRecentPageviews(filteredBlogitems)
 
   return (
     <Box pos="relative" style={{ minHeight: 100 }}>
@@ -193,16 +188,25 @@ export function ListTable({
               // For long date displays like "about 2 months ago"
               style={!matchesMobile ? { minWidth: 170 } : undefined}
             >
-              {orderBy === "pub_date" && (
+              {orderBy.endsWith("pub_date") && (
                 <Link to={addQueryString({ orderBy: "modify_date" })}>
                   Published
                 </Link>
               )}
-              {orderBy === "modify_date" && (
+              {orderBy.endsWith("modify_date") && (
                 <Link to={addQueryString({ orderBy: "pub_date" })}>
                   Modified
                 </Link>
-              )}
+              )}{" "}
+              <Link
+                to={addQueryString({
+                  orderBy: orderBy.startsWith("-")
+                    ? orderBy.slice(1)
+                    : `-${orderBy}`,
+                })}
+              >
+                {orderBy.startsWith("-") ? "▼" : "▲"}
+              </Link>
             </Table.Th>
           </Table.Tr>
           <Table.Tr>
@@ -210,16 +214,6 @@ export function ListTable({
               <SearchInput disabled={isPending} key={search} />
             </Table.Td>
             <Table.Th>
-              {/* {search && (
-                <Button
-                  onClick={() => {
-                    // setValue("")
-                    updateSearch("")
-                  }}
-                >
-                  Clear
-                </Button>
-              )} */}
               <Button variant="default" onClick={() => setShowTips((p) => !p)}>
                 Search tips
               </Button>
@@ -233,10 +227,11 @@ export function ListTable({
                 <SearchTips
                   append={(s: string) => {
                     console.warn("Not implemented", { s })
-                    // setValue((v) => {
-                    //   if (v.includes(s)) return v.replace(s, "").trim()
-                    //   return `${v} ${s}`.trim()
-                    // })
+                    if (search.includes(s)) {
+                      updateSearch(search.replace(s, ""))
+                    } else {
+                      updateSearch(`${search} ${s}`.trim())
+                    }
                   }}
                 />
                 <Button onClick={() => setShowTips(false)}>Close</Button>
@@ -303,18 +298,20 @@ export function ListTable({
                   ) : null}
                 </Table.Td>
                 <Table.Td>
-                  {/* {(pageviews.get(item.oid) || []).length > 0 ? (
-                      <Pageviews
-                        dates={pageviews.get(item.oid) as PageviewsByDate[]}
-                      />
-                    ) : (
-                      <Loader color="blue" size="xs" type="dots" />
-                    )} */}
+                  {(pageviews.get(item.oid) || []).length > 0 ? (
+                    <Pageviews
+                      dates={pageviews.get(item.oid) as PageviewsByDate[]}
+                    />
+                  ) : (
+                    <Loader color="blue" size="xs" type="dots" />
+                  )}
                 </Table.Td>
                 <Table.Td>
                   <DisplayDate
                     date={
-                      orderBy === "pub_date" ? item.pub_date : item.modify_date
+                      orderBy.endsWith("pub_date")
+                        ? item.pub_date
+                        : item.modify_date
                     }
                     compact={matchesMobile}
                   />
@@ -368,14 +365,12 @@ function SearchInput({ disabled }: { disabled: boolean }) {
         value={value}
         onChange={(event) => setValue(event.currentTarget.value)}
         radius="xl"
-        // rightSection={<IconSearch />}
         disabled={disabled}
         rightSection={
           search ? (
             <CloseButton
               aria-label="Clear input"
               onClick={() => updateSearch("")}
-              // style={{ display: value ? undefined : "none" }}
             />
           ) : (
             <IconSearch />
@@ -416,7 +411,7 @@ export function DisplayDate({
   )
 }
 
-function _Pageviews({ dates }: { dates: PageviewsByDate[] }) {
+function Pageviews({ dates }: { dates: PageviewsByDate[] }) {
   if (dates.length === 0) {
     return <span style={{ color: "gray" }}>n/a</span>
   }

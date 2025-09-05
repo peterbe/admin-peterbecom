@@ -24,7 +24,9 @@ export function useRecentPageviews(
       if (pathnames.length === 0) {
         return null
       }
-      const pathnamesArray = pathnames.map((p) => `'${p}'`).join(", ")
+      const pathnamesArray = pathnames
+        .map((p) => `'${p.replaceAll("'", "''")}'`)
+        .join(", ")
       return fetchAnalyticsQuery(
         `
       SELECT
