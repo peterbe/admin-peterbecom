@@ -78,39 +78,79 @@ export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
   return HttpResponse.json({ blogitem })
 }
 
-export const BLOGITEMS = (params: URLSearchParams) => {
-  const showAll = params.get("show") === "all"
-  if (showAll) {
-    const blogitems = Object.values(getBlogitems()).map((item) => {
+// export const BLOGITEMS = (params: URLSearchParams) => {
+export const BLOGITEMS = () => {
+  throw new Error("Use ALL_BLOGITEMS instead")
+  // const showAll = params.get("show") === "all"
+  // if (showAll) {
+  //   const blogitems = Object.values(getBlogitems()).map((item) => {
+  //     return {
+  //       id: item.id,
+  //       oid: item.oid,
+  //       title: item.title,
+  //     }
+  //   })
+  //   return HttpResponse.json({
+  //     blogitems,
+  //   })
+  // }
+  // const filtered = Object.values(getBlogitems()).filter((item) => {
+  //   return (
+  //     !params.get("search") ||
+  //     item.title
+  //       .toLowerCase()
+  //       .includes((params.get("search") as string).toLowerCase())
+  //   )
+  // })
+  // if (params.get("order") === "modify_date") {
+  //   filtered.sort((a, b) => {
+  //     return b.modify_date.localeCompare(a.modify_date)
+  //   })
+  // } else if (params.get("order") === "pub_date") {
+  //   filtered.sort((a, b) => {
+  //     return b.pub_date.localeCompare(a.pub_date)
+  //   })
+  // }
+
+  // return HttpResponse.json({
+  //   blogitems: filtered,
+  // })
+}
+
+export const ALL_BLOGITEMS = (params: URLSearchParams) => {
+  const minimalFields = params.get("minimal_fields") === "true"
+
+  const blogitems = Object.values(getBlogitems()).map((item) => {
+    if (minimalFields) {
       return {
         id: item.id,
         oid: item.oid,
         title: item.title,
       }
-    })
-    return HttpResponse.json({
-      blogitems,
-    })
-  }
-  const filtered = Object.values(getBlogitems()).filter((item) => {
-    return (
-      !params.get("search") ||
-      item.title
-        .toLowerCase()
-        .includes((params.get("search") as string).toLowerCase())
-    )
+    }
+    return item
   })
-  if (params.get("order") === "modify_date") {
-    filtered.sort((a, b) => {
-      return b.modify_date.localeCompare(a.modify_date)
-    })
-  } else if (params.get("order") === "pub_date") {
-    filtered.sort((a, b) => {
-      return b.pub_date.localeCompare(a.pub_date)
-    })
-  }
+  // const filtered = Object.values(getBlogitems()).filter((item) => {
+  //   return (
+  //     !params.get("search") ||
+  //     item.title
+  //       .toLowerCase()
+  //       .includes((params.get("search") as string).toLowerCase())
+  //   )
+  // })
+  // if (params.get("order") === "modify_date") {
+  //   filtered.sort((a, b) => {
+  //     return b.modify_date.localeCompare(a.modify_date)
+  //   })
+  // } else if (params.get("order") === "pub_date") {
+  //   filtered.sort((a, b) => {
+  //     return b.pub_date.localeCompare(a.pub_date)
+  //   })
+  // }
+
+  console.log("RETURNING", blogitems)
 
   return HttpResponse.json({
-    blogitems: filtered,
+    blogitems,
   })
 }
