@@ -8,6 +8,7 @@ import { BotAgentRequests } from "./bot-agent-requests"
 import { GeoLocations } from "./geo-locations"
 import { LogoEvents } from "./logo-events"
 import { LyricsFeatureflag } from "./lyrics-featureflag"
+import { LyricsPages } from "./lyrics-pages"
 import { MinimizeContext } from "./minimize-context"
 import { PageviewEvents } from "./pageview-events"
 import { PageviewNumbers } from "./pageview-numbers"
@@ -44,6 +45,7 @@ export function Component() {
             <PublicAPIPageviewsDurations />
             <LogoEvents />
             <UserAgents />
+            <LyricsPages />
             <BotAgentRequests />
             <RequestsPerDay />
             <RequestsVaryingQuerystring />
