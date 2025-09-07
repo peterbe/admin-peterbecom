@@ -15,34 +15,76 @@ export function PageviewNumbers() {
   )
 }
 
-const sqlQuery = (days = 0, back = 0) => `
+const sqlQueryUnion = (
+  days: number,
+  back: number,
+  days2: number,
+  back2: number,
+) =>
+  `
 SELECT
+    1 AS sort,
     count(url) AS count
 FROM
     analytics
 WHERE
     type='pageview'
     and ${createdRange(days, back)}
-`
-const sqlQueryRollup = (days = 0, back = 0) => `
+UNION
 SELECT
+    2 AS sort,
+    count(url) AS count
+FROM
+    analytics
+WHERE
+    type='pageview'
+    and ${createdRange(days2, back2)}
+ORDER BY sort
+`.trim()
+
+const sqlQueryRollupUnion = (days = 0, back = 0, days2 = 0, back2 = 0) =>
+  `
+SELECT
+    1 AS sort,
     SUM(count) AS count
 FROM
     analyticsrollupsdaily
 WHERE
     type='pageview'
     and ${createdRange(days, back, "day")}
-`
-
-const sqlQueryUsers = (days = 0, back = 0) => `
+UNION
 SELECT
+    2 AS sort,
+    SUM(count) AS count
+FROM
+    analyticsrollupsdaily
+WHERE
+    type='pageview'
+    and ${createdRange(days2, back2, "day")}
+ORDER BY sort
+`.trim()
+
+const sqlQueryUsersUnion = (days = 0, back = 0, days2 = 0, back2 = 0) =>
+  `
+SELECT
+    1 AS sort,
     COUNT(DISTINCT meta->'sid') as sessions,
     COUNT(DISTINCT meta->'uuid') as users
 FROM analytics
 WHERE
   type='pageview'
   and ${createdRange(days, back)}
-`
+UNION
+SELECT
+    2 AS sort,
+    COUNT(DISTINCT meta->'sid') as sessions,
+    COUNT(DISTINCT meta->'uuid') as users
+FROM analytics
+WHERE
+  type='pageview'
+  and ${createdRange(days2, back2)}
+ORDER BY sort
+`.trim()
 
 function Inner() {
   const useQuery = (sql: string, options?: QueryOptions) =>
@@ -55,24 +97,20 @@ function Inner() {
     (Date.now() - new Date(oldestCreated).getTime()) / (1000 * 60 * 60 * 24),
   )
 
-  const today = useQuery(sqlQuery(1), { refresh: true })
-  const yesterday = useQuery(sqlQuery(2, 1))
+  const today = useQuery(sqlQueryUnion(1, 0, 2, 1), { refresh: true })
 
-  const thisWeek = useQuery(sqlQueryRollup(7 + 1, 1))
-  const lastWeek = useQuery(sqlQueryRollup(14 + 1, 7 + 1))
+  const thisWeek = useQuery(sqlQueryRollupUnion(7 + 1, 1, 14 + 1, 7 + 1))
 
-  const thisMonth = useQuery(sqlQueryRollup(28 + 1, 1))
-  const lastMonth = useQuery(sqlQueryRollup(28 * 2 + 1, 28 + 1))
+  const thisMonth = useQuery(sqlQueryRollupUnion(28 + 1, 1, 28 * 2 + 1, 28 + 1))
 
-  const usersToday = useQuery(sqlQueryUsers(1), { refresh: true })
-  const usersYesterday = useQuery(sqlQueryUsers(2, 1))
+  const usersToday = useQuery(sqlQueryUsersUnion(1, 0, 2, 1), { refresh: true })
 
   return (
     <Box pos="relative" mt={25} mb={50} style={{ minHeight: 260 }}>
-      <Loading visible={today.isLoading && yesterday.isLoading} />
+      <Loading visible={today.isLoading} />
 
       <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} mb={10}>
-        {today.data && yesterday.data && (
+        {today.data && (
           <GridItem
             value={today.data.rows[0]?.count as number}
             title="Pageviews today"
@@ -80,12 +118,12 @@ function Inner() {
             isFetching={today.isFetching}
             diffPercentage={
               (100 * (today.data.rows[0]?.count as number)) /
-                (yesterday.data.rows[0]?.count as number) -
+                (today.data.rows[1]?.count as number) -
               100
             }
           />
         )}
-        {thisWeek.data && lastWeek.data && (
+        {thisWeek.data && (
           <GridItem
             value={thisWeek.data.rows[0]?.count as number}
             title="Pageviews this week"
@@ -93,21 +131,21 @@ function Inner() {
             isFetching={thisWeek.isFetching}
             diffPercentage={
               (100 * (thisWeek.data.rows[0]?.count as number)) /
-                (lastWeek.data.rows[0]?.count as number) -
+                (thisWeek.data.rows[1]?.count as number) -
               100
             }
           />
         )}
-        {thisMonth.data && lastMonth.data && (
+        {thisMonth.data && (
           <GridItem
             value={thisMonth.data.rows[0]?.count as number}
             title="Pageviews this month"
             note="Last 28 days"
             isFetching={thisMonth.isFetching}
             diffPercentage={
-              lastMonth.data.rows[0]?.count && oldestDays > 28 * 2
+              thisMonth.data.rows[0]?.count && oldestDays > 28 * 2
                 ? (100 * (thisMonth.data.rows[0]?.count as number)) /
-                    (lastMonth.data.rows[0]?.count as number) -
+                    (thisMonth.data.rows[1]?.count as number) -
                   100
                 : undefined
             }
@@ -115,28 +153,28 @@ function Inner() {
         )}
       </SimpleGrid>
       <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }}>
-        {usersToday.data && usersYesterday.data && (
+        {usersToday.data && (
           <GridItem
             value={usersToday.data.rows[0]?.users as number}
             title="Users today"
             note="Last 24 hours"
-            isFetching={usersToday.isFetching || usersYesterday.isFetching}
+            isFetching={usersToday.isFetching}
             diffPercentage={
               (100 * (usersToday.data.rows[0]?.users as number)) /
-                (usersYesterday.data.rows[0]?.users as number) -
+                (usersToday.data.rows[1]?.users as number) -
               100
             }
           />
         )}
-        {usersToday.data && usersYesterday.data && (
+        {usersToday.data && (
           <GridItem
             value={usersToday.data.rows[0]?.sessions as number}
             title="Sessions today"
             note="Last 24 hours"
-            isFetching={usersToday.isFetching || usersYesterday.isFetching}
+            isFetching={usersToday.isFetching}
             diffPercentage={
               (100 * (usersToday.data.rows[0]?.sessions as number)) /
-                (usersYesterday.data.rows[0]?.sessions as number) -
+                (usersToday.data.rows[1]?.sessions as number) -
               100
             }
           />
