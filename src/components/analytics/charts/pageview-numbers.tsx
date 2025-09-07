@@ -15,7 +15,7 @@ export function PageviewNumbers() {
   )
 }
 
-const sqlQuery = (days = 0, back = 0) => `
+const _sqlQuery = (days = 0, back = 0) => `
 SELECT
     count(url) AS count
 FROM
@@ -24,6 +24,29 @@ WHERE
     type='pageview'
     and ${createdRange(days, back)}
 `
+const sqlQueryUnion = (
+  days: number,
+  back: number,
+  days2: number,
+  back2: number,
+) => `
+SELECT
+    count(url) AS count
+FROM
+    analytics
+WHERE
+    type='pageview'
+    and ${createdRange(days, back)}
+UNION
+SELECT
+    count(url) AS count
+FROM
+    analytics
+WHERE
+    type='pageview'
+    and ${createdRange(days2, back2)}
+`
+
 const sqlQueryRollup = (days = 0, back = 0) => `
 SELECT
     SUM(count) AS count
@@ -32,6 +55,25 @@ FROM
 WHERE
     type='pageview'
     and ${createdRange(days, back, "day")}
+`
+
+const sqlQueryRollupUnion = (days = 0, back = 0, days2 = 0, back2 = 0) => `
+SELECT
+    SUM(count) AS count
+FROM
+    analyticsrollupsdaily
+WHERE
+    type='pageview'
+    and ${createdRange(days, back, "day")}
+UNION
+SELECT
+    SUM(count) AS count
+FROM
+    analyticsrollupsdaily
+WHERE
+    type='pageview'
+    and ${createdRange(days2, back2, "day")}
+
 `
 
 const sqlQueryUsers = (days = 0, back = 0) => `
@@ -55,11 +97,13 @@ function Inner() {
     (Date.now() - new Date(oldestCreated).getTime()) / (1000 * 60 * 60 * 24),
   )
 
-  const today = useQuery(sqlQuery(1), { refresh: true })
-  const yesterday = useQuery(sqlQuery(2, 1))
+  const today = useQuery(sqlQueryUnion(1, 0, 2, 1), { refresh: true })
 
-  const thisWeek = useQuery(sqlQueryRollup(7 + 1, 1))
+  const thisWeek0 = useQuery(sqlQueryRollup(7 + 1, 1))
   const lastWeek = useQuery(sqlQueryRollup(14 + 1, 7 + 1))
+  const thisWeek = useQuery(sqlQueryRollupUnion(7 + 1, 1, 14 + 1, 7 + 1))
+  console.log("OLD", thisWeek0.data?.rows, lastWeek.data?.rows)
+  console.log("NEW", thisWeek.data?.rows)
 
   const thisMonth = useQuery(sqlQueryRollup(28 + 1, 1))
   const lastMonth = useQuery(sqlQueryRollup(28 * 2 + 1, 28 + 1))
@@ -69,10 +113,10 @@ function Inner() {
 
   return (
     <Box pos="relative" mt={25} mb={50} style={{ minHeight: 260 }}>
-      <Loading visible={today.isLoading && yesterday.isLoading} />
+      <Loading visible={today.isLoading} />
 
       <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} mb={10}>
-        {today.data && yesterday.data && (
+        {today.data && (
           <GridItem
             value={today.data.rows[0]?.count as number}
             title="Pageviews today"
@@ -80,12 +124,12 @@ function Inner() {
             isFetching={today.isFetching}
             diffPercentage={
               (100 * (today.data.rows[0]?.count as number)) /
-                (yesterday.data.rows[0]?.count as number) -
+                (today.data.rows[1]?.count as number) -
               100
             }
           />
         )}
-        {thisWeek.data && lastWeek.data && (
+        {thisWeek.data && (
           <GridItem
             value={thisWeek.data.rows[0]?.count as number}
             title="Pageviews this week"
@@ -93,7 +137,7 @@ function Inner() {
             isFetching={thisWeek.isFetching}
             diffPercentage={
               (100 * (thisWeek.data.rows[0]?.count as number)) /
-                (lastWeek.data.rows[0]?.count as number) -
+                (thisWeek.data.rows[1]?.count as number) -
               100
             }
           />
