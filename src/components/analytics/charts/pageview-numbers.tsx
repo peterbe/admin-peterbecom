@@ -15,21 +15,22 @@ export function PageviewNumbers() {
   )
 }
 
-const _sqlQuery = (days = 0, back = 0) => `
-SELECT
-    count(url) AS count
-FROM
-    analytics
-WHERE
-    type='pageview'
-    and ${createdRange(days, back)}
-`
+// const _sqlQuery = (days = 0, back = 0) => `
+// SELECT
+//     count(url) AS count
+// FROM
+//     analytics
+// WHERE
+//     type='pageview'
+//     and ${createdRange(days, back)}
+// `
 const sqlQueryUnion = (
   days: number,
   back: number,
   days2: number,
   back2: number,
-) => `
+) =>
+  `
 SELECT
     count(url) AS count
 FROM
@@ -45,9 +46,10 @@ FROM
 WHERE
     type='pageview'
     and ${createdRange(days2, back2)}
-`
+`.trim()
 
-const sqlQueryRollup = (days = 0, back = 0) => `
+const sqlQueryRollup = (days = 0, back = 0) =>
+  `
 SELECT
     SUM(count) AS count
 FROM
@@ -55,9 +57,10 @@ FROM
 WHERE
     type='pageview'
     and ${createdRange(days, back, "day")}
-`
+`.trim()
 
-const sqlQueryRollupUnion = (days = 0, back = 0, days2 = 0, back2 = 0) => `
+const sqlQueryRollupUnion = (days = 0, back = 0, days2 = 0, back2 = 0) =>
+  `
 SELECT
     SUM(count) AS count
 FROM
@@ -74,9 +77,10 @@ WHERE
     type='pageview'
     and ${createdRange(days2, back2, "day")}
 
-`
+`.trim()
 
-const sqlQueryUsers = (days = 0, back = 0) => `
+const sqlQueryUsers = (days = 0, back = 0) =>
+  `
 SELECT
     COUNT(DISTINCT meta->'sid') as sessions,
     COUNT(DISTINCT meta->'uuid') as users
@@ -84,7 +88,7 @@ FROM analytics
 WHERE
   type='pageview'
   and ${createdRange(days, back)}
-`
+`.trim()
 
 function Inner() {
   const useQuery = (sql: string, options?: QueryOptions) =>
@@ -102,6 +106,7 @@ function Inner() {
   const thisWeek0 = useQuery(sqlQueryRollup(7 + 1, 1))
   const lastWeek = useQuery(sqlQueryRollup(14 + 1, 7 + 1))
   const thisWeek = useQuery(sqlQueryRollupUnion(7 + 1, 1, 14 + 1, 7 + 1))
+  console.log(sqlQueryRollupUnion(7 + 1, 1, 14 + 1, 7 + 1))
   console.log("OLD", thisWeek0.data?.rows, lastWeek.data?.rows)
   console.log("NEW", thisWeek.data?.rows)
 
