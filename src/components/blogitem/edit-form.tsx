@@ -199,6 +199,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
       })
       queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() })
       queryClient.invalidateQueries({ queryKey: blogitemsShowAllQueryKey() })
+      queryClient.invalidateQueries({ queryKey: ["blogitems-all"] })
     },
   })
 
