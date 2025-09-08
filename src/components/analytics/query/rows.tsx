@@ -15,11 +15,12 @@ export const Rows = memo(function Rows({ data }: { data: QueryResultRow[] }) {
   const prefix = keys.join("")
 
   let chartable = false
-  let firstIsString: null | boolean = null
+  let firstKey: null | boolean = null
   for (const key of keys) {
-    if (firstIsString === null) {
-      firstIsString = typeof first[key] === "string"
-    } else if (firstIsString) {
+    if (firstKey === null) {
+      firstKey =
+        typeof first[key] === "string" || typeof first[key] === "number"
+    } else if (firstKey) {
       if (typeof first[key] === "number") {
         chartable = true
         break
