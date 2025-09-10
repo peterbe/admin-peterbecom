@@ -1,4 +1,5 @@
-import { Box, Table } from "@mantine/core"
+import { Sparkline } from "@mantine/charts"
+import { Box, Table, Text } from "@mantine/core"
 import { useState } from "react"
 import type { QueryResultRow } from "../types"
 import { DisplayError } from "./alerts"
@@ -25,6 +26,27 @@ GROUP BY
     pathname
 ORDER BY 1 desc
 LIMIT ${Number(limit)}
+`.trim()
+
+const sqlQueryTrend = ({ months = 3 } = {}) =>
+  `
+
+SELECT
+    DATE_TRUNC('month', day) AS trunc,
+    pathname,
+    SUM(count) AS count
+FROM
+    analyticsrollupspathnamedaily
+WHERE
+    day > now() - interval '${months} months'
+    AND type='pageview'
+    AND (
+           pathname='/plog/blogitem-040601-1'
+        OR pathname like '/plog/blogitem-040601-1/p%'
+    )
+GROUP BY
+    pathname, trunc
+ORDER BY pathname, trunc, count desc
 `.trim()
 
 const TITLES: Record<number, string> = {
@@ -58,35 +80,37 @@ function Inner() {
   const useQuery = (sql: string, options?: QueryOptions) =>
     useSQLQuery(sql, { prefix: ID, ...options })
 
+  const trend = useQuery(sqlQueryTrend())
+
   const current = useQuery(sqlQuery({ days: Number(30) }))
-  const past = useQuery(
-    sqlQuery({
-      days: Number(30) * 2,
-      back: Number(30),
-    }),
-  )
+  // const past = useQuery(
+  //   sqlQuery({
+  //     days: Number(30) * 2,
+  //     back: Number(30),
+  //   }),
+  // )
 
   return (
     <>
       <Box pos="relative" mt={25} mb={50}>
-        <Loading visible={current.isLoading || past.isLoading} />
+        <Loading visible={current.isLoading || trend.isLoading} />
 
-        {current.data && past.data && (
-          <TableByPathname rows={current.data.rows} previous={past.data.rows} />
+        {current.data && trend.data && (
+          <TableByPathname rows={current.data.rows} trend={trend.data.rows} />
         )}
       </Box>
 
-      <DisplayError error={current.error || past.error} />
+      <DisplayError error={current.error || trend.error} />
     </>
   )
 }
 
 function TableByPathname({
   rows,
-  previous,
+  trend,
 }: {
   rows: QueryResultRow[]
-  previous: QueryResultRow[]
+  trend: QueryResultRow[]
 }) {
   type Data = {
     pathname: string
@@ -100,15 +124,7 @@ function TableByPathname({
     const count = row.count as number
     current.set(pathname, { pathname, count, previous: 0, increase: 0 })
   }
-  for (const row of previous) {
-    const pathname = row.pathname as string
-    const count = row.count as number
-    const block = current.get(pathname)
-    if (block) {
-      block.previous = count
-      block.increase = block.count - count
-    }
-  }
+
   type SortKeys = keyof Data
   const [sortBy, setSortBy] = useState<SortKeys>("count")
   const values = Array.from(current.values()).sort((a, b) => {
@@ -134,24 +150,11 @@ function TableByPathname({
           >
             Count
           </Table.Th>
-          <Table.Th
-            style={{ textAlign: "right" }}
-            onClick={() => setSortBy("previous")}
-          >
-            Previous
-          </Table.Th>
-          <Table.Th
-            style={{ textAlign: "right" }}
-            onClick={() => setSortBy("increase")}
-          >
-            Delta
-          </Table.Th>
+          <Table.Th>Trend (3 months)</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
         {values.map((row) => {
-          const percent = (100 * (row.count - row.previous)) / row.count
-
           const num = Number(row.pathname.split("-1/p")[1] || "1")
           let title = DEFAULT_TITLE
           if (TITLES[num]) {
@@ -171,27 +174,45 @@ function TableByPathname({
               <Table.Td style={{ textAlign: "right" }}>
                 {row.count.toLocaleString("en-US")}
               </Table.Td>
-              <Table.Td style={{ textAlign: "right" }}>
-                {row.previous.toLocaleString("en-US")}
-              </Table.Td>
-              <Table.Td
-                style={{
-                  textAlign: "right",
-                  color:
-                    row.increase > 0
-                      ? "green"
-                      : row.increase < 0
-                        ? "red"
-                        : undefined,
-                }}
-              >
-                {row.increase.toLocaleString("en-US")}
-                {` (${percent.toFixed(1)}%)`}
+
+              <Table.Td>
+                <TrendLine rows={trend} pathname={row.pathname} />
               </Table.Td>
             </Table.Tr>
           )
         })}
       </Table.Tbody>
     </Table>
+  )
+}
+
+function TrendLine({
+  rows,
+  pathname,
+}: {
+  rows: QueryResultRow[]
+  pathname: string
+}) {
+  const points = rows
+    .filter((r) => r.pathname === pathname)
+    .map((row) => row.count as number)
+
+  if (!points.length) {
+    return null
+  }
+  const sumPoints = points.reduce((a, b) => a + b, 0)
+  if (sumPoints < 100) {
+    return <Text size="xs">too little data</Text>
+  }
+
+  return (
+    <Sparkline
+      w={150}
+      h={30}
+      data={points}
+      trendColors={{ positive: "teal.6", negative: "red.6", neutral: "gray.5" }}
+      fillOpacity={0.2}
+      strokeWidth={1.0}
+    />
   )
 }
