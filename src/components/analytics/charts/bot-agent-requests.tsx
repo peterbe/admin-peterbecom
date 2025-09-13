@@ -1,4 +1,5 @@
-import { Box, Grid, Table, Text } from "@mantine/core"
+import { BarChart } from "@mantine/charts"
+import { Box, Grid, Modal, Switch, Table, Text } from "@mantine/core"
 import { useState } from "react"
 import type { QueryResultRow } from "../types"
 import { DisplayError, DisplayWarning } from "./alerts"
@@ -64,7 +65,6 @@ function Inner() {
       days: Number(intervalDays),
     }),
   )
-  console.log(statusCodes.data?.rows)
 
   const past = useQuery(
     sqlQuery({
@@ -120,6 +120,8 @@ function AgentsTable({
     codes[agent][status_code] = row.count as number
   }
 
+  const [zoomedAgent, setZoomedAgent] = useState<string | null>(null)
+
   type Sorts = "percent" | "count" | "agent"
   const [sortBy, setSortBy] = useState<Sorts>("percent")
   const [sortReverse, setSortReverse] = useState(false)
@@ -164,46 +166,65 @@ function AgentsTable({
   }
 
   return (
-    <Table mb={30}>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th onClick={() => changeSort("agent")}>Bot Agent</Table.Th>
-          <Table.Th>Status codes</Table.Th>
-          <Table.Th
-            style={{ textAlign: "right" }}
-            onClick={() => changeSort("count")}
-          >
-            Count
-          </Table.Th>
-          <Table.Th
-            style={{ textAlign: "right" }}
-            onClick={() => changeSort("percent")}
-          >
-            Increase
-          </Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {combined.map((row) => {
-          return (
-            <Table.Tr key={row.agent}>
-              <Table.Td>{row.agent}</Table.Td>
-              <Table.Td>
-                <StatusCodes codes={codes[row.agent]} />
-              </Table.Td>
-              <Table.Td style={{ textAlign: "right" }}>
-                {numberFormat.format(row.count)}
-              </Table.Td>
-              <Table.Td style={{ textAlign: "right" }}>
-                <span style={{ color: row.delta > 0 ? "green" : "red" }}>
-                  {row.percent.toFixed(0)}%
-                </span>
-              </Table.Td>
-            </Table.Tr>
-          )
-        })}
-      </Table.Tbody>
-    </Table>
+    <div>
+      <Modal
+        opened={!!zoomedAgent}
+        onClose={() => {
+          setZoomedAgent(null)
+        }}
+        title={`Status codes for ${zoomedAgent}`}
+        size="lg"
+      >
+        {zoomedAgent && zoomedAgent in codes && (
+          <StatusCodesBarChart codes={codes[zoomedAgent]} />
+        )}
+      </Modal>
+
+      <Table mb={30}>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th onClick={() => changeSort("agent")}>Bot Agent</Table.Th>
+            <Table.Th>Status codes</Table.Th>
+            <Table.Th
+              style={{ textAlign: "right" }}
+              onClick={() => changeSort("count")}
+            >
+              Count
+            </Table.Th>
+            <Table.Th
+              style={{ textAlign: "right" }}
+              onClick={() => changeSort("percent")}
+            >
+              Increase
+            </Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {combined.map((row) => {
+            return (
+              <Table.Tr key={row.agent}>
+                <Table.Td>{row.agent}</Table.Td>
+                <Table.Td
+                  onClick={() => {
+                    setZoomedAgent(row.agent)
+                  }}
+                >
+                  <StatusCodes codes={codes[row.agent]} />
+                </Table.Td>
+                <Table.Td style={{ textAlign: "right" }}>
+                  {numberFormat.format(row.count)}
+                </Table.Td>
+                <Table.Td style={{ textAlign: "right" }}>
+                  <span style={{ color: row.delta > 0 ? "green" : "red" }}>
+                    {row.percent.toFixed(0)}%
+                  </span>
+                </Table.Td>
+              </Table.Tr>
+            )
+          })}
+        </Table.Tbody>
+      </Table>
+    </div>
   )
 }
 
@@ -224,5 +245,60 @@ function StatusCodes({ codes }: { codes: Record<string, number> | undefined }) {
         </Text>
       ))}
     </Text>
+  )
+}
+
+function StatusCodesBarChart({ codes }: { codes: Record<string, number> }) {
+  const flat = Object.entries(codes).sort((a, b) => b[1] - a[1])
+  const [excludeBiggest, setExcludeBiggest] = useState(false)
+
+  // const colors = [
+  //   "indigo.6",
+  //   "yellow.6",
+  //   "teal.6",
+  //   "gray.6",
+  //   "red.6",
+  //   "blue.6",
+  //   "green.6",
+  //   "orange.6",
+  //   "pink.6",
+  //   "cyan.6",
+  //   "lime.6",
+  //   "violet.6",
+  // ]
+  // const data: {
+  //   name: string
+  //   value: number
+  //   color: string
+  // }[] = []
+  const start = excludeBiggest ? 1 : 0
+
+  const barData: {
+    code: string
+    count: number
+  }[] = []
+  for (let i = start; i < flat.length; i++) {
+    barData.push({
+      code: flat[i][0],
+      count: flat[i][1],
+    })
+  }
+
+  return (
+    <div>
+      <BarChart
+        h={500}
+        data={barData}
+        dataKey="code"
+        series={[{ name: "count", color: "violet.6" }]}
+      />
+      <Box>
+        <Switch
+          checked={excludeBiggest}
+          onChange={(event) => setExcludeBiggest(event.currentTarget.checked)}
+          label={`Exclude biggest (${flat[0][0]})`}
+        />
+      </Box>
+    </div>
   )
 }
