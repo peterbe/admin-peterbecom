@@ -30,7 +30,6 @@ LIMIT ${Number(limit)}
 
 const sqlQueryTrend = ({ months = 3 } = {}) =>
   `
-
 SELECT
     DATE_TRUNC('month', day) AS trunc,
     pathname,
