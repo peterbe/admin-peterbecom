@@ -28,7 +28,7 @@ ORDER BY 1 desc
 LIMIT ${Number(limit)}
 `.trim()
 
-const sqlQueryTrend = ({ months = 3 } = {}) =>
+const sqlQueryTrend = ({ months = 4 } = {}) =>
   `
 SELECT
     DATE_TRUNC('month', day) AS trunc,
@@ -75,19 +75,16 @@ export function LyricsPages() {
     </ChartContainer>
   )
 }
+
+const TREND_MONTHS = 4
+
 function Inner() {
   const useQuery = (sql: string, options?: QueryOptions) =>
     useSQLQuery(sql, { prefix: ID, ...options })
 
-  const trend = useQuery(sqlQueryTrend())
+  const trend = useQuery(sqlQueryTrend({ months: TREND_MONTHS }))
 
   const current = useQuery(sqlQuery({ days: Number(30) }))
-  // const past = useQuery(
-  //   sqlQuery({
-  //     days: Number(30) * 2,
-  //     back: Number(30),
-  //   }),
-  // )
 
   return (
     <>
@@ -149,7 +146,7 @@ function TableByPathname({
           >
             Count
           </Table.Th>
-          <Table.Th>Trend (3 months)</Table.Th>
+          <Table.Th>Trend ({TREND_MONTHS} months)</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
