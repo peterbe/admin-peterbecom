@@ -1,8 +1,8 @@
-export function createdRange(days: number, back: number) {
+export function createdRange(days: number, back: number, field = "created") {
   const ranges: string[] = []
-  ranges.push(`created > NOW() - INTERVAL '${days} days'`)
+  ranges.push(`${field} > NOW() - INTERVAL '${days} days'`)
   if (back) {
-    ranges.push(`created < (NOW() - INTERVAL '${back} days')`)
+    ranges.push(`${field} < (NOW() - INTERVAL '${back} days')`)
   }
-  return ranges.join(" and ")
+  return ranges.join(" AND ")
 }

@@ -1,5 +1,5 @@
-import { PieChart } from "@mantine/charts"
-import { Box, Grid, Table } from "@mantine/core"
+import { BarChart } from "@mantine/charts"
+import { Box, Grid, Modal, Switch, Table, Text } from "@mantine/core"
 import { useState } from "react"
 import type { QueryResultRow } from "../types"
 import { DisplayError, DisplayWarning } from "./alerts"
@@ -12,14 +12,30 @@ import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
 
-const sqlQuery = ({ limit = 200, days = 30, back = 0 } = {}) => `
-SELECT meta->>'botAgent' AS agent, count(meta->>'botAgent')
+const sqlQueryStatusCode = ({ limit = 200, days = 30, back = 0 } = {}) => `
+SELECT meta->>'botAgent' AS agent, status_code, COUNT(*) as count
 FROM requestlog
 WHERE
     ${createdRange(days, back)}
     AND (meta->'isbot')::BOOLEAN
     AND (meta->>'botAgent') IS NOT NULL
-GROUP BY meta->>'botAgent'
+GROUP BY meta->>'botAgent', status_code
+ORDER BY 3 DESC
+LIMIT ${Number(limit)}
+`
+const sqlQuery = ({
+  limit = 200,
+  days = 30,
+  back = 0,
+  groupBy = "meta->>'botAgent'",
+} = {}) => `
+SELECT meta->>'botAgent' AS agent, count(${groupBy}) as count
+FROM requestlog
+WHERE
+    ${createdRange(days, back)}
+    AND (meta->'isbot')::BOOLEAN
+    AND (meta->>'botAgent') IS NOT NULL
+GROUP BY ${groupBy}
 ORDER BY 2 DESC
 LIMIT ${Number(limit)}
 `
@@ -42,6 +58,14 @@ function Inner() {
   const current = useQuery(
     sqlQuery({ limit: Number(rows), days: Number(intervalDays) }),
   )
+
+  const statusCodes = useQuery(
+    sqlQueryStatusCode({
+      limit: 300,
+      days: Number(intervalDays),
+    }),
+  )
+
   const past = useQuery(
     sqlQuery({
       limit: Number(rows),
@@ -55,15 +79,12 @@ function Inner() {
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading || past.isLoading} />
 
-        {current.data && past.data && (
-          <Grid>
-            <Grid.Col span={8}>
-              <AgentsTable rows={current.data.rows} previous={past.data.rows} />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <AgentsPie rows={current.data.rows} />
-            </Grid.Col>
-          </Grid>
+        {current.data && past.data && statusCodes.data && (
+          <AgentsTable
+            rows={current.data.rows}
+            previous={past.data.rows}
+            statusCodes={statusCodes.data.rows}
+          />
         )}
       </Box>
       <Grid>
@@ -79,85 +100,28 @@ function Inner() {
     </>
   )
 }
-function AgentsPie({ rows }: { rows: QueryResultRow[] }) {
-  if (rows.length === 0) {
-    return (
-      <DisplayWarning warning="No data points">
-        There are no data points left to display. ({rows.length} rows)
-      </DisplayWarning>
-    )
-  }
-
-  const data: {
-    name: string
-    value: number
-    color: string
-  }[] = []
-  const MAX_SEGMENTS = 8
-  const colors = [
-    "#e6f7ff",
-    "#d3eafb",
-    "#a9d2f1",
-    "#7bb9e9",
-    "#56a4e1",
-    "#3e97dd",
-    "#2f90dc",
-    "#1f7dc4",
-    "#0f6fb0",
-    "#00609d",
-  ].reverse()
-  if (colors.length < MAX_SEGMENTS) throw new Error("too few colors")
-
-  let remaining = 0
-  for (const row of rows.toSorted(
-    (b, a) => (a.count as number) - (b.count as number),
-  )) {
-    if (data.length < MAX_SEGMENTS - 1) {
-      const color = colors.shift()
-      if (!color) continue
-      data.push({
-        name: row.agent as string,
-        value: row.count as number,
-        color,
-      })
-    } else {
-      remaining += row.count as number
-    }
-  }
-  if (remaining) {
-    const color = colors.shift()
-    if (color) {
-      data.push({
-        name: "Rest",
-        value: remaining,
-        color,
-      })
-    }
-  }
-
-  return (
-    <div>
-      <PieChart
-        withLabelsLine
-        labelsPosition="outside"
-        labelsType="percent"
-        withLabels
-        withTooltip
-        tooltipDataSource="segment"
-        data={data}
-        size={300}
-      />
-    </div>
-  )
-}
 
 function AgentsTable({
   rows,
   previous,
+  statusCodes,
 }: {
   rows: QueryResultRow[]
   previous: QueryResultRow[]
+  statusCodes: QueryResultRow[]
 }) {
+  const codes: Record<string, Record<string, number>> = {}
+  for (const row of statusCodes) {
+    const agent = row.agent as string
+    const status_code = String(row.status_code)
+    if (!(agent in codes)) {
+      codes[agent] = {}
+    }
+    codes[agent][status_code] = row.count as number
+  }
+
+  const [zoomedAgent, setZoomedAgent] = useState<string | null>(null)
+
   type Sorts = "percent" | "count" | "agent"
   const [sortBy, setSortBy] = useState<Sorts>("percent")
   const [sortReverse, setSortReverse] = useState(false)
@@ -202,41 +166,139 @@ function AgentsTable({
   }
 
   return (
-    <Table mb={30}>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th onClick={() => changeSort("agent")}>Bot Agent</Table.Th>
-          <Table.Th
-            style={{ textAlign: "right" }}
-            onClick={() => changeSort("count")}
-          >
-            Count
-          </Table.Th>
-          <Table.Th
-            style={{ textAlign: "right" }}
-            onClick={() => changeSort("percent")}
-          >
-            Increase
-          </Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {combined.map((row) => {
-          return (
-            <Table.Tr key={row.agent}>
-              <Table.Td>{row.agent}</Table.Td>
-              <Table.Td style={{ textAlign: "right" }}>
-                {numberFormat.format(row.count)}
-              </Table.Td>
-              <Table.Td style={{ textAlign: "right" }}>
-                <span style={{ color: row.delta > 0 ? "green" : "red" }}>
-                  {row.percent.toFixed(0)}%
-                </span>
-              </Table.Td>
-            </Table.Tr>
-          )
-        })}
-      </Table.Tbody>
-    </Table>
+    <div>
+      <Modal
+        opened={!!zoomedAgent}
+        onClose={() => {
+          setZoomedAgent(null)
+        }}
+        title={`Status codes for ${zoomedAgent}`}
+        size="lg"
+      >
+        {zoomedAgent && zoomedAgent in codes && (
+          <StatusCodesBarChart codes={codes[zoomedAgent]} />
+        )}
+      </Modal>
+
+      <Table mb={30}>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th onClick={() => changeSort("agent")}>Bot Agent</Table.Th>
+            <Table.Th>Status codes</Table.Th>
+            <Table.Th
+              style={{ textAlign: "right" }}
+              onClick={() => changeSort("count")}
+            >
+              Count
+            </Table.Th>
+            <Table.Th
+              style={{ textAlign: "right" }}
+              onClick={() => changeSort("percent")}
+            >
+              Increase
+            </Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {combined.map((row) => {
+            return (
+              <Table.Tr key={row.agent}>
+                <Table.Td>{row.agent}</Table.Td>
+                <Table.Td
+                  onClick={() => {
+                    setZoomedAgent(row.agent)
+                  }}
+                >
+                  <StatusCodes codes={codes[row.agent]} />
+                </Table.Td>
+                <Table.Td style={{ textAlign: "right" }}>
+                  {numberFormat.format(row.count)}
+                </Table.Td>
+                <Table.Td style={{ textAlign: "right" }}>
+                  <span style={{ color: row.delta > 0 ? "green" : "red" }}>
+                    {row.percent.toFixed(0)}%
+                  </span>
+                </Table.Td>
+              </Table.Tr>
+            )
+          })}
+        </Table.Tbody>
+      </Table>
+    </div>
+  )
+}
+
+function StatusCodes({ codes }: { codes: Record<string, number> | undefined }) {
+  if (!codes) return null
+
+  const total = Object.values(codes).reduce((a, b) => a + b, 0)
+  const flat = Object.entries(codes).sort((a, b) => b[1] - a[1])
+  const parts: string[] = []
+  for (const [code, count] of flat.slice(0, 3)) {
+    parts.push(`${((100 * count) / total).toFixed(0)}% ${code}`)
+  }
+  return (
+    <Text size="xs">
+      {parts.map((part) => (
+        <Text span key={part} style={{ marginRight: 15 }}>
+          {part}
+        </Text>
+      ))}
+    </Text>
+  )
+}
+
+function StatusCodesBarChart({ codes }: { codes: Record<string, number> }) {
+  const flat = Object.entries(codes).sort((a, b) => b[1] - a[1])
+  const [excludeBiggest, setExcludeBiggest] = useState(false)
+
+  // const colors = [
+  //   "indigo.6",
+  //   "yellow.6",
+  //   "teal.6",
+  //   "gray.6",
+  //   "red.6",
+  //   "blue.6",
+  //   "green.6",
+  //   "orange.6",
+  //   "pink.6",
+  //   "cyan.6",
+  //   "lime.6",
+  //   "violet.6",
+  // ]
+  // const data: {
+  //   name: string
+  //   value: number
+  //   color: string
+  // }[] = []
+  const start = excludeBiggest ? 1 : 0
+
+  const barData: {
+    code: string
+    count: number
+  }[] = []
+  for (let i = start; i < flat.length; i++) {
+    barData.push({
+      code: flat[i][0],
+      count: flat[i][1],
+    })
+  }
+
+  return (
+    <div>
+      <BarChart
+        h={500}
+        data={barData}
+        dataKey="code"
+        series={[{ name: "count", color: "violet.6" }]}
+      />
+      <Box>
+        <Switch
+          checked={excludeBiggest}
+          onChange={(event) => setExcludeBiggest(event.currentTarget.checked)}
+          label={`Exclude biggest (${flat[0][0]})`}
+        />
+      </Box>
+    </div>
   )
 }

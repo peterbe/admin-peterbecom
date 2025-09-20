@@ -8,8 +8,8 @@ import {
 } from "./data/blogitem"
 import {
   type AddBlogitemRequestBody,
+  ALL_BLOGITEMS,
   addBlogItem,
-  BLOGITEMS,
 } from "./data/blogitems"
 import { COMMENTS } from "./data/comments"
 import {
@@ -58,6 +58,11 @@ export const handlers = [
     return HttpResponse.json(PREVIEW())
   }),
 
+  http.get("/api/v0/plog/all/", async ({ request }) => {
+    const url = request.url
+    return ALL_BLOGITEMS(new URLSearchParams(new URL(url).search))
+  }),
+
   http.get("/api/v0/plog/comments/", ({ request, cookies }) => {
     if (!cookies.mocksessionid) return new HttpResponse(null, { status: 403 })
     const url = request.url
@@ -96,9 +101,10 @@ export const handlers = [
     },
   ),
 
-  http.get("/api/v0/plog/", async ({ request }) => {
-    const url = request.url
-    return BLOGITEMS(new URLSearchParams(new URL(url).search))
+  http.get("/api/v0/plog/", async () => {
+    throw new Error("Use /api/v0/plog/all/")
+    // const url = request.url
+    // return BLOGITEMS(new URLSearchParams(new URL(url).search))
   }),
 
   http.post<PathParams, AddBlogitemRequestBody>(

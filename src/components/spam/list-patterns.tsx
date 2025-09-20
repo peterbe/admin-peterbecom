@@ -9,13 +9,23 @@ import {
   Table,
   Text,
 } from "@mantine/core"
-import { IconTrash } from "@tabler/icons-react"
+import { notifications } from "@mantine/notifications"
+import { IconRun, IconTrash } from "@tabler/icons-react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { API_BASE } from "../../config"
 import type { SpamPattern } from "../../types"
 import { fetchSpamPatterns, spamPatternsQueryKey } from "../api-utils"
 import { DisplayDate } from "../blogitems/list-table"
+
+type SpamExecutionResponse = {
+  limit: number
+  executions: {
+    matched: boolean
+    approved: boolean
+    regex: boolean | null
+  }[]
+}
 
 type ServerData = {
   patterns: SpamPattern[]
@@ -77,7 +87,10 @@ export function ListPatterns() {
                   <DisplayDate date={pattern.modify_date} />
                 </Table.Td>
                 <Table.Td>
-                  <DeleteButton id={pattern.id} />
+                  <Group>
+                    <ExecuteButton id={pattern.id} />
+                    <DeleteButton id={pattern.id} />
+                  </Group>
                 </Table.Td>
               </Table.Tr>
             )
@@ -85,6 +98,53 @@ export function ListPatterns() {
         </Table.Tbody>
       </Table>
     </Box>
+  )
+}
+
+function ExecuteButton({ id }: { id: number }) {
+  const execute = useMutation<SpamExecutionResponse>({
+    mutationKey: ["execute-pattern", id],
+    mutationFn: async () => {
+      const response = await fetch(`${API_BASE}/plog/spam/execute/${id}`, {
+        method: "POST",
+      })
+      if (response.ok) {
+        return response.json()
+      }
+      throw new Error(`${response.status} on ${response.url}`)
+    },
+    onSuccess: (data) => {
+      const anyMatchedNotApproved = data.executions.filter(
+        (e) => e.matched && !e.approved,
+      )
+      const anyMatchedApproved = data.executions.filter(
+        (e) => e.matched && e.approved,
+      )
+      notifications.show({
+        message: (
+          <>
+            Tested {new Intl.NumberFormat("en-US").format(data.limit)} comments.
+            <br />
+            Found <b>{anyMatchedNotApproved.length}</b> match
+            {anyMatchedNotApproved.length === 1 ? "" : "es"} on <i>not</i>{" "}
+            approved comments.
+            <br />({anyMatchedApproved.length} matches on approved)
+          </>
+        ),
+      })
+    },
+  })
+
+  return (
+    <Button
+      size="sm"
+      title="Execute now"
+      onClick={() => {
+        execute.mutate()
+      }}
+    >
+      <IconRun />
+    </Button>
   )
 }
 
@@ -112,45 +172,43 @@ function DeleteButton({ id }: { id: number }) {
   return (
     <>
       {error && <Alert color="red">Error: {error.message}</Alert>}
-      <Group>
-        {!confirmed && (
-          <Button
-            color="orange"
-            size="sm"
-            title="Delete"
-            onClick={() => {
-              setConfirmed(true)
-            }}
-          >
-            <IconTrash />
-          </Button>
-        )}
+      {!confirmed && (
+        <Button
+          color="orange"
+          size="sm"
+          title="Delete"
+          onClick={() => {
+            setConfirmed(true)
+          }}
+        >
+          <IconTrash />
+        </Button>
+      )}
 
-        {confirmed && (
-          <Button
-            size="sm"
-            onClick={() => {
-              setConfirmed(false)
-            }}
-          >
-            Cancel
-          </Button>
-        )}
-        {confirmed && (
-          <Button
-            color="red"
-            size="sm"
-            title="Yes, delete"
-            disabled={isPending}
-            loading={isPending}
-            onClick={() => {
-              mutate()
-            }}
-          >
-            Yes, delete
-          </Button>
-        )}
-      </Group>
+      {confirmed && (
+        <Button
+          size="sm"
+          onClick={() => {
+            setConfirmed(false)
+          }}
+        >
+          Cancel
+        </Button>
+      )}
+      {confirmed && (
+        <Button
+          color="red"
+          size="sm"
+          title="Yes, delete"
+          disabled={isPending}
+          loading={isPending}
+          onClick={() => {
+            mutate()
+          }}
+        >
+          Yes, delete
+        </Button>
+      )}
     </>
   )
 }

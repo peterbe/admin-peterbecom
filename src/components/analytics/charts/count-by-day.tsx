@@ -1,5 +1,5 @@
 import { Box, Grid, Table } from "@mantine/core"
-
+import { createdRange } from "./created-range"
 import { IntervalOptions } from "./interval-options"
 import { BasicLineChart, type DataRow, type DataSerie } from "./line-chart"
 import { Loading } from "./loading"
@@ -10,7 +10,7 @@ import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useURLFilter } from "./use-url-filter"
 import { addDays } from "./utils"
 
-const sqlQuery = (type: string, days = 7, urlFilter = "") => `
+const sqlQueryFiltered = (type: string, days = 0, back = 0, urlFilter = "") => `
 SELECT
     DATE_TRUNC('day', created) AS day,
     COUNT(url) AS count
@@ -18,7 +18,7 @@ FROM
     analytics
 WHERE
     type='${type}'
-    and created > now() - interval '${days + 1} days'
+    and ${createdRange(days, back)}
     and created < DATE_TRUNC('day', now())
     ${urlFilterToSQL(urlFilter)}
 GROUP BY
@@ -26,22 +26,26 @@ GROUP BY
 ORDER BY
     day;
 `
-const sqlQueryPrevious = (type: string, days = 7, urlFilter = "") => `
+
+const sqlQuery = (type: string, days = 0, back = 0) => `
 SELECT
-    DATE_TRUNC('day', created) AS day,
-    COUNT(url) AS count
+  day, count
 FROM
-    analytics
+  analyticsrollupsdaily
 WHERE
-    type='${type}'
-    and created < now() - interval '${days + 1} days'
-    and created > now() - interval '${days + days + 1} days'
-    ${urlFilterToSQL(urlFilter)}
-GROUP BY
-    day
+  type='${type}'
+  AND ${createdRange(days, back, "day")}
 ORDER BY
-    day;
+  day DESC
+LIMIT ${days - back}
 `
+
+function dStringToDate(day: string): Date {
+  if (day.includes("T")) {
+    return new Date(day)
+  }
+  return new Date(`${day}T00:00:00`)
+}
 
 export function CountByDay({
   id,
@@ -56,27 +60,33 @@ export function CountByDay({
   const [intervalDays, setIntervalDays] = useInterval(id)
   const [urlFilter, setURLField] = useURLFilter(id, "")
 
-  const current = useQuery(sqlQuery(type, Number(intervalDays), urlFilter))
-  const previous = useQuery(
-    sqlQueryPrevious(type, Number(intervalDays), urlFilter),
+  const days = Number(intervalDays)
+  const current = useQuery(
+    urlFilter
+      ? sqlQueryFiltered(type, days + 1, 1, urlFilter)
+      : sqlQuery(type, days + 1, 1),
   )
-
+  const previous = useQuery(
+    urlFilter
+      ? sqlQueryFiltered(type, days * 2 + 1, days + 1, urlFilter)
+      : sqlQuery(type, days * 2 + 1, days + 1),
+  )
   const dataX: DataRow[] = []
   const series: DataSerie[] = [{ name: "count", label: "Number" }]
   const dataO: Record<string, number> = {}
   const dataP: Record<string, number> = {}
   const keys: string[] = []
   if (current.data) {
-    for (const row of current.data.rows) {
-      const d = new Date(row.day as string)
+    for (const row of current.data.rows.toReversed()) {
+      const d = dStringToDate(row.day as string)
       const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`
       dataO[k] = row.count as number
       keys.push(k)
     }
   }
   if (previous.data) {
-    for (const row of previous.data.rows) {
-      const d = addDays(new Date(row.day as string), Number(intervalDays))
+    for (const row of previous.data.rows.toReversed()) {
+      const d = addDays(dStringToDate(row.day as string), Number(intervalDays))
       const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`
       dataP[k] = row.count as number
     }

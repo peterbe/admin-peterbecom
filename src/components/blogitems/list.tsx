@@ -1,34 +1,25 @@
 import { Alert, Box } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
-import { useQuery } from "@tanstack/react-query"
-import { useSearchParams } from "react-router"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useEffect, useState } from "react"
 import { API_BASE } from "../../config"
 import type { BlogitemsServerData } from "../../types"
 import { ListTable } from "./list-table"
 import { PaginationSize } from "./pagination-size"
-import { useRecentPageviews } from "./use-pageviews"
 
 const DEFAULT_SIZE = "10"
 
 export function List() {
-  const [searchParams, setSearchParams] = useSearchParams()
   const [paginationSize, setPaginationSize] = useLocalStorage<string>({
     key: "pagination-size",
     defaultValue: DEFAULT_SIZE,
   })
-  const search = searchParams.get("search") || ""
-  const orderBy = searchParams.get("orderBy") || "modify_date"
-
-  const sp = new URLSearchParams({
-    search,
-    order: orderBy,
-    batch_size: `${paginationSize}`,
-  })
-  const apiUrl = `${API_BASE}/plog/?${sp}`
+  const [since, setSince] = useState("")
 
   const { data, error, isPending } = useQuery<BlogitemsServerData>({
-    queryKey: ["blogitems", apiUrl],
+    queryKey: ["blogitems-all"],
     queryFn: async () => {
+      const apiUrl = `${API_BASE}/plog/all/`
       const response = await fetch(apiUrl)
       if (!response.ok) {
         throw new Error(`${response.status} on ${response.url}`)
@@ -37,8 +28,65 @@ export function List() {
     },
   })
 
-  const blogitems = data?.blogitems || []
-  const pageviews = useRecentPageviews(blogitems)
+  useEffect(() => {
+    if (data?.blogitems && data.blogitems.length > 0) {
+      setSince(
+        data.blogitems
+          .map((b) => b.modify_date)
+          .sort()
+          .reverse()[0],
+      )
+    }
+  }, [data?.blogitems])
+
+  const updater = useQuery<BlogitemsServerData>({
+    queryKey: ["blogitems-updater", "updater", since],
+    queryFn: async () => {
+      const sp = new URLSearchParams({ since })
+      const apiUrl = `${API_BASE}/plog/all/?${sp}`
+
+      const response = await fetch(apiUrl)
+      if (!response.ok) {
+        throw new Error(`${response.status} on ${response.url}`)
+      }
+      return await response.json()
+    },
+    refetchInterval: 10_000,
+    enabled: !!since,
+    refetchOnWindowFocus: true,
+  })
+
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (!updater.data || !updater.data.count) return
+    const byId = new Map(updater.data.blogitems.map((b) => [b.id, b]))
+    queryClient.setQueryData(
+      ["blogitems-all"],
+      (oldData: BlogitemsServerData | undefined) => {
+        if (!oldData) return undefined
+
+        const newData: BlogitemsServerData = {
+          blogitems: [],
+          count: 0,
+        }
+        for (const blogitem of oldData.blogitems) {
+          const newBlogitem = byId.get(blogitem.id)
+          if (newBlogitem) {
+            newData.blogitems.push(newBlogitem)
+            byId.delete(blogitem.id)
+          } else {
+            newData.blogitems.push(blogitem)
+          }
+        }
+        for (const blogitem of byId.values()) {
+          newData.blogitems.push(blogitem)
+        }
+        newData.count = newData.blogitems.length
+        return newData
+      },
+    )
+  }, [updater.data, queryClient.setQueryData])
 
   return (
     <Box>
@@ -49,19 +97,7 @@ export function List() {
       <ListTable
         isPending={isPending}
         data={data}
-        orderBy={orderBy}
-        search={search}
-        updateSearch={(s: string) => {
-          const sp = new URLSearchParams(searchParams)
-          const existing = sp.get("search")
-          if (s.trim() && s !== existing) {
-            sp.set("search", s)
-          } else {
-            sp.delete("search")
-          }
-          setSearchParams(sp)
-        }}
-        pageviews={pageviews}
+        paginationSize={Number(paginationSize)}
       />
 
       <PaginationSize

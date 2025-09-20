@@ -1,12 +1,14 @@
 import { useDocumentTitle } from "@mantine/hooks"
-import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister"
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
 import { queryClient } from "../../../query-client"
 import { SignedIn } from "../../signed-in"
 import { BotAgentRequests } from "./bot-agent-requests"
 import { GeoLocations } from "./geo-locations"
+import { LogoEvents } from "./logo-events"
 import { LyricsFeatureflag } from "./lyrics-featureflag"
+import { LyricsPages } from "./lyrics-pages"
 import { MinimizeContext } from "./minimize-context"
 import { PageviewEvents } from "./pageview-events"
 import { PageviewNumbers } from "./pageview-numbers"
@@ -20,7 +22,7 @@ import { useMinimized } from "./use-minimized"
 import { useRefreshContainer } from "./use-refresh-container"
 import { UserAgents } from "./user-agents"
 
-const persister = createSyncStoragePersister({
+const persister = createAsyncStoragePersister({
   storage: window.localStorage,
 })
 
@@ -41,7 +43,9 @@ export function Component() {
             <Pageviews />
             <PublicAPIPageviews />
             <PublicAPIPageviewsDurations />
+            <LogoEvents />
             <UserAgents />
+            <LyricsPages />
             <BotAgentRequests />
             <RequestsPerDay />
             <RequestsVaryingQuerystring />
