@@ -16,26 +16,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: cached-node_modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-${{ hashFiles('package*.json') }}-${{ hashFiles('.github/workflows/bundle-stats.yml') }}
-
-      - name: Install
-        if: steps.cached-node_modules.outputs.cache-hit != 'true'
-        run: npm ci
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
 
       - name: Build (and lint)
-        run: npm run build
+        run: bun run build
 
       - name: Compare with main
         uses: actions/checkout@v5
@@ -43,22 +28,14 @@ jobs:
             ref: main
             path: main
 
-      - name: Cache node_modules in main
-        uses: actions/cache@v4
-        id: cached-node_modules-main
-        with:
-          path: main/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('main/package*.json') }}-${{ hashFiles('.github/workflows/bundle-stats.yml') }}
-
       - name: Install from main
         working-directory: main
-        if: steps.cached-node_modules-main.outputs.cache-hit != 'true'
-        run: npm ci
+        run: bun install
 
       - name: Build main
         if: ${{ github.event_name == 'pull_request' }}
         working-directory: main
-        run: npm run build
+        run: bun run build
 
       - name: Compare
         id: set-markdown
@@ -71,7 +48,7 @@ jobs:
           du -sh main/dist/assets
 
           echo ""
-          markdown=$(npm run --silent compare-build-dirs -- main/dist/assets dist/assets)
+          markdown=$(bun run --silent compare-build-dirs -- main/dist/assets dist/assets)
           echo "::set-output name=markdown::${markdown//$'\n'/%0A}"
 
       - name: Find Comment

@@ -13,9 +13,9 @@
     "tsc": "tsc",
     "prepare": "husky",
     "serve": "serve dist",
-    "test-manifest": "node scripts/test-manifest.mjs",
-    "compare-build-dirs": "node --experimental-strip-types --no-warnings scripts/compare-build-dirs.ts",
-    "postinstall": "npx @biomejs/biome migrate --write"
+    "test-manifest": "bun scripts/test-manifest.ts",
+    "compare-build-dirs": "bun run scripts/compare-build-dirs.ts",
+    "postinstall": "bunx @biomejs/biome migrate --write"
   },
   "dependencies": {
     "@mantine/charts": "^8.3.1",
@@ -56,7 +56,8 @@
     "msw": "^2.11.2",
     "serve": "^14.2.5",
     "typescript": "^5.9.2",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "@types/bun": "latest"
   },
   "msw": {
     "workerDirectory": [

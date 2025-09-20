@@ -2,7 +2,8 @@ import { readdirSync, statSync } from "node:fs"
 import { join, relative } from "node:path"
 
 const [dir1, dir2] = process.argv.slice(2)
-main(dir1, dir2)
+if (dir1 && dir2) main(dir1, dir2)
+else console.log("Usage: compare-build-dirs <dir1> <dir2>")
 
 function main(dir1: string, dir2: string) {
   const totalSize1 = getTotalSize(dir1)

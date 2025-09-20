@@ -2,63 +2,56 @@
 # https://just.systems/
 
 dev:
-    npm run dev -- --port 4001
+    bun run dev -- --port 4001
 
 dev-with-proxy:
-    API_TARGET=https://admin.peterbe.com npm run dev -- --port 4001
+    API_TARGET=https://admin.peterbe.com bun run dev -- --port 4001
 
 dev-for-testing:
-    NODE_ENV=test npm run dev -- --port 4001
+    NODE_ENV=test bun run dev -- --port 4001
 
 build:
-    npm run build
+    bun run build
 
 start: build
-    npm run preview -- --port 4001
+    bun  run preview -- --port 4001
 
 start-with-proxy: build
-    API_TARGET=https://admin.peterbe.com npm run preview -- --port 4001
+    API_TARGET=https://admin.peterbe.com bun run preview -- --port 4001
 
 start-for-testing:
-    NODE_ENV=test npm run build
-    NODE_ENV=test npm run preview -- --port 3000
+    NODE_ENV=test bun run build
+    NODE_ENV=test bun run preview -- --port 3000
 
 tsc:
-    npm run tsc
+    bun run tsc
 
 lint:
-    npm run lint
-    npm run tsc
+    bun run lint
+    bun run tsc
 
 lintfix:
-    npm run lint:fix
-
-prettyfix:
-    npm run pretty:fix
+    bun run lint:fix
 
 format: lintfix
 
 install:
-    npm install
+    bun install
 
 outdated:
-    npx npm-check-updates --interactive
-
-run-for-playwright:
-    NODE_ENV=test npm run build
-    PORT=3000 NODE_ENV=test npm run serve
+    bun outdated
 
 test-playwright:
     curl -s http://localhost:3000 > /dev/null
-    PLAYWRIGHT_BASE_URL=http://localhost:3000 npx playwright test
+    PLAYWRIGHT_BASE_URL=http://localhost:3000 bunx playwright test
 
 playwright-codegen:
-    npx playwright codegen
+    bunx playwright codegen
 
 test-manifest:
-    npm run test-manifest -- http://localhost:3000
+    bun run test-manifest -- http://localhost:3000
 
 test: test-playwright test-manifest
 
-upgrade:
-     npx npm-check-updates --interactive
+upgrade: outdated
+    bunx npm-check-updates --interactive

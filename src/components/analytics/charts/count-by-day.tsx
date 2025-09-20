@@ -103,7 +103,7 @@ export function CountByDay({
       countPrevious?: number
     } = {
       date: k,
-      count: dataO[k],
+      count: dataO[k] as number,
     }
     if (k in dataP) {
       entry.countPrevious = dataP[k]

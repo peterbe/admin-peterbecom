@@ -5,48 +5,13 @@ import type { QueryResult, QueryResultRow } from "../../types"
 function getQueryResult(query: string): QueryResult {
   const rows: QueryResultRow[] = []
 
-  // Example for a single
-  // SELECT
-  //   DATE_TRUNC('day', created) AS date,
-  //   COUNT(*) AS count
-  // FROM
-  //   analytics
-  // WHERE
-  //   type = 'pageview'
-  //   AND created > now() - interval '10 days'
-  //   AND (data->>'pathname') = '/plog/test'
-  // GROUP BY
-  //   date
-  // ORDER BY
-  //   1 desc
-  // LIMIT 100
-
-  // Example for multiple pathnames
-  // SELECT
-  //   DATE_TRUNC('month', created) AS date,
-  //   data->>'pathname' AS pathname,
-  //   COUNT(*) AS count
-  // FROM
-  //   analytics
-  // WHERE
-  //   type = 'pageview'
-  //   AND created > now() - interval '60 days'
-  //   AND (data->>'pathname') IN ('/plog/test')
-  // GROUP BY
-  //   data->>'pathname',
-  //   date
-  // ORDER BY
-  //   1 desc
-  // LIMIT 1000
-
   if (query.includes(`(data->>'pathname') IN (`)) {
     const rex = /\(data->>'pathname'\) IN \((.*)\)/
     const pathnames: string[] = []
     const matched = query.match(rex)
     if (matched) {
-      pathnames.push(
-        ...matched[1].split(",").map((p) => p.replace(/'/g, "").trim()),
-      )
+      const first = matched[1] as string
+      pathnames.push(...first.split(",").map((p) => p.replace(/'/g, "").trim()))
     }
     const now = new Date()
     for (const pathname of pathnames) {

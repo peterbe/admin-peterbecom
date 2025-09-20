@@ -218,7 +218,8 @@ function RequestsLine({
         grouped[dayDate] = {}
       }
       if (dayDate in grouped) {
-        grouped[dayDate][`${row.status_code}`] = row.count as number
+        ;(grouped[dayDate] as Record<string, number>)[`${row.status_code}`] =
+          row.count as number
         series.add(`${row.status_code}`)
       }
     }
@@ -400,17 +401,19 @@ function RequestsByStatusTable({ rows }: { rows: QueryResultRow[] }) {
       grouped[dayDate] = {}
     }
     if (dayDate in grouped) {
-      grouped[dayDate][`${row.status_code}`] = row.count as number
+      ;(grouped[dayDate] as Record<string, number>)[`${row.status_code}`] =
+        row.count as number
     }
   }
-  const data: Record<string, string | number>[] = []
+  type Entry = Record<string, string | number>
+  const data: Entry[] = []
   for (const [dateString, numbers] of Object.entries(grouped)) {
     data.push({
       day: formatter.format(new Date(dateString)),
       ...numbers,
     })
   }
-  const statusCodes = Object.keys(data[0]).filter((x) => x !== "day")
+  const statusCodes = Object.keys(data[0] as Entry).filter((x) => x !== "day")
 
   return (
     <Table mb={30}>
@@ -432,6 +435,7 @@ function RequestsByStatusTable({ rows }: { rows: QueryResultRow[] }) {
             .filter(([key]) => key !== "day")
             .map(([, v]) => v)
             .reduce((v, acc) => (acc as number) + (v as number), 0) as number
+          if (!row.day) throw new Error("row.day is missing")
           return (
             <Table.Tr key={row.day}>
               <Table.Td>{dayFormatter.format(new Date(row.day))}</Table.Td>

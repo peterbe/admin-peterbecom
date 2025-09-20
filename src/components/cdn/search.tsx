@@ -40,7 +40,7 @@ export function Search({ disabled }: { disabled?: boolean }) {
             <IconSearch />
           )
         }
-        disabled={disabled}
+        disabled={Boolean(disabled)}
       />
     </form>
   )
