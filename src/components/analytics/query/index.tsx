@@ -136,7 +136,6 @@ export function Component() {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
   function submitQuery() {
-    console.log({ typedQuery, activeQuery })
     setActiveQuery(`${typedQuery.trim()}\n`)
   }
 
@@ -185,7 +184,6 @@ export function Component() {
             value={searchPrevious}
             onChange={(e) => setSearchPrevious(e.target.value)}
             radius="xl"
-            // disabled={disabled}
             rightSection={
               searchPrevious ? (
                 <CloseButton
@@ -198,7 +196,7 @@ export function Component() {
             }
           />
           {searchPrevious && !filteredPreviousQueries.length && (
-            <Alert color="yellow">No previous queries match your search</Alert>
+            <Alert color="yellow">No previous queries found</Alert>
           )}
 
           {filteredPreviousQueries.map((pq) => {
@@ -215,7 +213,6 @@ export function Component() {
                     variant="light"
                     onClick={() => {
                       setTypedQuery(pq.query)
-                      // setActiveQuery(pq.query)
                       submitQuery()
                       closeDrawer()
                     }}
@@ -225,9 +222,8 @@ export function Component() {
                   <Text>{formatDistanceCompact(pq.created)}</Text>
                   {pq.queryResult ? (
                     <Text>
-                      {pq.queryResult.meta.count_rows.toLocaleString()} rows
-                      {" - "}
-                      <Took seconds={pq.queryResult.meta.took_seconds} />
+                      Rows {pq.queryResult.meta.count_rows.toLocaleString()}.{" "}
+                      Took <Took seconds={pq.queryResult.meta.took_seconds} />
                     </Text>
                   ) : (
                     <Text fs="italic">Not run before</Text>
@@ -273,7 +269,6 @@ export function Component() {
           value={typedQuery}
           onChange={(value) => {
             if (value !== undefined) setTypedQuery(value)
-            // console.log({ VALUE: value })
           }}
           onMount={(editor) => {
             editorRef.current = editor
