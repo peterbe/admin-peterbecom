@@ -18,9 +18,6 @@ export const COMMENTS = (params: URLSearchParams) => {
     return true
   })
   const old = filtered.map((x) => x.add_date).sort()
-  if (!old.length) {
-    throw new Error("No comments found")
-  }
   const oldest = old[0] as string
 
   const returned: CommentsServerData = {
