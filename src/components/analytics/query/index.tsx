@@ -1,40 +1,19 @@
-import {
-  CodeHighlight,
-  CodeHighlightAdapterProvider,
-} from "@mantine/code-highlight"
-import {
-  Alert,
-  Box,
-  Button,
-  CloseButton,
-  Code,
-  Drawer,
-  Paper,
-  SimpleGrid,
-  Text,
-  TextInput,
-} from "@mantine/core"
+import { CodeHighlightAdapterProvider } from "@mantine/code-highlight"
+import { Alert, Box, Button, Code, Paper } from "@mantine/core"
 import { useDisclosure, useLocalStorage } from "@mantine/hooks"
 import Editor from "@monaco-editor/react"
-import { IconSearch } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import type { editor } from "monaco-editor"
 import { KeyCode, KeyMod } from "monaco-editor"
 import { useEffect, useRef, useState } from "react"
-import { formatDistanceCompact } from "../../blogitems/format-distance-compact"
 import type { QueryResult } from "../types"
 import { getEditorHeight } from "./editor-height"
 import { KeyboardTip } from "./keyboard-tip"
 import { shikiAdapter } from "./load-shiki"
+import { PreviousQueriesDrawer } from "./previous-queries-drawer"
 import { Show } from "./show"
-import { Took } from "./took"
+import type { PreviousQuery } from "./types"
 import { useQueryDocumentTitle } from "./use-query-document-title"
-
-type PreviousQuery = {
-  query: string
-  created: string
-  queryResult?: QueryResult
-}
 
 export function Component() {
   const [savedQueries, _setSavedQueries, removeSavedQueries] = useLocalStorage({
@@ -160,97 +139,22 @@ export function Component() {
 
   const editorHeight = getEditorHeight(activeQuery)
 
-  const [searchPrevious, setSearchPrevious] = useState("")
-
-  const filteredPreviousQueries = previousQueries.filter((pq) => {
-    if (!searchPrevious.trim()) return true
-    return pq.query.toLowerCase().includes(searchPrevious.toLowerCase())
-  })
-
   return (
     <CodeHighlightAdapterProvider adapter={shikiAdapter}>
       <div>
-        <Drawer
+        <PreviousQueriesDrawer
           opened={openedDrawer}
-          position="top"
-          onClose={closeDrawer}
-          title={`Past queries (${previousQueries.length})`}
-          size="xl"
-        >
-          <TextInput
-            mb={20}
-            placeholder="Search"
-            aria-label="Search"
-            value={searchPrevious}
-            onChange={(e) => setSearchPrevious(e.target.value)}
-            radius="xl"
-            rightSection={
-              searchPrevious ? (
-                <CloseButton
-                  aria-label="Clear input"
-                  onClick={() => setSearchPrevious("")}
-                />
-              ) : (
-                <IconSearch />
-              )
-            }
-          />
-          {searchPrevious && !filteredPreviousQueries.length && (
-            <Alert color="yellow">No previous queries found</Alert>
-          )}
-
-          {filteredPreviousQueries.map((pq) => {
-            return (
-              <Box key={pq.query} mb={30}>
-                <CodeHighlight
-                  code={pq.query}
-                  language="sql"
-                  radius="md"
-                  mb={10}
-                />
-                <SimpleGrid cols={4}>
-                  <Button
-                    variant="light"
-                    onClick={() => {
-                      setTypedQuery(pq.query)
-                      submitQuery()
-                      closeDrawer()
-                    }}
-                  >
-                    Use this query
-                  </Button>
-                  <Text>{formatDistanceCompact(pq.created)}</Text>
-                  {pq.queryResult ? (
-                    <Text>
-                      Rows {pq.queryResult.meta.count_rows.toLocaleString()}.{" "}
-                      Took <Took seconds={pq.queryResult.meta.took_seconds} />
-                    </Text>
-                  ) : (
-                    <Text fs="italic">Not run before</Text>
-                  )}
-                  <Button
-                    variant="light"
-                    color="red"
-                    onClick={() => {
-                      const filtered = previousQueries.filter(
-                        (x) => x.query !== pq.query,
-                      )
-                      if (filtered.length < previousQueries.length) {
-                        setPreviousQueries(filtered)
-                      } else {
-                        console.error("Did not filter anything out")
-                      }
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </SimpleGrid>
-              </Box>
-            )
-          })}
-
-          <Button onClick={closeDrawer}>Close</Button>
-        </Drawer>
+          close={closeDrawer}
+          previousQueries={previousQueries}
+          onUseQuery={(query: string) => {
+            setTypedQuery(query)
+            submitQuery()
+            closeDrawer()
+          }}
+          setPreviousQueries={(queries: PreviousQuery[]) => {
+            setPreviousQueries(queries)
+          }}
+        />
 
         {previousQueries.length > 0 && (
           <Box mb={10}>
