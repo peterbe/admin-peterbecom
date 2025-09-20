@@ -3,7 +3,7 @@ import { IconSearch } from "@tabler/icons-react"
 import { useState } from "react"
 import { useSearchParams } from "react-router"
 
-export function Search({ disabled }: { disabled?: boolean }) {
+export function Search({ disabled }: { disabled?: string }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState(searchParams.get("search") || "")
   return (
