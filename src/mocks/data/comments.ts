@@ -17,11 +17,16 @@ export const COMMENTS = (params: URLSearchParams) => {
     }
     return true
   })
+  const old = filtered.map((x) => x.add_date).sort()
+  if (!old.length) {
+    throw new Error("No comments found")
+  }
+  const oldest = old[0] as string
 
   const returned: CommentsServerData = {
     comments: countOnly ? [] : filtered,
     count: filtered.length,
-    oldest: filtered.map((x) => x.add_date).sort()[0],
+    oldest,
   }
   return HttpResponse.json(returned)
 }

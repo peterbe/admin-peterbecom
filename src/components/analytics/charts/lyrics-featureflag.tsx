@@ -52,18 +52,20 @@ function Inner() {
     { name: "false", label: "No", color: "red" },
   ]
   if (current.data) {
-    const buckets: {
-      [date: string]: {
-        [enabled: string]: number
-      }
-    } = {}
+    type InnerEntry = {
+      [enabled: string]: number
+    }
+    type Entry = {
+      [date: string]: InnerEntry
+    }
+    const buckets: Entry = {}
     for (const row of current.data.rows) {
       const d = new Date(row.day as string)
       const k = `${d.toLocaleString("en-US", {
         month: "short",
       })} ${d.getDate()}`
-      if (!(k in buckets)) buckets[k] = {}
-      buckets[k][row.enabled as string] = row.count as number
+      if (!(k in buckets)) buckets[k] = {} as InnerEntry
+      ;(buckets[k] as InnerEntry)[row.enabled as string] = row.count as number
     }
     for (const [date, numbers] of Object.entries(buckets)) {
       dataX.push({

@@ -30,7 +30,7 @@ function formatDistance(
 ) {
   const result =
     token in formatDistanceLocale
-      ? formatDistanceLocale[token].replace("{{count}}", `${count}`)
+      ? (formatDistanceLocale[token] as string).replace("{{count}}", `${count}`)
       : token
 
   if (options?.addSuffix) {

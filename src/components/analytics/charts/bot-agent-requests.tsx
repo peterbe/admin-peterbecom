@@ -110,14 +110,15 @@ function AgentsTable({
   previous: QueryResultRow[]
   statusCodes: QueryResultRow[]
 }) {
-  const codes: Record<string, Record<string, number>> = {}
+  type Entry = Record<string, number>
+  const codes: Record<string, Entry> = {}
   for (const row of statusCodes) {
     const agent = row.agent as string
     const status_code = String(row.status_code)
     if (!(agent in codes)) {
       codes[agent] = {}
     }
-    codes[agent][status_code] = row.count as number
+    ;(codes[agent] as Entry)[status_code] = row.count as number
   }
 
   const [zoomedAgent, setZoomedAgent] = useState<string | null>(null)
@@ -176,7 +177,9 @@ function AgentsTable({
         size="lg"
       >
         {zoomedAgent && zoomedAgent in codes && (
-          <StatusCodesBarChart codes={codes[zoomedAgent]} />
+          <StatusCodesBarChart
+            codes={codes[zoomedAgent] as Record<string, number>}
+          />
         )}
       </Modal>
 
@@ -273,16 +276,20 @@ function StatusCodesBarChart({ codes }: { codes: Record<string, number> }) {
   // }[] = []
   const start = excludeBiggest ? 1 : 0
 
-  const barData: {
+  type Entry = {
     code: string
     count: number
-  }[] = []
+  }
+  const barData: Entry[] = []
   for (let i = start; i < flat.length; i++) {
+    const entry = flat[i] as [string, number]
     barData.push({
-      code: flat[i][0],
-      count: flat[i][1],
+      code: entry[0],
+      count: entry[1],
     })
   }
+
+  const first = flat[0] as [string, number]
 
   return (
     <div>
@@ -296,7 +303,7 @@ function StatusCodesBarChart({ codes }: { codes: Record<string, number> }) {
         <Switch
           checked={excludeBiggest}
           onChange={(event) => setExcludeBiggest(event.currentTarget.checked)}
-          label={`Exclude biggest (${flat[0][0]})`}
+          label={`Exclude biggest (${first[0]})`}
         />
       </Box>
     </div>

@@ -128,7 +128,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
   function suggestSummary() {
     const text = form.getValues().text
     if (text) {
-      let summary = text.trim().split(/\n\n+/)[0]
+      let summary = text.trim().split(/\n\n+/)[0] as string
       while (summary.startsWith("*") && summary.endsWith("*")) {
         summary = summary.slice(1, summary.length - 1)
       }

@@ -30,12 +30,11 @@ export function List() {
 
   useEffect(() => {
     if (data?.blogitems && data.blogitems.length > 0) {
-      setSince(
-        data.blogitems
-          .map((b) => b.modify_date)
-          .sort()
-          .reverse()[0],
-      )
+      const sorted = data.blogitems
+        .map((b) => b.modify_date)
+        .sort()
+        .reverse()
+      if (sorted[0]) setSince(sorted[0])
     }
   }, [data?.blogitems])
 

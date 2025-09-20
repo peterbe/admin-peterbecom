@@ -1,4 +1,4 @@
-async function main(args) {
+async function main(args: string[]) {
   const url = args[0] || "http://localhost:3000"
   console.time(`Download ${url}`)
   const response = await fetch(url)
@@ -9,8 +9,11 @@ async function main(args) {
 
   let found = false
   for (const tag of text.matchAll(/<link (.+?)>/g)) {
-    if (tag[1].includes('rel="manifest"')) {
-      const manifestUrl = new URL(tag[1].match(/href="(.+?)"/)[1], url)
+    const first = tag[1] as string
+    if (first.includes('rel="manifest"')) {
+      const matched = first.match(/href="(.+?)"/)
+      if (!matched || !matched[1]) throw new Error("No href in manifest link")
+      const manifestUrl = new URL(matched[1], url)
       await checkManifest(manifestUrl)
       found = true
     }
@@ -20,17 +23,24 @@ async function main(args) {
   console.log("All good!")
 }
 
-async function checkManifest(url) {
+type Manifest = {
+  icons: { src: string; sizes: string; type: string }[]
+}
+async function checkManifest(url: URL) {
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
   }
   const text = await response.text()
   const manifest = JSON.parse(text)
+  if (!manifest.icons) {
+    throw new Error(`No icons in manifest at ${url}`)
+  }
+  const manifestTyped = manifest as Manifest
 
   console.time(`Checking ${url}`)
   await Promise.all(
-    manifest.icons.map(async (icon) => {
+    manifestTyped.icons.map(async (icon) => {
       const iconUrl = new URL(icon.src, url)
       await checkIcon(iconUrl, icon.type)
     }),
@@ -38,7 +48,7 @@ async function checkManifest(url) {
   console.timeEnd(`Checking ${url}`)
 }
 
-async function checkIcon(url, type) {
+async function checkIcon(url: URL, type: string) {
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`Failed to fetch ${url}: ${response.statusText}`)

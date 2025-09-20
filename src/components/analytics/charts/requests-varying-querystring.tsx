@@ -325,10 +325,12 @@ function URLsTable({ rows }: { rows: QueryResultRow[] }) {
     counts.set(s, (counts.get(s) || 0) + 1)
     countAll++
   }
-  const rest: {
+
+  type Entry = {
     label: string
     value: string
-  }[] = []
+  }
+  const rest: Entry[] = []
   for (const [statusCode, count] of counts.entries()) {
     rest.push({
       label: `${statusCode} (${numberFormat.format(count)})`,
@@ -348,7 +350,7 @@ function URLsTable({ rows }: { rows: QueryResultRow[] }) {
       {rest.length === 1 && !searchStatusCode ? (
         <Text>
           They're all status_code
-          <Code>{rest[0].value}</Code>
+          <Code>{(rest[0] as Entry).value}</Code>
         </Text>
       ) : searchStatusCode ? (
         <Button

@@ -99,7 +99,7 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
 
   function uploadFiles(files: FileWithPath[]) {
     if (files.length > 0) {
-      setUploadedFile(files[0])
+      setUploadedFile(files[0] as FileWithPath)
     }
   }
 

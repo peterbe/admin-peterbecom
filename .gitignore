@@ -29,3 +29,4 @@ tsconfig.node.tsbuildinfo
 /blob-report/
 /playwright/.cache/
 .node-version
+tsconfig.tsbuildinfo

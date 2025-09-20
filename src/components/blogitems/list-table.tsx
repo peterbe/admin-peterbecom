@@ -79,28 +79,28 @@ export function ListTable({
   let requireSummary: null | boolean = null
   const summaryRegex = search.match(/\b(has|no):summary\b/i)
   if (summaryRegex) {
-    requireSummary = summaryRegex[1].toLowerCase() === "has"
+    requireSummary = (summaryRegex[1] as string).toLowerCase() === "has"
     freeFormSearch = freeFormSearch.replace(summaryRegex[0], "").trim()
   }
 
   let requireArchived: null | boolean = null
   const archivedRegex = search.match(/\b(is|not):archived\b/i)
   if (archivedRegex) {
-    requireArchived = archivedRegex[1].toLowerCase() === "is"
+    requireArchived = (archivedRegex[1] as string).toLowerCase() === "is"
     freeFormSearch = freeFormSearch.replace(archivedRegex[0], "").trim()
   }
 
   let isFuture: null | boolean = null
   const futureRegex = search.match(/\b(is|not):future\b/i)
   if (futureRegex) {
-    isFuture = futureRegex[1].toLowerCase() === "is"
+    isFuture = (futureRegex[1] as string).toLowerCase() === "is"
     freeFormSearch = freeFormSearch.replace(/\b(is|not):future\b/i, "").trim()
   }
 
   let requirePublished: null | boolean = null
   const publishedRegex = search.match(/\b(is|not):published\b/i)
   if (publishedRegex) {
-    requirePublished = publishedRegex[1].toLowerCase() === "is"
+    requirePublished = (publishedRegex[1] as string).toLowerCase() === "is"
     freeFormSearch = freeFormSearch.replace(publishedRegex[0], "").trim()
   }
 
@@ -109,7 +109,7 @@ export function ListTable({
   let m: RegExpExecArray | null = categoryRegex.exec(search)
 
   while (m) {
-    categories.push(m[1] || m[2])
+    categories.push((m[1] || m[2]) as string)
     freeFormSearch = freeFormSearch.replace(m[0], "").trim()
     m = categoryRegex.exec(search)
   }
@@ -416,11 +416,14 @@ function Pageviews({ dates }: { dates: PageviewsByDate[] }) {
     return <span style={{ color: "gray" }}>n/a</span>
   }
   if (dates.length === 1) {
-    const first = dates[0]
+    const first = dates[0] as PageviewsByDate
     return <span style={{ color: "green" }}>{largeNumber(first.count)}</span>
   }
 
-  return <Delta first={dates[0]} second={dates[1]} />
+  const first = dates[0] as PageviewsByDate
+  const second = dates[1] as PageviewsByDate
+
+  return <Delta first={first} second={second} />
 }
 
 function Delta({

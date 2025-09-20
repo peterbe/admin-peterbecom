@@ -31,7 +31,13 @@ export function SearchTips({ append }: Props) {
           return (
             <Table.Tr key={search}>
               <Table.Th>
-                <Code onClick={() => append(search)}>{search}</Code>
+                <Code
+                  onClick={() => {
+                    if (search !== undefined) append(search)
+                  }}
+                >
+                  {search}
+                </Code>
               </Table.Th>
               <Table.Td>
                 <Text>{explanation}</Text>

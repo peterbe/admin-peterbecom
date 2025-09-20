@@ -2,7 +2,7 @@ import { Table, Text } from "@mantine/core"
 import { memo } from "react"
 
 import { Link } from "react-router"
-import type { QueryResultRow } from "../types"
+import type { QueryResultRow, QueryResultRowValue } from "../types"
 import { Value } from "./value"
 
 export const Rows = memo(function Rows({ data }: { data: QueryResultRow[] }) {
@@ -10,7 +10,7 @@ export const Rows = memo(function Rows({ data }: { data: QueryResultRow[] }) {
     return <Text>No rows to show.</Text>
   }
 
-  const first = data[0]
+  const first = data[0] as QueryResultRow
   const keys = Object.keys(first)
   const prefix = keys.join("")
 
@@ -62,7 +62,7 @@ export const Rows = memo(function Rows({ data }: { data: QueryResultRow[] }) {
                 <a href={`#r${i + 1}`}>{i + 1}</a>
               </Table.Td>
               {keys.map((key, j) => {
-                const value = row[key]
+                const value = row[key] as QueryResultRowValue
                 return (
                   <Table.Td key={`${key}${j}`}>
                     <Text size="xs">
