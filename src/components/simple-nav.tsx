@@ -23,11 +23,16 @@ export function Nav() {
     useDisclosure(false)
   const { userData } = useUserData()
 
+  // const isShort = useMediaQuery(`(max-height: 300px)`)
+  // console.log({ isShort })
+
   if (!userData?.user) {
     return null
   }
+
   return (
-    <Box pb={100}>
+    // <Box pb={10}>
+    <Box pb={{ base: "sm", sm: "md", md: "lg" }}>
       <header>
         <Group justify="space-between">
           <Group hiddenFrom="sm" pt={10}>

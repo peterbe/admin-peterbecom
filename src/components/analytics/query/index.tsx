@@ -1,65 +1,59 @@
-import {
-  Alert,
-  Code,
-  Container,
-  Kbd,
-  Paper,
-  Text,
-  Textarea,
-} from "@mantine/core"
-import { useDocumentTitle, useLocalStorage } from "@mantine/hooks"
+import { CodeHighlightAdapterProvider } from "@mantine/code-highlight"
+import { Alert, Box, Button, Code, Paper } from "@mantine/core"
+import { useDisclosure, useLocalStorage } from "@mantine/hooks"
+import Editor from "@monaco-editor/react"
 import { useQuery } from "@tanstack/react-query"
+import type { editor } from "monaco-editor"
+import { KeyCode, KeyMod } from "monaco-editor"
 import { useEffect, useRef, useState } from "react"
 import type { QueryResult } from "../types"
-import classes from "./query.module.css"
+import { getEditorHeight } from "./editor-height"
+import { KeyboardTip } from "./keyboard-tip"
+import { shikiAdapter } from "./load-shiki"
+import { PreviousQueriesDrawer } from "./previous-queries-drawer"
 import { Show } from "./show"
+import type { PreviousQuery } from "./types"
+import { useQueryDocumentTitle } from "./use-query-document-title"
 
 export function Component() {
-  const [value, setValue] = useLocalStorage({
+  const [savedQueries, _setSavedQueries, removeSavedQueries] = useLocalStorage({
     key: "saved-queries",
     defaultValue: "",
+  })
+
+  const [previousQueries, setPreviousQueries] = useLocalStorage<
+    PreviousQuery[]
+  >({
+    key: "previous-queries",
+    defaultValue: [],
   })
   const [activeQuery, setActiveQuery] = useLocalStorage({
     key: "active-query",
     defaultValue: "",
   })
 
-  const [typedQuery, setTypedQuery] = useState(value)
+  const hasMigrated = useRef(false)
   useEffect(() => {
-    if (value && !typedQuery) {
-      setTypedQuery(value)
-    }
-  }, [value, typedQuery])
-
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-  const textareaElement = textareaRef.current
-  useEffect(() => {
-    const listener = (event: KeyboardEvent) => {
-      if (event.key === "Enter" && event.metaKey) {
-        if (!typedQuery.trim()) {
-          console.warn("No typed query yet")
-
-          return
+    if (savedQueries && !hasMigrated.current && !previousQueries.length) {
+      const split = savedQueries.split("\n\n").filter((x) => x.trim())
+      if (split.length) {
+        console.log(split.length)
+        const date = new Date()
+        const migrated: PreviousQuery[] = []
+        for (const q of split) {
+          date.setSeconds(date.getSeconds() - 1)
+          migrated.push({ query: q, created: date.toISOString() })
         }
-        if (textareaRef.current) {
-          const extracted = extractActiveQuery(typedQuery, textareaRef.current)
-          if (extracted.length <= 1) {
-            // console.log({ typedQuery, extracted })
-            throw new Error("Extracting query from position failed")
-          }
-
-          setActiveQuery(extracted)
-          setValue(typedQuery)
+        if (migrated.length) {
+          setPreviousQueries(migrated)
         }
+        hasMigrated.current = true
+        removeSavedQueries()
       }
     }
-    if (textareaElement) textareaElement.addEventListener("keydown", listener)
+  }, [savedQueries, previousQueries, removeSavedQueries, setPreviousQueries])
 
-    return () => {
-      if (textareaElement)
-        textareaElement.removeEventListener("keydown", listener)
-    }
-  }, [textareaElement, typedQuery, setActiveQuery, setValue])
+  const [typedQuery, setTypedQuery] = useState(activeQuery)
 
   let xhrUrl = null
   if (activeQuery.trim()) {
@@ -96,83 +90,126 @@ export function Component() {
     },
   )
 
-  let title = "Query"
-  if (error) {
-    title = "Error in query"
-  } else if (isPending) {
-    title = "Loading query..."
-  } else if (data) {
-    title = `${data.meta.count_rows.toLocaleString()} rows`
+  useEffect(() => {
+    if (data) {
+      const hash = (s: string) => s.trim().replace(/\s+/g, " ")
+      const needle = hash(activeQuery)
+      const already = previousQueries.find((x) => hash(x.query) === needle)
+      if (!already) {
+        const pq: PreviousQuery = {
+          query: activeQuery,
+          created: new Date().toISOString(),
+          queryResult: data,
+        }
+        const pqs = [pq, ...previousQueries]
+        if (pqs.length > 50) {
+          pqs.splice(50, pqs.length - 50)
+        }
+        setPreviousQueries(pqs)
+      }
+    }
+  }, [data, activeQuery, previousQueries, setPreviousQueries])
+
+  useQueryDocumentTitle(error, isPending, data)
+
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+
+  function submitQuery() {
+    setActiveQuery(`${typedQuery.trim()}\n`)
   }
-  useDocumentTitle(title)
+
+  const monacoEditor = editorRef.current
+
+  if (monacoEditor) {
+    monacoEditor.addCommand(KeyCode.Enter | KeyMod.CtrlCmd, () => {
+      // Your code to execute when Ctrl/Cmd + Enter is pressed
+      // console.log("Ctrl/Cmd + Enter pressed!")
+      if (!typedQuery.trim()) {
+        console.warn("No typed query yet")
+        return
+      }
+
+      if (editorRef.current) {
+        submitQuery()
+      }
+    })
+  }
+  const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
+    useDisclosure(false)
+
+  const editorHeight = getEditorHeight(activeQuery)
 
   return (
-    <div>
-      <Textarea
-        placeholder="select * from analytics order by created desc limit 20"
-        label="SQL Query"
-        resize="both"
-        autosize
-        minRows={4}
-        maxRows={30}
-        autoFocus
-        required
-        classNames={{ input: classes.textarea }}
-        style={{ width: "100%" }}
-        ref={textareaRef}
-        value={typedQuery}
-        onChange={(event) => {
-          setTypedQuery(event.target.value)
-        }}
-        autoCorrect="off"
-      />
-      <Container mb={20}>
-        <Text size="sm" ta="right">
-          Use <Kbd>⌘</Kbd>-<Kbd>Enter</Kbd> to run the query when focus is
-          inside textarea
-        </Text>
-      </Container>
+    <CodeHighlightAdapterProvider adapter={shikiAdapter}>
+      <div>
+        <PreviousQueriesDrawer
+          opened={openedDrawer}
+          close={closeDrawer}
+          previousQueries={previousQueries}
+          onUseQuery={(query: string) => {
+            setTypedQuery(query)
+            submitQuery()
+            closeDrawer()
+          }}
+          setPreviousQueries={(queries: PreviousQuery[]) => {
+            setPreviousQueries(queries)
+          }}
+        />
 
-      {isPending && <Alert color="gray">Loading...</Alert>}
-      {error ? (
-        <Alert color={error.message.includes("500") ? "red" : "yellow"}>
-          <pre style={{ margin: 0 }}>{error.message}</pre>
-        </Alert>
-      ) : data?.error ? (
-        <Alert color="yellow">
-          <pre style={{ margin: 0 }}>{data.error}</pre>
-        </Alert>
-      ) : null}
+        {previousQueries.length > 0 && (
+          <Box mb={10}>
+            <Button variant="default" onClick={openDrawer}>
+              ({previousQueries.length}) Previous queries
+            </Button>
+          </Box>
+        )}
+        <Editor
+          // height="90vh"
+          height={`${editorHeight}px`}
+          language="sql"
+          theme="vs-light"
+          // theme={theme.colorScheme === "dark" ? "vs-dark" : "light"}
+          defaultValue="select * from analytics order by created desc limit 20"
+          value={typedQuery}
+          onChange={(value) => {
+            if (value !== undefined) setTypedQuery(value)
+          }}
+          onMount={(editor) => {
+            editorRef.current = editor
+          }}
+          options={{
+            minimap: { enabled: false },
+            fontSize: 14,
+            // automaticLayout: true,
+          }}
+        />
+        <Button mt={10} onClick={submitQuery} disabled={!typedQuery.trim()}>
+          Run query
+        </Button>
 
-      {data && !data.error && (
-        <Show data={data} isFetching={isFetching} refetch={() => refetch()} />
-      )}
+        <KeyboardTip />
 
-      {activeQuery && (
-        <Paper mt="xl">
-          Active query: <Code>{activeQuery}</Code>
-        </Paper>
-      )}
-    </div>
+        {isPending && <Alert color="gray">Loading...</Alert>}
+        {error ? (
+          <Alert color={error.message.includes("500") ? "red" : "yellow"}>
+            <pre style={{ margin: 0 }}>{error.message}</pre>
+          </Alert>
+        ) : data?.error ? (
+          <Alert color="yellow">
+            <pre style={{ margin: 0 }}>{data.error}</pre>
+          </Alert>
+        ) : null}
+
+        {data && !data.error && (
+          <Show data={data} isFetching={isFetching} refetch={() => refetch()} />
+        )}
+
+        {activeQuery && (
+          <Paper mt="xl">
+            Active query: <Code>{activeQuery}</Code>
+          </Paper>
+        )}
+      </div>
+    </CodeHighlightAdapterProvider>
   )
-}
-
-function extractActiveQuery(typedQuery: string, textarea: HTMLTextAreaElement) {
-  let a = textarea.selectionStart
-  let b = textarea.selectionEnd
-  while (a) {
-    const here = typedQuery.substring(a - 2, a)
-    if (here === "\n\n") {
-      break
-    }
-    a--
-  }
-  while (b < typedQuery.length) {
-    const here = typedQuery.substring(b, b + 2)
-    if (here === "\n\n") {
-      break
-    }
-    b++
-  }
-  return typedQuery.substring(a, b)
 }
