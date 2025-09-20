@@ -21,7 +21,7 @@ start-with-proxy: build
 
 start-for-testing:
     NODE_ENV=test npm run build
-    NODE_ENV=test npm run preview -- --port 4001
+    NODE_ENV=test npm run preview -- --port 3000
 
 tsc:
     npm run tsc
@@ -44,15 +44,19 @@ install:
 outdated:
     npx npm-check-updates --interactive
 
+run-for-playwright:
+    NODE_ENV=test npm run build
+    PORT=3000 NODE_ENV=test npm run serve
+
 test-playwright:
-    curl -s http://localhost:4001 > /dev/null
-    PLAYWRIGHT_BASE_URL=http://localhost:4001 npx playwright test
+    curl -s http://localhost:3000 > /dev/null
+    PLAYWRIGHT_BASE_URL=http://localhost:3000 npx playwright test
 
 playwright-codegen:
     npx playwright codegen
 
 test-manifest:
-    npm run test-manifest -- http://localhost:4001
+    npm run test-manifest -- http://localhost:3000
 
 test: test-playwright test-manifest
 
