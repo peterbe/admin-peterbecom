@@ -14,7 +14,7 @@
     "prepare": "husky",
     "serve": "serve dist",
     "test-manifest": "bun scripts/test-manifest.ts",
-    "compare-build-dirs": "node --experimental-strip-types --no-warnings scripts/compare-build-dirs.ts",
+    "compare-build-dirs": "bun run scripts/compare-build-dirs.ts",
     "postinstall": "bunx @biomejs/biome migrate --write"
   },
   "dependencies": {
