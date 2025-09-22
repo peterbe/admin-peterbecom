@@ -20,7 +20,7 @@ jobs:
 
       - name: Was it locked?
         run: |
-          git diff --exit-code bun.lockb
+          git diff --exit-code
 
       - name: Lint
         run: bun run lint
