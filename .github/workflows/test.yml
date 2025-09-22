@@ -18,6 +18,10 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install
 
+      - name: Was it locked?
+        run: |
+          git diff --exit-code bun.lockb
+
       - name: Lint
         run: bun run lint
 
