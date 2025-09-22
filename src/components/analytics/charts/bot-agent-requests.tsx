@@ -1,5 +1,14 @@
 import { BarChart } from "@mantine/charts"
-import { Box, Grid, Modal, Switch, Table, Text } from "@mantine/core"
+import {
+  Box,
+  Grid,
+  Modal,
+  SegmentedControl,
+  Switch,
+  Table,
+  Text,
+} from "@mantine/core"
+import { differenceInHours } from "date-fns"
 import { useState } from "react"
 import type { QueryResultRow } from "../types"
 import { DisplayError, DisplayWarning } from "./alerts"
@@ -12,32 +21,45 @@ import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
 
-const sqlQueryStatusCode = ({ limit = 200, days = 30, back = 0 } = {}) => `
-SELECT meta->>'botAgent' AS agent, status_code, COUNT(*) as count
-FROM requestlog
-WHERE
-    ${createdRange(days, back)}
-    AND (meta->'isbot')::BOOLEAN
-    AND (meta->>'botAgent') IS NOT NULL
-GROUP BY meta->>'botAgent', status_code
-ORDER BY 3 DESC
-LIMIT ${Number(limit)}
-`
-const sqlQuery = ({
+const FILTER_STATUS_CODES = {
+  all: "All",
+  "200": "Only 200",
+  "!200": "Anything but 200",
+}
+type FilterStatusCodes = keyof typeof FILTER_STATUS_CODES
+
+const sqlQueryStatusCodeRollup = ({
   limit = 200,
   days = 30,
   back = 0,
-  groupBy = "meta->>'botAgent'",
 } = {}) => `
-SELECT meta->>'botAgent' AS agent, count(${groupBy}) as count
-FROM requestlog
+SELECT bot_agent AS agent, status_code, SUM(count) as count
+FROM requestlogrollupsbotagentstatuscodedaily
 WHERE
-    ${createdRange(days, back)}
-    AND (meta->'isbot')::BOOLEAN
-    AND (meta->>'botAgent') IS NOT NULL
-GROUP BY ${groupBy}
+    ${createdRange(days, back, "day")}
+GROUP BY bot_agent, status_code
+ORDER BY 3 DESC
+LIMIT ${Number(limit)}
+`
+
+const sqlQueryRollup = ({
+  limit = 200,
+  days = 30,
+  back = 0,
+  filterStatusCodes = "all",
+} = {}) => `
+SELECT bot_agent AS agent, SUM(count) as count
+FROM requestlogrollupsbotagentstatuscodedaily
+WHERE
+    ${createdRange(days, back, "day")}
+    ${filterStatusCodes !== "all" ? (filterStatusCodes === "200" ? "AND status_code=200" : "AND status_code!=200") : ""}
+GROUP BY bot_agent
 ORDER BY 2 DESC
 LIMIT ${Number(limit)}
+`
+
+const sqlQueryLatestDay = () => `
+SELECT MAX(day) as day FROM requestlogrollupsbotagentstatuscodedaily
 `
 
 const ID = "bot-agent-requests"
@@ -55,24 +77,34 @@ function Inner() {
 
   const [intervalDays, setIntervalDays] = useInterval(ID)
   const [rows, setRows] = useRows(ID, 10)
+
+  const [filterStatusCodes, setFilterStatusCodes] =
+    useState<FilterStatusCodes>("all")
+
   const current = useQuery(
-    sqlQuery({ limit: Number(rows), days: Number(intervalDays) }),
+    sqlQueryRollup({
+      limit: Number(rows),
+      days: Number(intervalDays),
+      filterStatusCodes,
+    }),
+  )
+  const past = useQuery(
+    sqlQueryRollup({
+      limit: Number(rows),
+      days: Number(intervalDays) * 2,
+      back: Number(intervalDays),
+      filterStatusCodes,
+    }),
   )
 
   const statusCodes = useQuery(
-    sqlQueryStatusCode({
+    sqlQueryStatusCodeRollup({
       limit: 300,
       days: Number(intervalDays),
     }),
   )
 
-  const past = useQuery(
-    sqlQuery({
-      limit: Number(rows),
-      days: Number(intervalDays) * 2,
-      back: Number(intervalDays),
-    }),
-  )
+  const latestDay = useQuery(sqlQueryLatestDay())
 
   return (
     <>
@@ -84,15 +116,35 @@ function Inner() {
             rows={current.data.rows}
             previous={past.data.rows}
             statusCodes={statusCodes.data.rows}
+            latestDay={latestDay.data?.rows[0].day as string}
           />
         )}
       </Box>
       <Grid>
         <Grid.Col span={4}>
-          <IntervalOptions value={intervalDays} onChange={setIntervalDays} />
+          <IntervalOptions
+            value={intervalDays}
+            onChange={setIntervalDays}
+            range={[7, 28, 90]}
+          />
         </Grid.Col>
         <Grid.Col span={4}>
           <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <SegmentedControl
+            value={filterStatusCodes}
+            onChange={(v: string) => {
+              if (v in FILTER_STATUS_CODES) {
+                setFilterStatusCodes(v as FilterStatusCodes)
+              }
+            }}
+            data={[
+              { label: "All", value: "all" },
+              { label: "Only 200", value: "200" },
+              { label: "Anything but 200", value: "!200" },
+            ]}
+          />
         </Grid.Col>
       </Grid>
 
@@ -105,10 +157,12 @@ function AgentsTable({
   rows,
   previous,
   statusCodes,
+  latestDay,
 }: {
   rows: QueryResultRow[]
   previous: QueryResultRow[]
   statusCodes: QueryResultRow[]
+  latestDay?: string
 }) {
   type Entry = Record<string, number>
   const codes: Record<string, Entry> = {}
@@ -227,6 +281,13 @@ function AgentsTable({
           })}
         </Table.Tbody>
       </Table>
+      {latestDay && (
+        <Text size="xs" c="dimmed" ta="right">
+          The data is rolled up as of{" "}
+          <b>{differenceInHours(new Date(), new Date(latestDay))} hours ago</b>{" "}
+          ({new Date(latestDay).toISOString()}). .
+        </Text>
+      )}
     </div>
   )
 }
