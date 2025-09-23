@@ -1,5 +1,8 @@
-import { CodeHighlightAdapterProvider } from "@mantine/code-highlight"
-import { Alert, Box, Button, Code, Paper } from "@mantine/core"
+import {
+  CodeHighlight,
+  CodeHighlightAdapterProvider,
+} from "@mantine/code-highlight"
+import { Alert, Box, Button, Grid, Loader, Paper } from "@mantine/core"
 import { useDisclosure, useLocalStorage } from "@mantine/hooks"
 import Editor from "@monaco-editor/react"
 import { useQuery } from "@tanstack/react-query"
@@ -7,6 +10,7 @@ import type { editor } from "monaco-editor"
 import { KeyCode, KeyMod } from "monaco-editor"
 import { useEffect, useRef, useState } from "react"
 import type { QueryResult } from "../types"
+import { AllTablesModal } from "./all-tables-modal"
 import { getEditorHeight } from "./editor-height"
 import { KeyboardTip } from "./keyboard-tip"
 import { shikiAdapter } from "./load-shiki"
@@ -136,12 +140,21 @@ export function Component() {
   }
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false)
+  const [
+    openedAllTablesModal,
+    { close: closeAllTablesModal, toggle: toggleAllTablesModal },
+  ] = useDisclosure(false)
 
   const editorHeight = getEditorHeight(activeQuery)
 
   return (
     <CodeHighlightAdapterProvider adapter={shikiAdapter}>
       <div>
+        <AllTablesModal
+          opened={openedAllTablesModal}
+          onClose={closeAllTablesModal}
+        />
+
         <PreviousQueriesDrawer
           opened={openedDrawer}
           close={closeDrawer}
@@ -156,19 +169,25 @@ export function Component() {
           }}
         />
 
-        {previousQueries.length > 0 && (
-          <Box mb={10}>
-            <Button variant="default" onClick={openDrawer}>
-              ({previousQueries.length}) Previous queries
-            </Button>
-          </Box>
-        )}
+        <Grid>
+          <Grid.Col span={4}>
+            {previousQueries.length > 0 && (
+              <Box mb={10}>
+                <Button variant="default" onClick={openDrawer}>
+                  ({previousQueries.length}) Previous queries
+                </Button>
+              </Box>
+            )}
+          </Grid.Col>
+          <Grid.Col span={8}>
+            <KeyboardTip />
+          </Grid.Col>
+        </Grid>
+
         <Editor
-          // height="90vh"
           height={`${editorHeight}px`}
           language="sql"
           theme="vs-light"
-          // theme={theme.colorScheme === "dark" ? "vs-dark" : "light"}
           defaultValue="select * from analytics order by created desc limit 20"
           value={typedQuery}
           onChange={(value) => {
@@ -180,16 +199,27 @@ export function Component() {
           options={{
             minimap: { enabled: false },
             fontSize: 14,
+
             // automaticLayout: true,
           }}
         />
-        <Button mt={10} onClick={submitQuery} disabled={!typedQuery.trim()}>
-          Run query
-        </Button>
 
-        <KeyboardTip />
+        <Grid mb={10}>
+          <Grid.Col span={4}>
+            <Button onClick={submitQuery} disabled={!typedQuery.trim()}>
+              Run query
+            </Button>
+          </Grid.Col>
 
-        {isPending && <Alert color="gray">Loading...</Alert>}
+          <Grid.Col span={4}>
+            {isPending && <Loader color="blue" />}
+            {!isPending && (
+              <Button variant="light" onClick={toggleAllTablesModal}>
+                All tables
+              </Button>
+            )}
+          </Grid.Col>
+        </Grid>
         {error ? (
           <Alert color={error.message.includes("500") ? "red" : "yellow"}>
             <pre style={{ margin: 0 }}>{error.message}</pre>
@@ -206,7 +236,14 @@ export function Component() {
 
         {activeQuery && (
           <Paper mt="xl">
-            Active query: <Code>{activeQuery}</Code>
+            Active query:
+            <CodeHighlight
+              code={activeQuery}
+              language="sql"
+              radius="md"
+              withCopyButton={false}
+              mb={10}
+            />
           </Paper>
         )}
       </div>
