@@ -4,20 +4,31 @@ import {
 } from "@mantine/code-highlight"
 import { Alert, Box, Button, Grid, Loader, Paper } from "@mantine/core"
 import { useDisclosure, useLocalStorage } from "@mantine/hooks"
-import Editor from "@monaco-editor/react"
 import { useQuery } from "@tanstack/react-query"
-import type { editor } from "monaco-editor"
-import { KeyCode, KeyMod } from "monaco-editor"
+import { Editor, type PrismEditor } from "prism-react-editor"
+import { BasicSetup } from "prism-react-editor/setups"
 import { useEffect, useRef, useState } from "react"
 import type { QueryResult } from "../types"
 import { AllTablesModal } from "./all-tables-modal"
-import { getEditorHeight } from "./editor-height"
 import { KeyboardTip } from "./keyboard-tip"
 import { shikiAdapter } from "./load-shiki"
 import { PreviousQueriesDrawer } from "./previous-queries-drawer"
 import { Show } from "./show"
 import type { PreviousQuery } from "./types"
 import { useQueryDocumentTitle } from "./use-query-document-title"
+
+// Adding the JSX grammar
+// import "prism-react-editor/prism/languages/jsx"
+import "prism-react-editor/prism/languages/sql"
+
+// Adds comment toggling and auto-indenting for JSX
+// import "prism-react-editor/languages/sql"
+
+import "prism-react-editor/layout.css"
+import "prism-react-editor/themes/github-light.css"
+
+// Required by the basic setup
+// import "prism-react-editor/search.css"
 
 export function Component() {
   const [savedQueries, _setSavedQueries, removeSavedQueries] = useLocalStorage({
@@ -58,6 +69,9 @@ export function Component() {
   }, [savedQueries, previousQueries, removeSavedQueries, setPreviousQueries])
 
   const [typedQuery, setTypedQuery] = useState(activeQuery)
+  useEffect(() => {
+    if (activeQuery) setTypedQuery(activeQuery)
+  }, [activeQuery])
 
   let xhrUrl = null
   if (activeQuery.trim()) {
@@ -115,37 +129,39 @@ export function Component() {
   }, [data, activeQuery, previousQueries, setPreviousQueries])
 
   useQueryDocumentTitle(error, isPending, data)
-
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
-
   function submitQuery() {
     setActiveQuery(`${typedQuery.trim()}\n`)
   }
 
-  const monacoEditor = editorRef.current
+  const editorRef = useRef<PrismEditor | null>(null)
+  // const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
-  if (monacoEditor) {
-    monacoEditor.addCommand(KeyCode.Enter | KeyMod.CtrlCmd, () => {
-      // Your code to execute when Ctrl/Cmd + Enter is pressed
-      // console.log("Ctrl/Cmd + Enter pressed!")
-      if (!typedQuery.trim()) {
-        console.warn("No typed query yet")
-        return
-      }
+  // const monacoEditor = editorRef.current
 
-      if (editorRef.current) {
-        submitQuery()
-      }
-    })
-  }
+  // if (monacoEditor) {
+  //   monacoEditor.addCommand(KeyCode.Enter | KeyMod.CtrlCmd, () => {
+  //     // Your code to execute when Ctrl/Cmd + Enter is pressed
+  //     // console.log("Ctrl/Cmd + Enter pressed!")
+  //     if (!typedQuery.trim()) {
+  //       console.warn("No typed query yet")
+  //       return
+  //     }
+
+  //     if (editorRef.current) {
+  //       submitQuery()
+  //     }
+  //   })
+  // }
+
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false)
+
   const [
     openedAllTablesModal,
     { close: closeAllTablesModal, toggle: toggleAllTablesModal },
   ] = useDisclosure(false)
 
-  const editorHeight = getEditorHeight(activeQuery)
+  // const editorHeight = getEditorHeight(activeQuery)
 
   return (
     <CodeHighlightAdapterProvider adapter={shikiAdapter}>
@@ -184,7 +200,20 @@ export function Component() {
           </Grid.Col>
         </Grid>
 
+        {/*
+        Don't use it in a controlled way.
+        https://github.com/jonpyt/prism-react-editor?tab=readme-ov-file#pitfall
+        Treat the `value` as a default value only.
+         */}
         <Editor
+          language="sql"
+          value={typedQuery}
+          ref={editorRef}
+          lineNumbers={false}
+        >
+          {(editor) => <BasicSetup editor={editor} />}
+        </Editor>
+        {/* <Editor
           height={`${editorHeight}px`}
           language="sql"
           theme="vs-light"
@@ -202,7 +231,7 @@ export function Component() {
 
             // automaticLayout: true,
           }}
-        />
+        /> */}
 
         <Grid mb={10}>
           <Grid.Col span={4}>
