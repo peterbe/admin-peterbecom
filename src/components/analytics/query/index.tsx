@@ -2,7 +2,15 @@ import {
   CodeHighlight,
   CodeHighlightAdapterProvider,
 } from "@mantine/code-highlight"
-import { Alert, Box, Button, Grid, Loader, Paper } from "@mantine/core"
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Loader,
+  Paper,
+  useMantineColorScheme,
+} from "@mantine/core"
 import { useDisclosure, useLocalStorage } from "@mantine/hooks"
 import { useQuery } from "@tanstack/react-query"
 import { Editor, type PrismEditor } from "prism-react-editor"
@@ -25,12 +33,42 @@ import "prism-react-editor/prism/languages/sql"
 // import "prism-react-editor/languages/sql"
 
 import "prism-react-editor/layout.css"
-import "prism-react-editor/themes/github-light.css"
+import "prism-react-editor/themes/vs-code-light.css" // default
+// import "prism-react-editor/themes/github-light.css"
+// import "prism-react-editor/themes/github-dark.css"
+
+import { loadTheme } from "prism-react-editor/themes"
+
+// loadTheme("github-light").then((theme) => {
+//   console.log(theme)
+// })
 
 // Required by the basic setup
 // import "prism-react-editor/search.css"
 
+function injectStylesheet(cssText: string): void {
+  const existing = document.getElementById("prism-theme")
+  if (existing) {
+    existing.textContent = cssText
+  } else {
+    const style = document.createElement("style")
+    style.id = "prism-theme"
+    style.textContent = cssText
+    document.head.appendChild(style)
+  }
+}
+
 export function Component() {
+  const { colorScheme } = useMantineColorScheme()
+
+  useEffect(() => {
+    loadTheme(colorScheme === "light" ? "vs-code-light" : "vs-code-dark").then(
+      (theme) => {
+        if (theme) injectStylesheet(theme)
+      },
+    )
+  }, [colorScheme])
+
   const [savedQueries, _setSavedQueries, removeSavedQueries] = useLocalStorage({
     key: "saved-queries",
     defaultValue: "",
@@ -69,9 +107,6 @@ export function Component() {
   }, [savedQueries, previousQueries, removeSavedQueries, setPreviousQueries])
 
   const [typedQuery, setTypedQuery] = useState(activeQuery)
-  useEffect(() => {
-    if (activeQuery) setTypedQuery(activeQuery)
-  }, [activeQuery])
 
   let xhrUrl = null
   if (activeQuery.trim()) {
@@ -134,24 +169,21 @@ export function Component() {
   }
 
   const editorRef = useRef<PrismEditor | null>(null)
-  // const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
-  // const monacoEditor = editorRef.current
+  useEffect(() => {
+    const editor = editorRef.current
+    if (editor) {
+      const oldEnterCallback = editor.keyCommandMap.Enter
 
-  // if (monacoEditor) {
-  //   monacoEditor.addCommand(KeyCode.Enter | KeyMod.CtrlCmd, () => {
-  //     // Your code to execute when Ctrl/Cmd + Enter is pressed
-  //     // console.log("Ctrl/Cmd + Enter pressed!")
-  //     if (!typedQuery.trim()) {
-  //       console.warn("No typed query yet")
-  //       return
-  //     }
-
-  //     if (editorRef.current) {
-  //       submitQuery()
-  //     }
-  //   })
-  // }
+      editor.keyCommandMap.Enter = (e, selection, value) => {
+        if (e.metaKey) {
+          submitQuery()
+          return true
+        }
+        return oldEnterCallback?.(e, selection, value)
+      }
+    }
+  })
 
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false)
@@ -160,8 +192,6 @@ export function Component() {
     openedAllTablesModal,
     { close: closeAllTablesModal, toggle: toggleAllTablesModal },
   ] = useDisclosure(false)
-
-  // const editorHeight = getEditorHeight(activeQuery)
 
   return (
     <CodeHighlightAdapterProvider adapter={shikiAdapter}>
@@ -177,7 +207,7 @@ export function Component() {
           previousQueries={previousQueries}
           onUseQuery={(query: string) => {
             setTypedQuery(query)
-            submitQuery()
+            setActiveQuery(query)
             closeDrawer()
           }}
           setPreviousQueries={(queries: PreviousQuery[]) => {
@@ -207,37 +237,23 @@ export function Component() {
          */}
         <Editor
           language="sql"
-          value={typedQuery}
+          value={activeQuery}
           ref={editorRef}
           lineNumbers={false}
+          onUpdate={(value) => {
+            setTypedQuery(value)
+          }}
+          style={{
+            // height: "100%",
+            fontSize: "14px",
+          }}
         >
           {(editor) => <BasicSetup editor={editor} />}
         </Editor>
-        {/* <Editor
-          height={`${editorHeight}px`}
-          language="sql"
-          theme="vs-light"
-          defaultValue="select * from analytics order by created desc limit 20"
-          value={typedQuery}
-          onChange={(value) => {
-            if (value !== undefined) setTypedQuery(value)
-          }}
-          onMount={(editor) => {
-            editorRef.current = editor
-          }}
-          options={{
-            minimap: { enabled: false },
-            fontSize: 14,
-
-            // automaticLayout: true,
-          }}
-        /> */}
 
         <Grid mb={10}>
           <Grid.Col span={4}>
-            <Button onClick={submitQuery} disabled={!typedQuery.trim()}>
-              Run query
-            </Button>
+            <Button onClick={submitQuery}>Run query</Button>
           </Grid.Col>
 
           <Grid.Col span={4}>
