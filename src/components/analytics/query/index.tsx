@@ -15,7 +15,7 @@ import { useDisclosure, useLocalStorage } from "@mantine/hooks"
 import { useQuery } from "@tanstack/react-query"
 import { Editor, type PrismEditor } from "prism-react-editor"
 import { BasicSetup } from "prism-react-editor/setups"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import type { QueryResult } from "../types"
 import { AllTablesModal } from "./all-tables-modal"
 import { KeyboardTip } from "./keyboard-tip"
@@ -164,9 +164,10 @@ export function Component() {
   }, [data, activeQuery, previousQueries, setPreviousQueries])
 
   useQueryDocumentTitle(error, isPending, data)
-  function submitQuery() {
+
+  const submitQuery = useCallback(() => {
     setActiveQuery(`${typedQuery.trim()}\n`)
-  }
+  }, [typedQuery, setActiveQuery])
 
   const editorRef = useRef<PrismEditor | null>(null)
 
@@ -183,7 +184,7 @@ export function Component() {
         return oldEnterCallback?.(e, selection, value)
       }
     }
-  })
+  }, [submitQuery])
 
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false)
