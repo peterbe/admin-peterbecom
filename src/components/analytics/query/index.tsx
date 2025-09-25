@@ -2,16 +2,22 @@ import {
   CodeHighlight,
   CodeHighlightAdapterProvider,
 } from "@mantine/code-highlight"
-import { Alert, Box, Button, Grid, Loader, Paper } from "@mantine/core"
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Loader,
+  Paper,
+  useMantineColorScheme,
+} from "@mantine/core"
 import { useDisclosure, useLocalStorage } from "@mantine/hooks"
-import Editor from "@monaco-editor/react"
 import { useQuery } from "@tanstack/react-query"
-import type { editor } from "monaco-editor"
-import { KeyCode, KeyMod } from "monaco-editor"
+import { Editor, type PrismEditor } from "prism-react-editor"
+import { BasicSetup } from "prism-react-editor/setups"
 import { useEffect, useRef, useState } from "react"
 import type { QueryResult } from "../types"
 import { AllTablesModal } from "./all-tables-modal"
-import { getEditorHeight } from "./editor-height"
 import { KeyboardTip } from "./keyboard-tip"
 import { shikiAdapter } from "./load-shiki"
 import { PreviousQueriesDrawer } from "./previous-queries-drawer"
@@ -19,7 +25,50 @@ import { Show } from "./show"
 import type { PreviousQuery } from "./types"
 import { useQueryDocumentTitle } from "./use-query-document-title"
 
+// Adding the JSX grammar
+// import "prism-react-editor/prism/languages/jsx"
+import "prism-react-editor/prism/languages/sql"
+
+// Adds comment toggling and auto-indenting for JSX
+// import "prism-react-editor/languages/sql"
+
+import "prism-react-editor/layout.css"
+import "prism-react-editor/themes/vs-code-light.css" // default
+// import "prism-react-editor/themes/github-light.css"
+// import "prism-react-editor/themes/github-dark.css"
+
+import { loadTheme } from "prism-react-editor/themes"
+
+// loadTheme("github-light").then((theme) => {
+//   console.log(theme)
+// })
+
+// Required by the basic setup
+// import "prism-react-editor/search.css"
+
+function injectStylesheet(cssText: string): void {
+  const existing = document.getElementById("prism-theme")
+  if (existing) {
+    existing.textContent = cssText
+  } else {
+    const style = document.createElement("style")
+    style.id = "prism-theme"
+    style.textContent = cssText
+    document.head.appendChild(style)
+  }
+}
+
 export function Component() {
+  const { colorScheme } = useMantineColorScheme()
+
+  useEffect(() => {
+    loadTheme(colorScheme === "light" ? "vs-code-light" : "vs-code-dark").then(
+      (theme) => {
+        if (theme) injectStylesheet(theme)
+      },
+    )
+  }, [colorScheme])
+
   const [savedQueries, _setSavedQueries, removeSavedQueries] = useLocalStorage({
     key: "saved-queries",
     defaultValue: "",
@@ -115,37 +164,34 @@ export function Component() {
   }, [data, activeQuery, previousQueries, setPreviousQueries])
 
   useQueryDocumentTitle(error, isPending, data)
-
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
-
   function submitQuery() {
     setActiveQuery(`${typedQuery.trim()}\n`)
   }
 
-  const monacoEditor = editorRef.current
+  const editorRef = useRef<PrismEditor | null>(null)
 
-  if (monacoEditor) {
-    monacoEditor.addCommand(KeyCode.Enter | KeyMod.CtrlCmd, () => {
-      // Your code to execute when Ctrl/Cmd + Enter is pressed
-      // console.log("Ctrl/Cmd + Enter pressed!")
-      if (!typedQuery.trim()) {
-        console.warn("No typed query yet")
-        return
-      }
+  useEffect(() => {
+    const editor = editorRef.current
+    if (editor) {
+      const oldEnterCallback = editor.keyCommandMap.Enter
 
-      if (editorRef.current) {
-        submitQuery()
+      editor.keyCommandMap.Enter = (e, selection, value) => {
+        if (e.metaKey) {
+          submitQuery()
+          return true
+        }
+        return oldEnterCallback?.(e, selection, value)
       }
-    })
-  }
+    }
+  })
+
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false)
+
   const [
     openedAllTablesModal,
     { close: closeAllTablesModal, toggle: toggleAllTablesModal },
   ] = useDisclosure(false)
-
-  const editorHeight = getEditorHeight(activeQuery)
 
   return (
     <CodeHighlightAdapterProvider adapter={shikiAdapter}>
@@ -161,7 +207,7 @@ export function Component() {
           previousQueries={previousQueries}
           onUseQuery={(query: string) => {
             setTypedQuery(query)
-            submitQuery()
+            setActiveQuery(query)
             closeDrawer()
           }}
           setPreviousQueries={(queries: PreviousQuery[]) => {
@@ -184,31 +230,30 @@ export function Component() {
           </Grid.Col>
         </Grid>
 
+        {/*
+        Don't use it in a controlled way.
+        https://github.com/jonpyt/prism-react-editor?tab=readme-ov-file#pitfall
+        Treat the `value` as a default value only.
+         */}
         <Editor
-          height={`${editorHeight}px`}
           language="sql"
-          theme="vs-light"
-          defaultValue="select * from analytics order by created desc limit 20"
-          value={typedQuery}
-          onChange={(value) => {
-            if (value !== undefined) setTypedQuery(value)
+          value={activeQuery}
+          ref={editorRef}
+          lineNumbers={false}
+          onUpdate={(value) => {
+            setTypedQuery(value)
           }}
-          onMount={(editor) => {
-            editorRef.current = editor
+          style={{
+            // height: "100%",
+            fontSize: "14px",
           }}
-          options={{
-            minimap: { enabled: false },
-            fontSize: 14,
-
-            // automaticLayout: true,
-          }}
-        />
+        >
+          {(editor) => <BasicSetup editor={editor} />}
+        </Editor>
 
         <Grid mb={10}>
           <Grid.Col span={4}>
-            <Button onClick={submitQuery} disabled={!typedQuery.trim()}>
-              Run query
-            </Button>
+            <Button onClick={submitQuery}>Run query</Button>
           </Grid.Col>
 
           <Grid.Col span={4}>
