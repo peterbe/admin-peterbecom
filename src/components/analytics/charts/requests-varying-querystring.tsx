@@ -24,6 +24,7 @@ import { apiPrefix, fetcher } from "./fetcher"
 import { IntervalOptions } from "./interval-options"
 import { Loading } from "./loading"
 import { RowsOptions } from "./rows-options"
+import { TruncateText } from "./truncate-text"
 import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
@@ -226,7 +227,18 @@ function PathsTable({ rows }: { rows: QueryResultRow[] }) {
                   setSearchParams(sp)
                 }}
               >
-                {row.path}
+                {/* <TruncateText
+                  size="sm"
+                  text={row.path as string}
+                  // maxLength={40}
+                >
+                  {row.path as string}
+                </TruncateText> */}
+                <TruncateText
+                  size="sm"
+                  text={row.path as string}
+                  // maxLength={40}
+                />
               </Table.Td>
               <Table.Td style={{ textAlign: "right" }}>
                 {numberFormat.format(row.count as number)}
