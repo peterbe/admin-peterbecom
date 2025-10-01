@@ -13,7 +13,7 @@
         "@mantine/notifications": "^8.3.1",
         "@tabler/icons-react": "^3.35.0",
         "@tanstack/query-async-storage-persister": "^5.89.0",
-        "@tanstack/react-query": "^5.89.0",
+        "@tanstack/react-query": "^5.90.2",
         "@tanstack/react-query-devtools": "^5.89.0",
         "@tanstack/react-query-persist-client": "^5.89.0",
         "date-fns": "^4.1.0",
@@ -307,7 +307,7 @@
 
     "@tanstack/query-persist-client-core": ["@tanstack/query-persist-client-core@5.90.1", "", { "dependencies": { "@tanstack/query-core": "5.90.1" } }, "sha512-0G5/r/ovaPOoFXdO+VUV6s5pVnUQbjGv1EwYKeC5GkkGBLD1KQwYxudwj4+U8ue722EtGdB7Y4nTijpVN+Z6gA=="],
 
-    "@tanstack/react-query": ["@tanstack/react-query@5.90.1", "", { "dependencies": { "@tanstack/query-core": "5.90.1" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-tN7Fx2HuV2SBhl+STgL8enbfSInRoNU1B1+5LIU62klcMElE4lFzol4aReuRSUeD6ntzPayK0KrM6w9+ZlHEkw=="],
+    "@tanstack/react-query": ["@tanstack/react-query@5.90.2", "", { "dependencies": { "@tanstack/query-core": "5.90.2" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-CLABiR+h5PYfOWr/z+vWFt5VsOA2ekQeRQBFSKlcoW6Ndx/f8rfyVmq4LbgOM4GG2qtxAxjLYLOpCNTYm4uKzw=="],
 
     "@tanstack/react-query-devtools": ["@tanstack/react-query-devtools@5.90.1", "", { "dependencies": { "@tanstack/query-devtools": "5.90.1" }, "peerDependencies": { "@tanstack/react-query": "^5.90.1", "react": "^18 || ^19" } }, "sha512-otOjczcUft13RZlWi8JHIWei1MLuRf0AK+hyEEAm0/IqKUbs/0ZXj0wlc+P1XdE0nYcOMuHK69496FvP/9g3LQ=="],
 
@@ -824,6 +824,8 @@
     "@bundled-es-modules/cookie/cookie": ["cookie@0.7.2", "", {}, "sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w=="],
 
     "@inquirer/core/wrap-ansi": ["wrap-ansi@6.2.0", "", { "dependencies": { "ansi-styles": "^4.0.0", "string-width": "^4.1.0", "strip-ansi": "^6.0.0" } }, "sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA=="],
+
+    "@tanstack/react-query/@tanstack/query-core": ["@tanstack/query-core@5.90.2", "", {}, "sha512-k/TcR3YalnzibscALLwxeiLUub6jN5EDLwKDiO7q5f4ICEoptJ+n9+7vcEFy5/x/i6Q+Lb/tXrsKCggf5uQJXQ=="],
 
     "ansi-escapes/type-fest": ["type-fest@0.21.3", "", {}, "sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w=="],
 
