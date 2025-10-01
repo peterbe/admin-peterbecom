@@ -10,7 +10,7 @@
         "@mantine/dropzone": "^8.3.1",
         "@mantine/form": "^8.3.1",
         "@mantine/hooks": "^8.3.1",
-        "@mantine/notifications": "^8.3.1",
+        "@mantine/notifications": "^8.3.2",
         "@tabler/icons-react": "^3.35.0",
         "@tanstack/query-async-storage-persister": "^5.89.0",
         "@tanstack/react-query": "^5.89.0",
@@ -199,9 +199,9 @@
 
     "@mantine/hooks": ["@mantine/hooks@8.3.1", "", { "peerDependencies": { "react": "^18.x || ^19.x" } }, "sha512-lQutBS+Q0iz/cNFvdrsYassPWo3RtWcmDGJeOtKfHigLzFOhxUuLOkQgepDbMf3WcVMB/tist6Px1PQOv57JTw=="],
 
-    "@mantine/notifications": ["@mantine/notifications@8.3.1", "", { "dependencies": { "@mantine/store": "8.3.1", "react-transition-group": "4.4.5" }, "peerDependencies": { "@mantine/core": "8.3.1", "@mantine/hooks": "8.3.1", "react": "^18.x || ^19.x", "react-dom": "^18.x || ^19.x" } }, "sha512-C1Iqa4g1HNNTLv2/CxOCR1mNlYNFCNtnS0u/JsR+HvtFVrun1namxDG6e6/U0hIva2klogYdivx4cyxmjPFerg=="],
+    "@mantine/notifications": ["@mantine/notifications@8.3.2", "", { "dependencies": { "@mantine/store": "8.3.2", "react-transition-group": "4.4.5" }, "peerDependencies": { "@mantine/core": "8.3.2", "@mantine/hooks": "8.3.2", "react": "^18.x || ^19.x", "react-dom": "^18.x || ^19.x" } }, "sha512-DLo3T8epAVPKT8KJePHix6xyY8NzWYC4u9W/UyUBtZlhooJrY1Fm77B9vMP+T0dJg//QnE8WDLHVtOb0QNb1Ow=="],
 
-    "@mantine/store": ["@mantine/store@8.3.1", "", { "peerDependencies": { "react": "^18.x || ^19.x" } }, "sha512-OZwg0YKbCEKnkFmS9oRLKA8TMriBzO1T6nUib1yfLCx0VFuznllYZiDtaSWNkEYSdnFWCv5hKh5aOD4RHUnQfQ=="],
+    "@mantine/store": ["@mantine/store@8.3.2", "", { "peerDependencies": { "react": "^18.x || ^19.x" } }, "sha512-AZ2Gzj7G8mtdb/GCwda4Ol/DjRmU2hYLaSH/UAUC4Z79kYSHF7CE5uJl7NKLmJnwyFR6Znz/XHpyxfNzPN4nmQ=="],
 
     "@mswjs/interceptors": ["@mswjs/interceptors@0.39.2", "", { "dependencies": { "@open-draft/deferred-promise": "^2.2.0", "@open-draft/logger": "^0.3.0", "@open-draft/until": "^2.0.0", "is-node-process": "^1.2.0", "outvariant": "^1.4.3", "strict-event-emitter": "^0.5.1" } }, "sha512-RuzCup9Ct91Y7V79xwCb146RaBRHZ7NBbrIUySumd1rpKqHL5OonaqrGIbug5hNwP/fRyxFMA6ISgw4FTtYFYg=="],
 
