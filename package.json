@@ -23,7 +23,7 @@
     "@mantine/core": "^8.3.1",
     "@mantine/dropzone": "^8.3.1",
     "@mantine/form": "^8.3.1",
-    "@mantine/hooks": "^8.3.1",
+    "@mantine/hooks": "^8.3.2",
     "@mantine/notifications": "^8.3.1",
     "@tabler/icons-react": "^3.35.0",
     "@tanstack/query-async-storage-persister": "^5.89.0",
