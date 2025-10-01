@@ -4,7 +4,7 @@
     "": {
       "name": "admin-peterbecom",
       "dependencies": {
-        "@mantine/charts": "^8.3.1",
+        "@mantine/charts": "^8.3.2",
         "@mantine/code-highlight": "^8.3.1",
         "@mantine/core": "^8.3.1",
         "@mantine/dropzone": "^8.3.1",
@@ -187,7 +187,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.29", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-uw6guiW/gcAGPDhLmd77/6lW8QLeiV5RUTsAX46Db6oLhGaVj4lhnPwb184s1bkc8kdVg/+h988dro8GRDpmYQ=="],
 
-    "@mantine/charts": ["@mantine/charts@8.3.1", "", { "peerDependencies": { "@mantine/core": "8.3.1", "@mantine/hooks": "8.3.1", "react": "^18.x || ^19.x", "react-dom": "^18.x || ^19.x", "recharts": ">=2.13.3" } }, "sha512-Mb6rSbDbcL2lQmSVZA3dZfJf3734qsdN+UeZ8vAoh00e1hJEzu6hT0SUimP7G16q1yMaB+6bgN76lOQsG8vRug=="],
+    "@mantine/charts": ["@mantine/charts@8.3.2", "", { "peerDependencies": { "@mantine/core": "8.3.2", "@mantine/hooks": "8.3.2", "react": "^18.x || ^19.x", "react-dom": "^18.x || ^19.x", "recharts": ">=2.13.3" } }, "sha512-Mcw3uWshHIhy8U2PeGw+DjZA6mAc6dC6gOqj3vzk2ngbGD//j6jxTrREnQx/iKKajHIyfpbT09rjdFGgwG6H+A=="],
 
     "@mantine/code-highlight": ["@mantine/code-highlight@8.3.1", "", { "dependencies": { "clsx": "^2.1.1" }, "peerDependencies": { "@mantine/core": "8.3.1", "@mantine/hooks": "8.3.1", "react": "^18.x || ^19.x", "react-dom": "^18.x || ^19.x" } }, "sha512-YRjMuLGnNg8BlzYg1+Dj3ZW3sb4q0P9QBNZwGdKpe4x0dtLOPa3pVPnKWhSiD4/Y0cWUbCiyzUQ+MlzFYnAg9w=="],
 
