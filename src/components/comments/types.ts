@@ -39,6 +39,7 @@ export type Comment = {
   email: string
   name: string
   location: LocationT | null
+  ip_address: string | null
   max_add_date: string
   modify_date: string
   page: number

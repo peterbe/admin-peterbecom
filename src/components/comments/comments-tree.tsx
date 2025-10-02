@@ -25,6 +25,7 @@ import { fixAllCaps, isAllCaps } from "./all-caps"
 import { ApprovalForm } from "./approval-form"
 import { ClassifyComment } from "./classify"
 import { DisplayClues } from "./clues"
+import { CommentIPAddress } from "./comment-ip-address"
 import classes from "./comments-tree.module.css"
 import { DisplayLocation } from "./location"
 import { SpamSignatureComment } from "./spam-signature"
@@ -270,6 +271,7 @@ function InnerComment({
                 ) : (
                   <em>location not known</em>
                 )}
+                <CommentIPAddress comment={comment} />
               </Group>
             )}
             {!editMode && (
