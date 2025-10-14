@@ -53,5 +53,5 @@ test-manifest:
 
 test: test-playwright test-manifest
 
-upgrade: outdated
-    bunx npm-check-updates --interactive
+upgrade:
+    bun update --interactive
