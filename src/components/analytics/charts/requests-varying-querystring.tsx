@@ -319,7 +319,7 @@ function URLsTable({ rows }: { rows: QueryResultRow[] }) {
         color: "green",
       })
     }
-  }, [clickedUrl, clipboard.copy])
+  }, [clickedUrl, clipboard])
 
   if (rows.length === 0) {
     return (
