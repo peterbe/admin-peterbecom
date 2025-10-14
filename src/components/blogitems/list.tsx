@@ -85,7 +85,7 @@ export function List() {
         return newData
       },
     )
-  }, [updater.data, queryClient.setQueryData])
+  }, [updater.data, queryClient])
 
   return (
     <Box>
