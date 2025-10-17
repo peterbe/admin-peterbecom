@@ -55,3 +55,4 @@ test: test-playwright test-manifest
 
 upgrade:
     bun update --interactive
+    bunx biome migrate --write
