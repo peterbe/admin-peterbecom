@@ -16,6 +16,8 @@ export type BlogitemT = {
   summary: string
   archived: null
   has_split: boolean
+  hide_comments: boolean
+  disallow_comments: boolean
 }
 
 export type EditBlogitemT = {
