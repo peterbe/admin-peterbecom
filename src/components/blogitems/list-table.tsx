@@ -283,6 +283,13 @@ export function ListTable({
                     </CustomBadge>
                   )}
 
+                  {item.hide_comments && (
+                    <CustomBadge color="red">Comments hidden</CustomBadge>
+                  )}
+                  {item.disallow_comments && (
+                    <CustomBadge color="red">Comments disallowed</CustomBadge>
+                  )}
+
                   {item.archived && (
                     <CustomBadge color="red">Archived</CustomBadge>
                   )}
