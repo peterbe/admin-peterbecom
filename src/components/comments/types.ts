@@ -42,12 +42,10 @@ export type Comment = {
   ip_address: string | null
   max_add_date: string
   modify_date: string
-  page: number
   rendered: string
   replies: Comment[]
   user_agent: string
   user_other_comments_count: number
-  _absolute_url: string
   _bumped: boolean
   _clues: Clues
   gravatar_url: string
