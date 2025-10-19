@@ -277,7 +277,7 @@ function InnerComment({
             {!editMode && (
               <Text size="xs">
                 <Anchor
-                  href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}#${comment.oid}`}
+                  href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}/comment/${comment.oid}`}
                 >
                   <DisplayDate date={comment.add_date} />
                   {!equalDates(comment.add_date, comment.modify_date) && (
