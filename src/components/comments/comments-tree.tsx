@@ -27,6 +27,7 @@ import { ClassifyComment } from "./classify"
 import { DisplayClues } from "./clues"
 import { CommentIPAddress } from "./comment-ip-address"
 import classes from "./comments-tree.module.css"
+import { DeleteComment } from "./delete-comment"
 import { DisplayLocation } from "./location"
 import { SpamSignatureComment } from "./spam-signature"
 import type { Comment } from "./types"
@@ -272,6 +273,10 @@ function InnerComment({
                   <em>location not known</em>
                 )}
                 <CommentIPAddress comment={comment} />
+                <DeleteComment
+                  comment={comment}
+                  refetchComments={refetchComments}
+                />
               </Group>
             )}
             {!editMode && (
