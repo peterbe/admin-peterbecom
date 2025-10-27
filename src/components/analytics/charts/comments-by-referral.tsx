@@ -4,21 +4,36 @@ import { DisplayError } from "./alerts"
 import { ChartContainer } from "./container"
 import { createdRange } from "./created-range"
 import { Loading } from "./loading"
+import { QueriesTookInfo } from "./queries-took-info"
 import { type QueryOptions, useSQLQuery } from "./use-query"
+
+// const sqlQuery = ({ limit = 100, days = 30, back = 0 } = {}) =>
+//   `
+// SELECT
+//     meta->>'referrer' = '' AS has_referrer,
+//     data->>'is_bot' AS is_bot,
+//     count(*) AS count
+// FROM analytics
+// WHERE
+//     ${createdRange(days, back)}
+//     AND type='pageview'
+//     AND data->>'is_comment' = 'true'
+// GROUP BY meta->>'referrer' = '', data->>'is_bot'
+// ORDER BY 2 desc
+// LIMIT ${Number(limit)}
+// `.trim()
 
 const sqlQuery = ({ limit = 100, days = 30, back = 0 } = {}) =>
   `
 SELECT
-    meta->>'referrer' = '' AS has_referrer,
-    data->>'is_bot' AS is_bot,
-    count(*) AS count
-FROM analytics
+    referrer = '' AS has_referrer,
+    is_bot,
+    SUM(count) AS count
+FROM analyticsrollupcommentsreferrerdaily
 WHERE
-    ${createdRange(days, back)}
-    AND type='pageview'
-    AND data->>'is_comment' = 'true'
-GROUP BY meta->>'referrer' = '', data->>'is_bot'
-ORDER BY 2 desc
+    ${createdRange(days, back, "day")}
+GROUP BY referrer = '', is_bot
+ORDER BY 3 desc
 LIMIT ${Number(limit)}
 `.trim()
 
@@ -47,6 +62,7 @@ function Inner() {
       </Box>
 
       <DisplayError error={current.error} />
+      <QueriesTookInfo queries={[current]} />
     </>
   )
 }
