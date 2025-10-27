@@ -16,6 +16,7 @@ import { ChartContainer } from "./container"
 import { createdRange } from "./created-range"
 import { IntervalOptions } from "./interval-options"
 import { Loading } from "./loading"
+import { QueriesTookInfo } from "./queries-took-info"
 import { RowsOptions } from "./rows-options"
 import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
@@ -120,7 +121,7 @@ function Inner() {
           />
         )}
       </Box>
-      <Grid>
+      <Grid mb={20}>
         <Grid.Col span={4}>
           <IntervalOptions
             value={intervalDays}
@@ -149,6 +150,7 @@ function Inner() {
       </Grid>
 
       <DisplayError error={current.error || past.error} />
+      <QueriesTookInfo queries={[current, past]} />
     </>
   )
 }
