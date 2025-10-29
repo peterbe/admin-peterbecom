@@ -7,22 +7,6 @@ import { Loading } from "./loading"
 import { QueriesTookInfo } from "./queries-took-info"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 
-// const sqlQuery = ({ limit = 100, days = 30, back = 0 } = {}) =>
-//   `
-// SELECT
-//     meta->>'referrer' = '' AS has_referrer,
-//     data->>'is_bot' AS is_bot,
-//     count(*) AS count
-// FROM analytics
-// WHERE
-//     ${createdRange(days, back)}
-//     AND type='pageview'
-//     AND data->>'is_comment' = 'true'
-// GROUP BY meta->>'referrer' = '', data->>'is_bot'
-// ORDER BY 2 desc
-// LIMIT ${Number(limit)}
-// `.trim()
-
 const sqlQuery = ({ limit = 100, days = 30, back = 0 } = {}) =>
   `
 SELECT
@@ -82,7 +66,7 @@ function TableByGroups({ rows }: { rows: QueryResultRow[] }) {
           return (
             <Table.Tr key={`${row.has_referrer}-${row.is_bot}`}>
               <Table.Td>{row.has_referrer ? "Yes" : "No"}</Table.Td>
-              <Table.Td>{row.is_bot === "true" ? "Yes" : "No"}</Table.Td>
+              <Table.Td>{row.is_bot ? "Yes" : "No"}</Table.Td>
               <Table.Td style={{ textAlign: "right" }}>
                 {(row.count as number).toLocaleString("en-US")}
               </Table.Td>
