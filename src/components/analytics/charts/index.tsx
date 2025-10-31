@@ -5,6 +5,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { queryClient } from "../../../query-client"
 import { SignedIn } from "../../signed-in"
 import { BotAgentRequests } from "./bot-agent-requests"
+import { CommentsByPost } from "./comments-by-post"
 import { CommentsByReferral } from "./comments-by-referral"
 import { GeoLocations } from "./geo-locations"
 import { LogoEvents } from "./logo-events"
@@ -47,6 +48,7 @@ export function Component() {
             <LogoEvents />
             <UserAgents />
             <CommentsByReferral />
+            <CommentsByPost />
             <LyricsPages />
             <BotAgentRequests />
             <RequestsPerDay />
