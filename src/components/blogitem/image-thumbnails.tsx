@@ -36,6 +36,7 @@ export function ImageThumbnails({ oid }: { oid: string }) {
               {images.data.images.map((image) => (
                 <ImageThumbnail key={image.full_url} image={image} />
               ))}
+              {/* <ImageFullThumbnail image={image} /> */}
             </Group>
           </Group>
         </Container>
@@ -51,9 +52,10 @@ export function ImageThumbnails({ oid }: { oid: string }) {
 }
 
 function ImageThumbnail({ image }: { image: ImageT }) {
-  const sizes = ["small", "big", "bigger"] as const
+  // const sizes = ["small", "big", "bigger"] as const
+  const sizes = ["big", "bigger"] as const
 
-  return sizes.map((size) => {
+  const bySizes = sizes.map((size) => {
     const thumb = image[size]
     const imageTagHtml = `
     <img src="${thumb.url}" alt="${thumb.alt}" width="${thumb.width}" height="${thumb.height}">
@@ -88,32 +90,6 @@ function ImageThumbnail({ image }: { image: ImageT }) {
         )}
 
         <Group gap="xs">
-          <CopyButton value={thumb.url}>
-            {({ copied, copy }) => (
-              <Button
-                variant={copied ? "filled" : "default"}
-                color={copied ? "green" : undefined}
-                size="xs"
-                onClick={copy}
-              >
-                {copied ? "Copied" : "URL"}
-              </Button>
-            )}
-          </CopyButton>
-
-          <CopyButton value={imageTagHtml}>
-            {({ copied, copy }) => (
-              <Button
-                variant={copied ? "filled" : "default"}
-                color={copied ? "green" : undefined}
-                size="xs"
-                onClick={copy}
-              >
-                {copied ? "Copied" : "Image tag"}
-              </Button>
-            )}
-          </CopyButton>
-
           <CopyButton value={aTagHtml}>
             {({ copied, copy }) => (
               <Button
@@ -130,4 +106,57 @@ function ImageThumbnail({ image }: { image: ImageT }) {
       </Card>
     )
   })
+
+  let alt = ""
+  for (const value of Object.values(image)) {
+    if (typeof value === "object" && "alt" in value && value.alt) {
+      alt = value.alt
+      break
+    }
+  }
+
+  const fullSizeHtml = `
+    <a href="${image.full_url}"><img src="${image.full_url}" class="fullsize"></a>
+    `.trim()
+
+  console.log(image.full_size)
+
+  bySizes.push(
+    <Card key="full" shadow="sm" padding="lg" radius="md" withBorder>
+      <Card.Section>
+        <AbsoluteImage src={image.full_url} alt={alt} w={200} />
+      </Card.Section>
+
+      <Group justify="space-between" mt="md" mb="xs">
+        <Text fw={500}>
+          {" "}
+          {image.full_size[0]}x{image.full_size[1]}{" "}
+        </Text>
+        <Badge>Full</Badge>
+      </Group>
+
+      {alt && (
+        <Text size="sm" c="dimmed">
+          {alt}
+        </Text>
+      )}
+
+      <Group gap="xs">
+        <CopyButton value={fullSizeHtml}>
+          {({ copied, copy }) => (
+            <Button
+              variant={copied ? "filled" : "default"}
+              color={copied ? "green" : undefined}
+              size="xs"
+              onClick={copy}
+            >
+              {copied ? "Copied" : "Full size"}
+            </Button>
+          )}
+        </CopyButton>
+      </Group>
+    </Card>,
+  )
+
+  return bySizes
 }
