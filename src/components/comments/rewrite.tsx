@@ -12,6 +12,8 @@ import { useQuery } from "@tanstack/react-query"
 import { commentRewriteQueryKey, fetchCommentRewrite } from "../api-utils"
 import type { Comment } from "./types"
 import "./rewrite-styles.css"
+import { IconHourglassHigh, IconReload } from "@tabler/icons-react"
+import { useState } from "react"
 import { Fragment } from "react/jsx-runtime"
 import { Took } from "../analytics/query/took"
 
@@ -34,11 +36,16 @@ export function RewriteComment({
   comment: Comment
   onClose: (newText?: string) => void
 }) {
-  const { data, error, isPending } = useQuery<RewriteServerData>({
-    queryKey: commentRewriteQueryKey(comment.oid),
-    queryFn: () => fetchCommentRewrite(comment.oid),
-    retry: false,
-  })
+  const [manuallyLoading, setManuallyLoading] = useState(false)
+
+  const { data, error, isPending, isLoading, refetch } =
+    useQuery<RewriteServerData>({
+      queryKey: commentRewriteQueryKey(comment.oid),
+      queryFn: () => fetchCommentRewrite(comment.oid),
+      retry: false,
+    })
+
+  console.log({ isPending, isLoading })
 
   return (
     <Modal
@@ -49,9 +56,7 @@ export function RewriteComment({
       }}
       title={isPending ? "Rewrite (loading)" : "Rewrite"}
     >
-      <LoadingOverlay
-        visible={isPending || data?.llm_call.status === "progress"}
-      />
+      <LoadingOverlay visible={isPending} />
       {error && (
         <Alert color="red">
           Failed to load classification: {error.message}
@@ -60,9 +65,44 @@ export function RewriteComment({
 
       {data && <LLMInfo llm_call={data.llm_call} />}
 
-      <Blockquote color="gray" cite="Before" mt="xl">
+      <Blockquote color="gray" cite="Before" mt="xl" mb={20}>
         <Lines text={comment.comment.trim()} />
       </Blockquote>
+
+      {data?.llm_call.status === "progress" && (
+        <Alert
+          color="yellow"
+          title="Rewrite in progress"
+          icon={<IconHourglassHigh />}
+          mb={20}
+        >
+          The rewrite is still in progress. Please wait a moment and try again.
+        </Alert>
+      )}
+
+      {data?.llm_call.status === "progress" && (
+        <Button
+          fullWidth
+          variant="outline"
+          leftSection={<IconReload />}
+          loading={manuallyLoading}
+          disabled={manuallyLoading}
+          onClick={() => {
+            refetch()
+            setManuallyLoading(true)
+            setTimeout(() => {
+              setManuallyLoading(false)
+              refetch()
+            }, 2000)
+            setTimeout(() => {
+              setManuallyLoading(false)
+              refetch()
+            }, 4000)
+          }}
+        >
+          Try now
+        </Button>
+      )}
 
       {data && (
         <>
@@ -115,9 +155,11 @@ function LLMInfo({ llm_call }: { llm_call: RewriteServerData["llm_call"] }) {
         {llm_call.status}
       </Badge>
       <Badge variant="light">Model: {llm_call.model}</Badge>
-      <Badge variant="light" color="gray">
-        Took: <Took seconds={llm_call.took_seconds} />
-      </Badge>
+      {llm_call.status !== "progress" && (
+        <Badge variant="light" color="gray">
+          Took: <Took seconds={llm_call.took_seconds} />
+        </Badge>
+      )}
     </Group>
   )
 }
