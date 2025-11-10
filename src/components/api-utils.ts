@@ -36,6 +36,10 @@ export function commentClassificationQueryKey(oid: string) {
   return ["classify", oid]
 }
 
+export function commentRewriteQueryKey(oid: string) {
+  return ["rewrite", oid]
+}
+
 export function commentsCountQueryKey() {
   return ["count-unapproved-comments"]
 }
@@ -96,6 +100,10 @@ export async function fetchSpamPatterns() {
 
 export async function fetchCommentClassification(oid: string) {
   return standardFetch(`${API_BASE}/plog/comments/${oid}/classify/`)
+}
+
+export async function fetchCommentRewrite(oid: string) {
+  return standardFetch(`${API_BASE}/plog/comments/${oid}/rewrite/`)
 }
 
 export async function fetchCDNProbe(url: string) {
