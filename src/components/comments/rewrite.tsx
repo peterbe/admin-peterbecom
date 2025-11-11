@@ -38,14 +38,11 @@ export function RewriteComment({
 }) {
   const [manuallyLoading, setManuallyLoading] = useState(false)
 
-  const { data, error, isPending, isLoading, refetch } =
-    useQuery<RewriteServerData>({
-      queryKey: commentRewriteQueryKey(comment.oid),
-      queryFn: () => fetchCommentRewrite(comment.oid),
-      retry: false,
-    })
-
-  console.log({ isPending, isLoading })
+  const { data, error, isPending, refetch } = useQuery<RewriteServerData>({
+    queryKey: commentRewriteQueryKey(comment.oid),
+    queryFn: () => fetchCommentRewrite(comment.oid),
+    retry: false,
+  })
 
   return (
     <Modal
