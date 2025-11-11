@@ -433,7 +433,7 @@ function InnerComment({
                 : "Classify"}
           </Button>
 
-          {!isApproved && (
+          {!comment.approved && (
             <Button
               variant="light"
               onClick={() => {

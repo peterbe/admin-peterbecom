@@ -13,7 +13,7 @@ import { commentRewriteQueryKey, fetchCommentRewrite } from "../api-utils"
 import type { Comment } from "./types"
 import "./rewrite-styles.css"
 import { IconHourglassHigh, IconReload } from "@tabler/icons-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Fragment } from "react/jsx-runtime"
 import { Took } from "../analytics/query/took"
 
@@ -38,11 +38,21 @@ export function RewriteComment({
 }) {
   const [manuallyLoading, setManuallyLoading] = useState(false)
 
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+
   const { data, error, isPending, refetch } = useQuery<RewriteServerData>({
     queryKey: commentRewriteQueryKey(comment.oid),
     queryFn: () => fetchCommentRewrite(comment.oid),
-    retry: false,
+    refetchInterval,
   })
+
+  useEffect(() => {
+    if (data?.llm_call.status === "progress") {
+      setRefetchInterval(3000)
+    } else {
+      setRefetchInterval(false)
+    }
+  }, [data])
 
   return (
     <Modal
@@ -82,19 +92,14 @@ export function RewriteComment({
           fullWidth
           variant="outline"
           leftSection={<IconReload />}
-          loading={manuallyLoading}
+          loading={manuallyLoading || Boolean(refetchInterval)}
           disabled={manuallyLoading}
           onClick={() => {
             refetch()
             setManuallyLoading(true)
             setTimeout(() => {
               setManuallyLoading(false)
-              refetch()
             }, 2000)
-            setTimeout(() => {
-              setManuallyLoading(false)
-              refetch()
-            }, 4000)
           }}
         >
           Try now

@@ -1,6 +1,7 @@
 import { Alert, Box, Button, LoadingOverlay, Text } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
 import { thousands } from "../../number-formatter"
 import {
@@ -47,10 +48,22 @@ export function Tree() {
     setDeleted,
   } = useBatchSubmission()
 
-  const isMutatatingBatchSubmit =
+  const [isMutatatingBatchSubmit, setIsMutatatingBatchSubmit] = useState(
     queryClient.isMutating({
       mutationKey: ["batch-submit"],
-    }) > 0
+    }) > 0,
+  )
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsMutatatingBatchSubmit(
+        queryClient.isMutating({
+          mutationKey: ["batch-submit"],
+        }) > 0,
+      )
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [queryClient])
 
   return (
     <Box>
