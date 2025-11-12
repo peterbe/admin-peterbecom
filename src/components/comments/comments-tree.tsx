@@ -433,17 +433,15 @@ function InnerComment({
                 : "Classify"}
           </Button>
 
-          {!comment.approved && (
-            <Button
-              variant="light"
-              onClick={() => {
-                setRewriteMode((p) => !p)
-              }}
-              disabled={disabled}
-            >
-              {rewriteMode ? "Close" : "Rewrite"}
-            </Button>
-          )}
+          <Button
+            variant="light"
+            onClick={() => {
+              setRewriteMode((p) => !p)
+            }}
+            disabled={disabled}
+          >
+            {rewriteMode ? "Close" : "Rewrite"}
+          </Button>
 
           {isDeleted ? (
             <Badge
