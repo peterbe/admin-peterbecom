@@ -6,12 +6,14 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  Select,
   Text,
 } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 import { commentRewriteQueryKey, fetchCommentRewrite } from "../api-utils"
 import type { Comment } from "./types"
 import "./rewrite-styles.css"
+import { useLocalStorage } from "@mantine/hooks"
 import { IconHourglassHigh, IconReload } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 import { Fragment } from "react/jsx-runtime"
@@ -29,6 +31,9 @@ type RewriteServerData = {
   }
 }
 
+const VALID_MODELS = ["gpt-5", "gpt-5-mini", "gpt-5-nano"] as const
+type ValidModel = (typeof VALID_MODELS)[number]
+
 export function RewriteComment({
   comment,
   onClose,
@@ -40,9 +45,19 @@ export function RewriteComment({
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
+  const [model, setModel] = useLocalStorage<ValidModel>({
+    key: "rewrite:model",
+    defaultValue: VALID_MODELS[0],
+  })
+  useEffect(() => {
+    if (!VALID_MODELS.includes(model)) {
+      setModel(VALID_MODELS[0])
+    }
+  }, [model, setModel])
+
   const { data, error, isPending, refetch } = useQuery<RewriteServerData>({
-    queryKey: commentRewriteQueryKey(comment.oid),
-    queryFn: () => fetchCommentRewrite(comment.oid),
+    queryKey: commentRewriteQueryKey(comment.oid, model),
+    queryFn: () => fetchCommentRewrite(comment.oid, model),
     refetchInterval,
   })
 
@@ -71,6 +86,18 @@ export function RewriteComment({
       )}
 
       {data && <LLMInfo llm_call={data.llm_call} />}
+
+      <Select
+        label="GPT model"
+        placeholder="Pick value"
+        data={VALID_MODELS}
+        value={model}
+        onChange={(value) => {
+          if (VALID_MODELS.includes(value as ValidModel)) {
+            setModel(value as ValidModel)
+          }
+        }}
+      />
 
       <Blockquote color="gray" cite="Before" mt="xl" mb={20}>
         <Lines text={comment.comment.trim()} />
