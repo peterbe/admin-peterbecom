@@ -29,6 +29,7 @@ import { CommentIPAddress } from "./comment-ip-address"
 import classes from "./comments-tree.module.css"
 import { DeleteComment } from "./delete-comment"
 import { DisplayLocation } from "./location"
+import { RewriteComment } from "./rewrite"
 import { SpamSignatureComment } from "./spam-signature"
 import type { Comment } from "./types"
 
@@ -144,6 +145,7 @@ function InnerComment({
   const [editMode, setEditMode] = useState(false)
   const [classifyMode, setClassifyMode] = useState(false)
   const [spamSignatureMode, setSpamSignatureMode] = useState(false)
+  const [rewriteMode, setRewriteMode] = useState(false)
 
   const form = useForm({
     mode: "uncontrolled",
@@ -360,6 +362,19 @@ function InnerComment({
           />
         )}
 
+        {rewriteMode && (
+          <RewriteComment
+            comment={comment}
+            onClose={(newComment?: string) => {
+              setRewriteMode(false)
+              if (newComment) {
+                form.setFieldValue("comment", newComment)
+                setEditMode(true)
+              }
+            }}
+          />
+        )}
+
         {spamSignatureMode && (
           <SpamSignatureComment
             comment={comment}
@@ -416,6 +431,16 @@ function InnerComment({
               : comment.classification
                 ? `"${comment.classification.classification}"`
                 : "Classify"}
+          </Button>
+
+          <Button
+            variant="light"
+            onClick={() => {
+              setRewriteMode((p) => !p)
+            }}
+            disabled={disabled}
+          >
+            {rewriteMode ? "Close" : "Rewrite"}
           </Button>
 
           {isDeleted ? (

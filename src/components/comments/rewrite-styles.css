@@ -1,0 +1,19 @@
+ins.diff--replace,
+ins.diff--insert,
+del.diff--delete,
+del.diff--replace {
+  text-decoration: none;
+}
+
+ins.diff--replace {
+  background-color: #c7f4c7;
+}
+ins.diff--insert {
+  background-color: #c7f4c7;
+}
+del.diff--delete {
+  background-color: #ffd9df;
+}
+del.diff--replace {
+  background-color: #ffd9df;
+}
