@@ -17,6 +17,7 @@ import { PageviewNumbers } from "./pageview-numbers"
 import { Pageviews } from "./pageviews"
 import { PublicAPIPageviews } from "./publicapi-pageviews"
 import { PublicAPIPageviewsDurations } from "./publicapi-pageviews-durations"
+import { Querystrings } from "./querystrings"
 import { RefreshContainerContext } from "./refresh-context"
 import { RequestsPerDay } from "./requests-per-day"
 import { RequestsVaryingQuerystring } from "./requests-varying-querystring"
@@ -52,6 +53,7 @@ export function Component() {
             <LyricsPages />
             <BotAgentRequests />
             <RequestsPerDay />
+            <Querystrings />
             <RequestsVaryingQuerystring />
             <LyricsFeatureflag />
             <PageviewEvents />
