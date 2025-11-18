@@ -20,7 +20,6 @@ import { PublicAPIPageviewsDurations } from "./publicapi-pageviews-durations"
 import { Querystrings } from "./querystrings"
 import { RefreshContainerContext } from "./refresh-context"
 import { RequestsPerDay } from "./requests-per-day"
-import { RequestsVaryingQuerystring } from "./requests-varying-querystring"
 import { useMinimized } from "./use-minimized"
 import { useRefreshContainer } from "./use-refresh-container"
 import { UserAgents } from "./user-agents"
@@ -54,7 +53,6 @@ export function Component() {
             <BotAgentRequests />
             <RequestsPerDay />
             <Querystrings />
-            <RequestsVaryingQuerystring />
             <LyricsFeatureflag />
             <PageviewEvents />
             <GeoLocations />
