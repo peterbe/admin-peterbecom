@@ -5,7 +5,7 @@ dev:
     bun run dev -- --port 4001
 
 dev-with-proxy:
-    API_TARGET=https://admin.peterbe.com bun run dev -- --port 4001
+    VITE_API_TARGET=https://admin.peterbe.com bun run dev -- --port 4001
 
 dev-for-testing:
     NODE_ENV=test bun run dev -- --port 4001
@@ -17,7 +17,7 @@ start: build
     bun  run preview -- --port 4001
 
 start-with-proxy: build
-    API_TARGET=https://admin.peterbe.com bun run preview -- --port 4001
+    VITE_API_TARGET=https://admin.peterbe.com bun run preview -- --port 4001
 
 start-for-testing:
     NODE_ENV=test bun run build
