@@ -12,7 +12,7 @@ import { notifications } from "@mantine/notifications"
 import { IconCheck, IconCopy, IconStethoscope } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import escapeString from "escape-sql-string"
-import { useSearchParams } from "react-router"
+import { useState } from "react"
 import type { QueryResultRow } from "../types"
 import { DisplayError, DisplayWarning } from "./alerts"
 import { ChartContainer } from "./container"
@@ -25,8 +25,6 @@ import { TruncateText } from "./truncate-text"
 import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
-
-console.log("import.meta.env.VITE_API_TARGET", import.meta.env.VITE_API_TARGET)
 
 const sqlQuery = ({
   select = "path",
@@ -80,11 +78,8 @@ export function Querystrings() {
 }
 
 function Inner() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const includeManifest = searchParams.get("includeManifest") === "1"
-
-  const select =
-    searchParams.get("select") === "querystring" ? "querystring" : "path"
+  const [includeManifest, setIncludeManifest] = useState(false)
+  const [select, setSelect] = useState<"querystring" | "path">("path")
 
   const useQuery = (sql: string, options?: QueryOptions) =>
     useSQLQuery(sql, { prefix: ID, ...options })
@@ -110,7 +105,7 @@ function Inner() {
     }),
   )
 
-  const searchValue = searchParams.get("qs:search")
+  const [searchValue, setSearchValue] = useState("")
 
   const search = useQuery(
     sqlSearchQuery({
@@ -135,6 +130,10 @@ function Inner() {
             pastRows={past.data.rows}
             select={select}
             wide={true}
+            searchValue={searchValue}
+            setSearchValue={(v: string | null) => {
+              setSearchValue(v || "")
+            }}
           />
         )}
 
@@ -145,6 +144,10 @@ function Inner() {
                 rows={current.data.rows}
                 select={select}
                 wide={false}
+                searchValue={searchValue}
+                setSearchValue={(v: string | null) => {
+                  setSearchValue(v || "")
+                }}
               />
             </Grid.Col>
             <Grid.Col span={6}>
@@ -153,6 +156,10 @@ function Inner() {
                 select={select === "querystring" ? "path" : "querystring"}
                 wide={false}
                 probe
+                searchValue={searchValue}
+                setSearchValue={(v: string | null) => {
+                  setSearchValue(v || "")
+                }}
               />
             </Grid.Col>
           </Grid>
@@ -172,12 +179,10 @@ function Inner() {
           <SegmentedControl
             value={select}
             onChange={(value: string) => {
-              const sp = new URLSearchParams(searchParams)
               if (value === "querystring" || value === "path") {
-                sp.set("select", value)
+                setSelect(value)
               }
-              sp.delete("qs:search")
-              setSearchParams(sp)
+              setSearchValue("")
             }}
             withItemsBorders={false}
             transitionDuration={300}
@@ -192,13 +197,7 @@ function Inner() {
           <Switch
             checked={includeManifest}
             onChange={(event) => {
-              const sp = new URLSearchParams(searchParams)
-              if (event.currentTarget.checked) {
-                sp.set("includeManifest", "1")
-              } else {
-                sp.delete("includeManifest")
-              }
-              setSearchParams(sp)
+              setIncludeManifest(event.currentTarget.checked)
             }}
             label="Include /__manifest"
           />
@@ -217,16 +216,17 @@ function PathsTable({
   select,
   wide,
   probe = false,
+  searchValue,
+  setSearchValue,
 }: {
   rows: QueryResultRow[]
   pastRows?: QueryResultRow[]
   select: "querystring" | "path"
   wide: boolean
   probe?: boolean
+  searchValue: string | null
+  setSearchValue: (value: string | null) => void
 }) {
-  const [searchParams, setSearchParams] = useSearchParams()
-
-  const searchValue = searchParams.get("qs:search")
   const asDict = pastRows
     ? Object.fromEntries(
         pastRows.map((row) => [row.key as string, row.count as number]),
@@ -328,15 +328,13 @@ function PathsTable({
             >
               <Table.Td
                 onClick={() => {
-                  const sp = new URLSearchParams(searchParams)
                   if (row.key === searchValue) {
-                    // setSearchParams({ searchPath: "" })
-                    sp.delete("qs:search")
+                    setSearchValue(null)
                   } else {
-                    sp.set("qs:search", row.key as string)
+                    setSearchValue(row.key as string)
                   }
-                  setSearchParams(sp)
                 }}
+                style={{ cursor: "pointer" }}
               >
                 <TruncateText
                   size="sm"
