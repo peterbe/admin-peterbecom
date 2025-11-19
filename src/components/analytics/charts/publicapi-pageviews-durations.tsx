@@ -6,6 +6,7 @@ import type { QueryResultRow } from "../types"
 import { ChartContainer } from "./container"
 import { IntervalOptions } from "./interval-options"
 import { Loading } from "./loading"
+import { QueriesTookInfo } from "./queries-took-info"
 import { RowsOptions } from "./rows-options"
 import { useInterval } from "./use-interval"
 import { useSQLQuery } from "./use-query"
@@ -92,7 +93,7 @@ function Inner({ id }: { id: string }) {
           <IntervalOptions
             value={intervalDays}
             onChange={setIntervalDays}
-            range={[3, 7, 28]}
+            range={[1, 3, 7]}
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
@@ -111,6 +112,8 @@ function Inner({ id }: { id: string }) {
           />
         </Grid.Col>
       </Grid>
+
+      <QueriesTookInfo queries={[current]} />
     </>
   )
 }

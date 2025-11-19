@@ -6,6 +6,7 @@ import { ChartContainer } from "./container"
 import { IntervalOptions } from "./interval-options"
 import type { DataSerie } from "./line-chart"
 import { Loading } from "./loading"
+import { QueriesTookInfo } from "./queries-took-info"
 import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 
@@ -98,7 +99,11 @@ function Inner() {
 
       <Grid>
         <Grid.Col span={12}>
-          <IntervalOptions value={intervalDays} onChange={setIntervalDays} />
+          <IntervalOptions
+            value={intervalDays}
+            onChange={setIntervalDays}
+            range={[3, 7, 28]}
+          />
         </Grid.Col>
         <Grid.Col span={6}>
           <SegmentedControl
@@ -114,6 +119,8 @@ function Inner() {
           />
         </Grid.Col>
       </Grid>
+
+      <QueriesTookInfo queries={[current]} />
     </>
   )
 }
