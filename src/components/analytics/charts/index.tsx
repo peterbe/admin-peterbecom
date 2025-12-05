@@ -17,9 +17,9 @@ import { PageviewNumbers } from "./pageview-numbers"
 import { Pageviews } from "./pageviews"
 import { PublicAPIPageviews } from "./publicapi-pageviews"
 import { PublicAPIPageviewsDurations } from "./publicapi-pageviews-durations"
+import { Querystrings } from "./querystrings"
 import { RefreshContainerContext } from "./refresh-context"
 import { RequestsPerDay } from "./requests-per-day"
-import { RequestsVaryingQuerystring } from "./requests-varying-querystring"
 import { useMinimized } from "./use-minimized"
 import { useRefreshContainer } from "./use-refresh-container"
 import { UserAgents } from "./user-agents"
@@ -52,7 +52,7 @@ export function Component() {
             <LyricsPages />
             <BotAgentRequests />
             <RequestsPerDay />
-            <RequestsVaryingQuerystring />
+            <Querystrings />
             <LyricsFeatureflag />
             <PageviewEvents />
             <GeoLocations />

@@ -9,15 +9,20 @@ type Props = {
 }
 export function QueriesTookInfo({ queries }: Props) {
   let sumTotalSeconds = 0.0
+  let countQueries = 0
   for (const q of queries) {
+    if (!q.isEnabled) {
+      continue
+    }
     if (!q.data) {
       return null
     }
     sumTotalSeconds += q.data.meta.took_seconds
+    countQueries++
   }
   return (
     <Text size="xs" c="dimmed">
-      {queries.length} {queries.length === 1 ? "query" : "queries"} took{" "}
+      {countQueries} {countQueries === 1 ? "query" : "queries"} took{" "}
       <Took seconds={sumTotalSeconds} />
     </Text>
   )

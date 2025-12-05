@@ -4,21 +4,19 @@ import Blogitems from "./components/blogitems"
 import Comments from "./components/comments"
 import ErrorPage from "./components/error-page"
 import { Home } from "./components/home"
-import { loader as rootLoader } from "./loaders/root"
 import { Root } from "./routes/root"
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
-    loader: rootLoader,
     id: "root",
     errorElement: <ErrorPage />,
     children: [
       {
         errorElement: <ErrorPage />,
         children: [
-          { index: true, element: <Home />, loader: rootLoader },
+          { index: true, element: <Home /> },
           {
             path: "plog",
             children: [
