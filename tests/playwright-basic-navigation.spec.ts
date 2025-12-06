@@ -142,3 +142,10 @@ test("analytics query", async ({ page }) => {
   await page.getByRole("link", { name: "Analytics Query" }).click()
   // TODO. Implement more tests here.
 })
+
+test("charts", async ({ page }) => {
+  await page.goto("/")
+  await expect(page).toHaveTitle(/Sign in/)
+  await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click()
+  await page.getByRole("link", { name: "Analytics Charts" }).click()
+})
