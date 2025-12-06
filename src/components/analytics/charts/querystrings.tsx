@@ -11,7 +11,6 @@ import {
 import { notifications } from "@mantine/notifications"
 import { IconCheck, IconCopy, IconStethoscope } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
-import escapeString from "escape-sql-string"
 import { useState } from "react"
 import type { QueryResultRow } from "../types"
 import { DisplayError, DisplayWarning } from "./alerts"
@@ -25,6 +24,16 @@ import { TruncateText } from "./truncate-text"
 import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useRows } from "./use-rows"
+
+function escapeSqlString(value: string): string {
+  // Replace backslash \ with \\, then single quote ' with \'
+  const escaped = value
+    .replace(/\\/g, "\\\\") // Escape backslashes
+    .replace(/'/g, "\\'") // Escape single quotes
+
+  // Wrap in single quotes
+  return `'${escaped}'`
+}
 
 const sqlQuery = ({
   select = "path",
@@ -60,7 +69,7 @@ const sqlSearchQuery = ({
     where
         ${createdRange(days, back, "day")}
         ${includeManifest ? "" : "AND path <> '/__manifest'"}
-        AND ${filterBy} = ${escapeString(search)}
+        AND ${filterBy} = ${escapeSqlString(search)}
     GROUP BY 1
     ORDER BY 2 desc
     LIMIT ${Number(limit)}
