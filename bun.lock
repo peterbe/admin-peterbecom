@@ -18,7 +18,6 @@
         "@tanstack/react-query-devtools": "^5.90.2",
         "@tanstack/react-query-persist-client": "^5.90.2",
         "date-fns": "^4.1.0",
-        "escape-sql-string": "^1.2.2",
         "flag-icons": "^7.5.0",
         "install": "^0.13.0",
         "npm": "^11.6.0",
@@ -430,8 +429,6 @@
     "emoji-regex": ["emoji-regex@8.0.0", "", {}, "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A=="],
 
     "escalade": ["escalade@3.2.0", "", {}, "sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA=="],
-
-    "escape-sql-string": ["escape-sql-string@1.2.2", "", {}, "sha512-d94H1vwMmAmchX+8+Zaj8GhaPW7vrayHxwLEu/1S34wVSj4D5Q+m+9mRCUgFa+IHSMdUg2QkE23CwSzVECgUmQ=="],
 
     "eventemitter3": ["eventemitter3@4.0.7", "", {}, "sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw=="],
 

@@ -31,7 +31,6 @@
     "@tanstack/react-query-devtools": "^5.90.2",
     "@tanstack/react-query-persist-client": "^5.90.2",
     "date-fns": "^4.1.0",
-    "escape-sql-string": "^1.2.2",
     "flag-icons": "^7.5.0",
     "install": "^0.13.0",
     "npm": "^11.6.0",
