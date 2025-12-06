@@ -148,4 +148,5 @@ test("charts", async ({ page }) => {
   await expect(page).toHaveTitle(/Sign in/)
   await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click()
   await page.getByRole("link", { name: "Analytics Charts" }).click()
+  await expect(page.getByText("Pageview Numbers")).toBeVisible()
 })
