@@ -28,6 +28,7 @@ import { DisplayClues } from "./clues"
 import { CommentIPAddress } from "./comment-ip-address"
 import classes from "./comments-tree.module.css"
 import { DeleteComment } from "./delete-comment"
+import { HighlightComment } from "./highlight-comment"
 import { DisplayLocation } from "./location"
 import { RewriteComment } from "./rewrite"
 import { SpamSignatureComment } from "./spam-signature"
@@ -279,6 +280,12 @@ function InnerComment({
                   comment={comment}
                   refetchComments={refetchComments}
                 />
+                {comment.approved && (
+                  <HighlightComment
+                    comment={comment}
+                    refetchComments={refetchComments}
+                  />
+                )}
               </Group>
             )}
             {!editMode && (

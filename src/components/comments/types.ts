@@ -50,6 +50,7 @@ export type Comment = {
   _clues: Clues
   gravatar_url: string
   classification: InlineCommentClassification | null
+  highlighted?: string | null
 }
 
 export type CommentsServerData = {
