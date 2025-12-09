@@ -35,6 +35,15 @@ export function Home() {
             Add blogitem
           </Button>
           <CommentsButton count={data?.count} size={size} />
+          <Button
+            size={size}
+            component={Link}
+            to="/plog/highlighted-comments"
+            viewTransition
+            fullWidth
+          >
+            Highlighted Comments
+          </Button>
         </Group>
       </ButtonBox>
       <ButtonBox>
