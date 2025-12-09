@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router"
 import Blogitem from "./components/blogitem"
 import Blogitems from "./components/blogitems"
 import Comments from "./components/comments"
+import HighlightedComments from "./components/comments/highlighted-comments"
 import ErrorPage from "./components/error-page"
 import { Home } from "./components/home"
 import { Root } from "./routes/root"
@@ -45,6 +46,10 @@ export const router = createBrowserRouter([
               { index: true, element: <Blogitems /> },
               { path: "add", element: <Blogitem /> },
               { path: "comments", element: <Comments /> },
+              {
+                path: "highlighted-comments",
+                element: <HighlightedComments />,
+              },
               {
                 path: "categories",
                 lazy: () => import("./components/categories"),

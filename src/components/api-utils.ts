@@ -32,6 +32,10 @@ export function spamPatternsQueryKey() {
   return ["spam", "patterns"]
 }
 
+export function highlightedCommentsQueryKey() {
+  return ["comments", "highlighted"]
+}
+
 export function commentClassificationQueryKey(oid: string) {
   return ["classify", oid]
 }
@@ -96,6 +100,10 @@ export async function fetchSpamSignatures() {
 
 export async function fetchSpamPatterns() {
   return standardFetch(`${API_BASE}/plog/spam/patterns`)
+}
+
+export async function fetchHighlightedComments() {
+  return standardFetch(`${API_BASE}/plog/comments/highlighted/`)
 }
 
 export async function fetchCommentClassification(oid: string) {
