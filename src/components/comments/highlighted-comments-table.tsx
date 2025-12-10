@@ -18,6 +18,7 @@ type CommentData = {
   add_date: string
   highlighted: string
   is_first: boolean
+  page: number
 }
 
 type HighlightedComment = CommentData & {
@@ -64,6 +65,14 @@ export function HighlightedCommentsTable() {
               {comment.name ? <b>{comment.name}</b> : <i>Anonymous</i>} on{" "}
               <b>{comment.blogitem.title}</b>{" "}
             </Text>
+            {
+              <Badge
+                variant="outline"
+                color={comment.page > 1 ? "red" : "blue"}
+              >
+                Page {comment.page}
+              </Badge>
+            }
             {comment.parent_id && (
               <Badge variant="light" color="orange">
                 A reply comment
