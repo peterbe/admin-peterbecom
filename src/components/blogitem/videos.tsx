@@ -93,8 +93,8 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
       }
       return response.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: videosQueryKey(oid) })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: videosQueryKey(oid) })
 
       setUploadedFile(null)
     },

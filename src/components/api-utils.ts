@@ -249,7 +249,7 @@ export function usePrefetchBlogitem() {
 
   useEffect(() => {
     if (debounced) {
-      queryClient.prefetchQuery({
+      void queryClient.prefetchQuery({
         queryKey: blogitemQueryKey(debounced),
         queryFn: async () => fetchBlogitem(debounced),
         // Prefetch only fires when data is older than the staleTime,

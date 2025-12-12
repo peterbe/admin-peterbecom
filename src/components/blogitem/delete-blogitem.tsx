@@ -25,9 +25,9 @@ export function DeleteBlogitem({ oid }: { oid: string }) {
       notifications.show({ message: "Blogitem deleted", color: "green" })
       return response.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() })
-      navigate("/plog")
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() })
+      await navigate("/plog")
     },
   })
 

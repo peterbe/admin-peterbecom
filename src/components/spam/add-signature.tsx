@@ -62,11 +62,11 @@ export function AddSignature({
         throw new Error(`${response.status} on ${response.url}`)
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       form.reset()
       form.setValues(initialValues)
 
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: spamSignaturesQueryKey(),
       })
       if (onSuccess) {

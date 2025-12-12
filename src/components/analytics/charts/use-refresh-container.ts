@@ -6,9 +6,12 @@ export function useRefreshContainer(): [string, (id: string) => void] {
 
   useEffect(() => {
     if (refresh) {
-      queryClient.invalidateQueries({
-        queryKey: ["use-query", refresh],
-      })
+      queryClient
+        .invalidateQueries({
+          queryKey: ["use-query", refresh],
+        })
+        .then(() => {})
+        .catch(() => {})
     }
   }, [refresh])
 

@@ -33,7 +33,7 @@ export function DeleteComment({ comment, refetchComments }: Props) {
         color: "red",
       })
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       notifications.show({
         title: "Deleted",
         message: "Comment permanently deleted",

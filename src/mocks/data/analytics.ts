@@ -40,26 +40,22 @@ function getQueryResult(query: string): QueryResult {
       "select type, count(type) as c from analytics group by type order by 2 desc",
     )
   ) {
-    rows.push(
-      ...[
-        {
-          type: "pageview",
-          c: 9672,
-        },
-        {
-          type: "error",
-          c: 20,
-        },
-        {
-          type: "search-error",
-          c: 12,
-        },
-        {
-          type: "search",
-          c: 6,
-        },
-      ],
-    )
+    rows.push({
+      type: "pageview",
+      c: 9672,
+    })
+    rows.push({
+      type: "error",
+      c: 20,
+    })
+    rows.push({
+      type: "search-error",
+      c: 12,
+    })
+    rows.push({
+      type: "search",
+      c: 6,
+    })
   } else {
     console.warn(query)
 

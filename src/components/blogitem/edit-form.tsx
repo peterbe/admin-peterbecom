@@ -173,7 +173,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         const json = (await response.json()) as PostedSuccess
         if (json.blogitem.oid !== blogitem.oid) {
           // redirect to the new oid
-          navigate(`/plog/${json.blogitem.oid}`)
+          void navigate(`/plog/${json.blogitem.oid}`)
           return
         }
       } else if (response.status === 200) {
@@ -184,22 +184,24 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
         const json = (await response.json()) as { blogitem: EditBlogitemT }
         if (json.blogitem.oid !== blogitem.oid) {
           // redirect to the new oid
-          navigate(`/plog/${json.blogitem.oid}`)
+          await navigate(`/plog/${json.blogitem.oid}`)
         }
       } else {
         throw new Error(`${response.status} on ${response.url}`)
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       form.resetTouched()
       form.resetDirty()
 
-      queryClient.invalidateQueries({
-        queryKey: blogitemQueryKey(blogitem.oid),
-      })
-      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() })
-      queryClient.invalidateQueries({ queryKey: blogitemsShowAllQueryKey() })
-      queryClient.invalidateQueries({ queryKey: ["blogitems-all"] })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: blogitemQueryKey(blogitem.oid),
+        }),
+        queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() }),
+        queryClient.invalidateQueries({ queryKey: blogitemsShowAllQueryKey() }),
+        queryClient.invalidateQueries({ queryKey: ["blogitems-all"] }),
+      ])
     },
   })
 

@@ -87,11 +87,14 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
       }
       return response.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: imagesQueryKey(oid) })
-      queryClient.invalidateQueries({ queryKey: openGraphImagesQueryKey(oid) })
-
+    onSuccess: async () => {
       setUploadedFile(null)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: imagesQueryKey(oid) }),
+        queryClient.invalidateQueries({
+          queryKey: openGraphImagesQueryKey(oid),
+        }),
+      ])
     },
   })
 

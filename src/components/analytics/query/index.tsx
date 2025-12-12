@@ -62,11 +62,11 @@ export function Component() {
   const { colorScheme } = useMantineColorScheme()
 
   useEffect(() => {
-    loadTheme(colorScheme === "light" ? "vs-code-light" : "vs-code-dark").then(
-      (theme) => {
+    loadTheme(colorScheme === "light" ? "vs-code-light" : "vs-code-dark")
+      .then((theme) => {
         if (theme) injectStylesheet(theme)
-      },
-    )
+      })
+      .catch(() => {})
   }, [colorScheme])
 
   const [savedQueries, _setSavedQueries, removeSavedQueries] = useLocalStorage({

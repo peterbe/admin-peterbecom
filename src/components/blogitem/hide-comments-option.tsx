@@ -33,7 +33,7 @@ export function BlogitemHideComments({
       }
       return response.json()
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setAsked(false)
       notifications.show({
         message: blogitem.hide_comments
@@ -41,11 +41,12 @@ export function BlogitemHideComments({
           : "Comments hidden",
         color: "green",
       })
-
-      queryClient.invalidateQueries({
-        queryKey: blogitemQueryKey(blogitem.oid),
-      })
-      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: blogitemQueryKey(blogitem.oid),
+        }),
+        queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() }),
+      ])
     },
   })
 

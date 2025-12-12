@@ -113,8 +113,8 @@ function UploadedVideo({
       form.setValues({ title: title.trim() })
       return response.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["videos", oid] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["videos", oid] })
     },
   })
 
@@ -138,8 +138,8 @@ function UploadedVideo({
       }
       return response.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["videos", oid] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["videos", oid] })
       notifications.show({ message: "Video deleted", color: "green" })
     },
   })

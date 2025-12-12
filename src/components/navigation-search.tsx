@@ -103,7 +103,7 @@ export function NavigationSearch({
         onOptionSubmit={(picked) => {
           if (picked) {
             setValue("") // XXX doesn't work
-            navigate(`/plog/${picked}`)
+            void navigate(`/plog/${picked}`)
           }
         }}
         disabled={!data || isError || isPending}

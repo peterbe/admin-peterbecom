@@ -24,13 +24,16 @@ async function enableMocking() {
   }
 }
 
-enableMocking().then(() => {
-  const root = document.getElementById("root")
-  if (!root) throw new Error("no root element found")
+enableMocking().then(
+  () => {
+    const root = document.getElementById("root")
+    if (!root) throw new Error("no root element found")
 
-  ReactDOM.createRoot(root).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>,
-  )
-})
+    ReactDOM.createRoot(root).render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>,
+    )
+  },
+  () => console.error("Failed to enable mocking"),
+)

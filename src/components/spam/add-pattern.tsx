@@ -50,7 +50,7 @@ export function AddPattern() {
         throw new Error(`${response.status} on ${response.url}`)
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       notifications.show({
         message: "Spam pattern added",
         color: "green",
@@ -59,7 +59,7 @@ export function AddPattern() {
       form.reset()
       form.setValues(initialValues)
 
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: spamPatternsQueryKey(),
       })
     },
