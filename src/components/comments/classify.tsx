@@ -81,13 +81,13 @@ export function ClassifyComment({
       }
       return response.json()
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       notifications.show({
         title: "Classified",
         message: "Comment text classification saved",
         color: "green",
       })
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: commentClassificationQueryKey(comment.oid),
       })
 
@@ -113,13 +113,13 @@ export function ClassifyComment({
       }
       return response.json()
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       notifications.show({
         title: "Removed",
         message: "Comment text classification deleted",
         color: "green",
       })
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: commentClassificationQueryKey(comment.oid),
       })
 

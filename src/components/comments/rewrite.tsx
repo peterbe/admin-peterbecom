@@ -122,11 +122,11 @@ export function RewriteComment({
           loading={manuallyLoading || Boolean(refetchInterval)}
           disabled={manuallyLoading}
           onClick={() => {
-            refetch()
             setManuallyLoading(true)
             setTimeout(() => {
               setManuallyLoading(false)
             }, 2000)
+            void refetch()
           }}
         >
           Try now

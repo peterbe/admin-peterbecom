@@ -187,7 +187,7 @@ function InnerComment({
       }
       return response.json()
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       notifications.show({
         title: "Saved",
         message: "Comment details saved and updated",
@@ -210,7 +210,7 @@ function InnerComment({
         prev.add(oid)
         return prev
       })
-      queryClient.prefetchQuery({
+      void queryClient.prefetchQuery({
         queryKey: commentClassificationQueryKey(oid),
         queryFn: () => fetchCommentClassification(oid),
         // Prefetch only fires when data is older than the staleTime,
@@ -362,7 +362,7 @@ function InnerComment({
             comment={comment}
             onClose={() => {
               setClassifyMode(false)
-              queryClient.invalidateQueries({
+              void queryClient.invalidateQueries({
                 queryKey: ["comments"],
               })
             }}
@@ -387,7 +387,7 @@ function InnerComment({
             comment={comment}
             onClose={() => {
               setSpamSignatureMode(false)
-              queryClient.invalidateQueries({
+              void queryClient.invalidateQueries({
                 queryKey: ["comments"],
               })
             }}

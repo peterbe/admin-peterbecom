@@ -86,7 +86,7 @@ export function Tree() {
             reset={() => {
               reset()
 
-              queryClient.invalidateQueries({
+              void queryClient.invalidateQueries({
                 queryKey: commentsCountQueryKey(),
               })
             }}
@@ -97,7 +97,7 @@ export function Tree() {
               variant="transparent"
               size="xs"
               onClick={() => {
-                refetch()
+                void refetch()
               }}
             >
               Refetch
@@ -111,7 +111,7 @@ export function Tree() {
             comments={data.comments}
             disabled={isPending || isMutatatingBatchSubmit}
             refetchComments={() => {
-              queryClient.invalidateQueries({
+              void queryClient.invalidateQueries({
                 queryKey: commentsQueryKey(searchParams),
               })
             }}

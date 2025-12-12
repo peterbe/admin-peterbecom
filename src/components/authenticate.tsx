@@ -31,8 +31,8 @@ function SignIn() {
         onClick={(event) => {
           if (process.env.NODE_ENV === "test") {
             event.preventDefault()
-            fetch(`/oidc/authenticate/?${sp}`, { method: "POST" }).then(
-              (response) => {
+            fetch(`/oidc/authenticate/?${sp}`, { method: "POST" })
+              .then((response) => {
                 if (!response.ok) {
                   throw new Error(`${response.status} on ${response.url}`)
                 }
@@ -40,8 +40,10 @@ function SignIn() {
                 // biome-ignore lint/suspicious/noDocumentCookie: only used for automated testing
                 document.cookie = "mocksessionid=mruser"
                 window.location.href = "/?redirected=true"
-              },
-            )
+              })
+              .catch((error) => {
+                console.error("Error during mock authentication:", error)
+              })
           }
         }}
       >

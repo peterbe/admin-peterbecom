@@ -9,6 +9,9 @@ export async function JSONPost(
   const headers = {
     "X-CSRFToken": csrfToken,
   }
+  if (method === "GET") {
+    return await fetch(url, { method, headers })
+  }
 
   return await fetch(url, {
     method,

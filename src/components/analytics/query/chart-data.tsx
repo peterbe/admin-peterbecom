@@ -13,13 +13,10 @@ export function ChartData({
   data: QueryResult
   chart: string
 }) {
-  // const [, navigate] = useLocation()
   const navigate = useNavigate()
-  // const search = useSearch()
-  const [searchParams] = useSearchParams()
-  // const search = searchParams.get("search") || ""
 
-  // const searchParams = new URLSearchParams(search)
+  const [searchParams] = useSearchParams()
+
   const orientationRaw = searchParams.get(`${name}:orientation`) || "horizontal"
   const orientation =
     orientationRaw === "horizontal" ? "horizontal" : "vertical"
@@ -44,7 +41,7 @@ export function ChartData({
                   `${name}:orientation`,
                   orientation === "horizontal" ? "vertical" : "horizontal",
                 )
-                navigate(`?${searchParams.toString()}`)
+                void navigate(`?${searchParams.toString()}`)
               }}
             >
               Toggle orientation

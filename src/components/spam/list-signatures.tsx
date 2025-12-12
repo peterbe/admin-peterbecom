@@ -97,8 +97,8 @@ function DeleteSignatureButton({ id }: { id: number }) {
       }
       throw new Error(`${response.status} on ${response.url}`)
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: spamSignaturesQueryKey(),
       })
     },

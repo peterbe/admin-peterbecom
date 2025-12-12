@@ -122,8 +122,8 @@ function UploadedImage({
       form.setValues({ title: title.trim() })
       return response.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["images", oid] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["images", oid] })
     },
   })
 
@@ -147,9 +147,9 @@ function UploadedImage({
       }
       return response.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["images", oid] })
+    onSuccess: async () => {
       notifications.show({ message: "Image deleted", color: "green" })
+      await queryClient.invalidateQueries({ queryKey: ["images", oid] })
     },
   })
 

@@ -29,17 +29,18 @@ export function ArchiveBlogitem({ blogitem }: { blogitem: EditBlogitemT }) {
       }
       return response.json()
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setAsked(false)
       notifications.show({
         message: "Blogitem archived status toggled",
         color: "green",
       })
-
-      queryClient.invalidateQueries({
-        queryKey: blogitemQueryKey(blogitem.oid),
-      })
-      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: blogitemQueryKey(blogitem.oid),
+        }),
+        queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() }),
+      ])
     },
   })
 

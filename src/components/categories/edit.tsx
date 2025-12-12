@@ -36,13 +36,13 @@ export function Edit({
         throw new Error(`${response.status} on ${response.url}`)
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       notifications.show({
         message: "Category updated",
         color: "green",
       })
       onClose()
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: categoriesQueryKey(),
       })
     },

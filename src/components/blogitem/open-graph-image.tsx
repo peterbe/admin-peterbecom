@@ -74,8 +74,8 @@ function ImageChoice({ image, oid }: { image: OpenGraphImageT; oid: string }) {
       }
       return response.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["open-graph-image", oid],
       })
     },

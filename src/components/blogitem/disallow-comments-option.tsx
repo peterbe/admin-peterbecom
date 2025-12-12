@@ -33,7 +33,7 @@ export function BlogitemDisallowComments({
       }
       return response.json()
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setAsked(false)
       notifications.show({
         message: blogitem.disallow_comments
@@ -42,10 +42,12 @@ export function BlogitemDisallowComments({
         color: "green",
       })
 
-      queryClient.invalidateQueries({
-        queryKey: blogitemQueryKey(blogitem.oid),
-      })
-      queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: blogitemQueryKey(blogitem.oid),
+        }),
+        queryClient.invalidateQueries({ queryKey: blogitemsQueryKey() }),
+      ])
     },
   })
 
