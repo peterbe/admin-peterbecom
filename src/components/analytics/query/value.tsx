@@ -2,6 +2,8 @@ import { Code, HoverCard, Text } from "@mantine/core"
 
 import type { QueryResultRowValue } from "../types"
 
+const POSSIBLY_URLS = new Set(["url"])
+
 export function Value({
   value,
   column,
@@ -37,5 +39,22 @@ export function Value({
   if (typeof value === "number" && Number.isInteger(value) && column !== "id") {
     return value.toLocaleString()
   }
+
+  if (POSSIBLY_URLS.has(column) && value && isValidURL(`${value}`)) {
+    return (
+      <a href={value.toString()} target="_blank" rel="noopener noreferrer">
+        {value.toString()}
+      </a>
+    )
+  }
   return value.toString()
+}
+
+function isValidURL(str: string): boolean {
+  try {
+    new URL(str)
+    return true
+  } catch (_) {
+    return false
+  }
 }
