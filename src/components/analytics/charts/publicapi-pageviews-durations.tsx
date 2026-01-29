@@ -1,4 +1,4 @@
-import { Box, Grid, SegmentedControl, Table, Text } from "@mantine/core"
+import { Box, SegmentedControl, SimpleGrid, Table, Text } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
 import type { QueryOptions } from "@tanstack/react-query"
 import { useSearchParams } from "react-router"
@@ -27,6 +27,7 @@ const sqlQuery = (
   limit = 10,
   orderBy = 4,
   reverse = false,
+  minCount: number | null = null,
 ) => `
 SELECT
     ${primaryKey === "url" ? "url AS url" : "meta->>'path' AS path"},
@@ -40,6 +41,7 @@ WHERE
     and created > now() - interval '${days} days'
 GROUP BY
     ${primaryKey === "url" ? "url" : "meta->>'path'"}
+${minCount ? `HAVING count(*) >= ${minCount}` : ""}
 ORDER BY
     ${orderBy} ${reverse ? "asc" : "desc"}
 LIMIT ${limit};
@@ -54,6 +56,10 @@ function Inner({ id }: { id: string }) {
   const [primaryKey, setPrimaryKey] = useLocalStorage({
     key: `analytics:primarykey:${id}`,
     defaultValue: "path",
+  })
+  const [minCount, setMinCount] = useLocalStorage({
+    key: `analytics:mincount:${id}`,
+    defaultValue: "1",
   })
 
   const [searchParams] = useSearchParams()
@@ -72,7 +78,14 @@ function Inner({ id }: { id: string }) {
     reverse = sortBy.startsWith("-")
   }
   const current = useQuery(
-    sqlQuery(primaryKey, Number(intervalDays), Number(rows), orderBy, reverse),
+    sqlQuery(
+      primaryKey,
+      Number(intervalDays),
+      Number(rows),
+      orderBy,
+      reverse,
+      Number(minCount),
+    ),
   )
 
   return (
@@ -85,33 +98,42 @@ function Inner({ id }: { id: string }) {
         )}
       </Box>
 
-      <Grid>
-        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
-          <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
-          <IntervalOptions
-            value={intervalDays}
-            onChange={setIntervalDays}
-            range={[1, 3, 7]}
-          />
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
-          <SegmentedControl
-            value={primaryKey}
-            onChange={(x) => {
-              setPrimaryKey(x)
-            }}
-            withItemsBorders={false}
-            transitionDuration={300}
-            transitionTimingFunction="linear"
-            data={[
-              { label: "URL", value: "url" },
-              { label: "Path", value: "path" },
-            ]}
-          />
-        </Grid.Col>
-      </Grid>
+      <SimpleGrid cols={4} mb={20}>
+        <RowsOptions value={rows} onChange={setRows} range={[10, 25, 100]} />
+
+        <IntervalOptions
+          value={intervalDays}
+          onChange={setIntervalDays}
+          range={[1, 3, 7]}
+        />
+        <SegmentedControl
+          value={minCount}
+          onChange={(x) => {
+            setMinCount(x)
+          }}
+          withItemsBorders={false}
+          data={[
+            { label: "1", value: "1" },
+            { label: "2", value: "2" },
+            { label: "10", value: "10" },
+            { label: "100", value: "100" },
+            { label: "1,000", value: "1000" },
+          ]}
+        />
+        <SegmentedControl
+          value={primaryKey}
+          onChange={(x) => {
+            setPrimaryKey(x)
+          }}
+          withItemsBorders={false}
+          transitionDuration={300}
+          transitionTimingFunction="linear"
+          data={[
+            { label: "URL", value: "url" },
+            { label: "Path", value: "path" },
+          ]}
+        />
+      </SimpleGrid>
 
       <QueriesTookInfo queries={[current]} />
     </>
