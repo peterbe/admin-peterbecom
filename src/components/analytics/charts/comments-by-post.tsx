@@ -130,6 +130,7 @@ function TableByGroups({ rows }: { rows: QueryResultRow[] }) {
                 <a
                   href={`https://www.peterbe.com/plog/${row.post}`}
                   target="_blank"
+                  rel="noopener"
                 >
                   {row.post}
                 </a>
