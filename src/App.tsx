@@ -7,6 +7,7 @@ import "@mantine/code-highlight/styles.css"
 import { MantineProvider } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
 import { QueryClientProvider } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { RouterProvider } from "react-router"
 
 import { queryClient } from "./query-client"
@@ -21,6 +22,7 @@ export default function App() {
         <UserDataProvider>
           <RouterProvider router={router} />
         </UserDataProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </MantineProvider>
   )
