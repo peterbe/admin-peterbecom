@@ -1,30 +1,22 @@
 import { Alert, Box, Button, LoadingOverlay, Text } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
 import { thousands } from "../../number-formatter"
-import {
-  commentsCountQueryKey,
-  commentsQueryKey,
-  fetchComments,
-} from "../api-utils"
+import { commentsCountQueryKey, commentsQueryKey } from "../api-utils"
 import { BatchSubmit } from "./batch-submit"
 import { CommentsTree } from "./comments-tree"
 import { Filters } from "./filters"
 import { NoComments } from "./no-comments"
-import type { CommentsServerData } from "./types"
 import { useBatchSubmission } from "./use-batch-submission"
+import { useCommentsQuery } from "./use-comments-query"
 
 export function Tree() {
   const [searchParams] = useSearchParams()
 
   const { data, error, isPending, isFetching, refetch } =
-    useQuery<CommentsServerData>({
-      queryKey: commentsQueryKey(searchParams),
-      queryFn: () => fetchComments(searchParams),
-      refetchOnWindowFocus: false,
-    })
+    useCommentsQuery(searchParams)
 
   let title = "Comments"
   if (data) {

@@ -2,8 +2,54 @@ import { HttpResponse } from "msw"
 
 import type { QueryResult, QueryResultRow } from "../../types"
 
+const QUERY_001 = `SELECT
+    1 AS sort,
+    count(url) AS count
+FROM
+    analytics
+WHERE
+    type='pageview'
+    and created > NOW() - INTERVAL '1 days'
+UNION
+SELECT
+    2 AS sort,
+    count(url) AS count
+FROM
+    analytics
+WHERE
+    type='pageview'
+    and created > NOW() - INTERVAL '2 days' AND created < (NOW() - INTERVAL '1 days')
+ORDER BY sort`
+
+const FAKE_RESULTS: Record<string, QueryResult> = {
+  [QUERY_001]: {
+    rows: [
+      {
+        sort: 1,
+        count: 3163,
+      },
+      {
+        sort: 2,
+        count: 3360,
+      },
+    ],
+    meta: {
+      took_seconds: 0.07825565338134766,
+      count_rows: 2,
+      maxed_rows: false,
+    },
+    error: null,
+  },
+}
+
 function getQueryResult(query: string): QueryResult {
   const rows: QueryResultRow[] = []
+
+  if (query in FAKE_RESULTS) {
+    return FAKE_RESULTS[query]
+  }
+  console.log("QUERY UNRECOGNIZED________________________")
+  console.log(query)
 
   if (query.includes(`(data->>'pathname') IN (`)) {
     const rex = /\(data->>'pathname'\) IN \((.*)\)/
@@ -17,7 +63,7 @@ function getQueryResult(query: string): QueryResult {
     for (const pathname of pathnames) {
       for (let i = 2; i > 0; i--) {
         rows.push({
-          date: now.toISOString(),
+          day: now.toISOString(),
           pathname,
           count: Math.floor(Math.random() * 100),
         })
@@ -61,6 +107,9 @@ function getQueryResult(query: string): QueryResult {
 
     throw new Error("Query not implemented")
   }
+
+  console.log("ROWS____________________________________")
+  console.log(rows)
 
   const queryResult: QueryResult = {
     rows,

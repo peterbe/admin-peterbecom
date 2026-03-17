@@ -3,12 +3,17 @@ import { useDocumentTitle } from "@mantine/hooks"
 import { Link } from "react-router"
 
 import { useCountUnapprovedComments } from "../hooks/use-count-unapproved-comments"
+import { useCommentsQuery } from "./comments/use-comments-query"
 import { SignedIn } from "./signed-in"
 
 export function Home() {
   useDocumentTitle("Home")
 
   const { data } = useCountUnapprovedComments()
+
+  // Pre-emptively warm up the query cache for the comments page,
+  // since it's likely the user will click there next.
+  useCommentsQuery(new URLSearchParams({ only: "unapproved" }))
 
   const size = "lg"
 
