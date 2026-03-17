@@ -16,12 +16,14 @@ export function ChartContainer({
 }) {
   const { minimized, toggleMinimized } = useContext(MinimizeContext)
   const { setRefresh } = useContext(RefreshContainerContext)
+
+  const isMinimized = minimized.includes(id) || minimized.length === 0
   return (
     <Card withBorder shadow="md" padding="lg" mt={10} mb={40} id={id}>
       <SimpleGrid cols={2}>
         <ChartTitle id={id} text={title} />
         <div style={{ textAlign: "right" }}>
-          {!minimized.includes(id) && (
+          {!isMinimized && (
             <Button
               variant="transparent"
               title="Refresh"
@@ -38,17 +40,17 @@ export function ChartContainer({
           <Button
             variant="transparent"
             size="xs"
-            title={minimized.includes(id) ? "expand" : "minimize"}
+            title={isMinimized ? "expand" : "minimize"}
             onClick={() => {
               toggleMinimized(id)
             }}
           >
-            {minimized.includes(id) ? "+" : "-"}
+            {isMinimized ? "+" : "-"}
           </Button>
         </div>
       </SimpleGrid>
 
-      {!minimized.includes(id) && children}
+      {!isMinimized && children}
     </Card>
   )
 }

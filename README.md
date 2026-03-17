@@ -7,8 +7,8 @@ The front-end for the back-end of [www.peterbe.com](https://www.peterbe.com).
 In one terminal:
 
 ```bash
-NODE_ENV=test npm run build
-NODE_ENV=test npm run preview -- --port 4001
+NODE_ENV=test bun run build
+NODE_ENV=test bun run preview -- --port 4001
 ```
 
 (Note, this is the same as `just start-for-testing`)
@@ -16,12 +16,12 @@ NODE_ENV=test npm run preview -- --port 4001
 Then, in another terminal:
 
 ```bash
-PLAYWRIGHT_BASE_URL=http://localhost:4001 npx playwright test
+PLAYWRIGHT_BASE_URL=http://localhost:4001 bunx playwright test
 ```
 
 Start codegen:
 
 ```bash
-npx playwright codegen
+bunx playwright codegen
 ```
 

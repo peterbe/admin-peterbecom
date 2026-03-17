@@ -21,14 +21,17 @@ test("add, find, edit blogitem", async ({ page }) => {
   await page.getByLabel("URL").fill(" https://www.peterbe.com ")
   await page.getByLabel("Keywords").click()
   await page.getByLabel("Keywords").fill("one\n\n two \n  ")
+  await page.locator("body").click({ position: { x: 0, y: 0 } }) // click outside to close the dropdown
   await page
     .locator("div")
     .filter({ hasText: /^Categories$/ })
     .locator("div")
     .nth(1)
     .click()
+
   await page.getByText("Hardware").click()
   await page.getByText("Software").click()
+  await page.locator("body").click({ position: { x: 0, y: 0 } }) // click outside to close the dropdown
 
   const button = page.getByRole("button", { name: "Save" })
   const isDisabled = await button.evaluate(
@@ -148,5 +151,6 @@ test("charts", async ({ page }) => {
   await expect(page).toHaveTitle(/Sign in/)
   await page.getByRole("link", { name: "Sign in with OpenID Connect" }).click()
   await page.getByRole("link", { name: "Analytics Charts" }).click()
+
   await expect(page.getByText("Pageview Numbers")).toBeVisible()
 })

@@ -348,6 +348,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
             value: `${category.id}`,
             label: category.name,
           }))}
+          test-id="categories-multiselect"
           {...form.getInputProps("categories")}
         />
 
