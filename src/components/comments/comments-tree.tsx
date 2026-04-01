@@ -280,12 +280,10 @@ function InnerComment({
                   comment={comment}
                   refetchComments={refetchComments}
                 />
-                {comment.approved && (
-                  <HighlightComment
-                    comment={comment}
-                    refetchComments={refetchComments}
-                  />
-                )}
+                <HighlightComment
+                  comment={comment}
+                  refetchComments={refetchComments}
+                />
               </Group>
             )}
             {!editMode && (

@@ -98,7 +98,9 @@ export function HighlightComment({ comment, refetchComments }: Props) {
         label={
           comment.highlighted
             ? `This has been highlighted since ${comment.highlighted}`
-            : "Toggle to highlight comment"
+            : comment.approved
+              ? "Toggle to highlight comment"
+              : "Toggle to highlight (not yet approved) comment"
         }
       >
         <ActionIcon variant="default" aria-label="Delete">
