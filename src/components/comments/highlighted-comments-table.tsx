@@ -1,46 +1,11 @@
 import { Alert, Badge, Box, LoadingOverlay, Paper, Text } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
-import { useQuery } from "@tanstack/react-query"
 import { Link } from "react-router"
-import {
-  fetchHighlightedComments,
-  highlightedCommentsQueryKey,
-} from "../api-utils"
+import { useHighlightedCommentsQuery } from "../../hooks/use-highlighted-comments-query"
 import { DisplayDate } from "../blogitems/list-table"
 
-type CommentData = {
-  id: number
-  oid: string
-  name: string
-  email: string
-  comment: string
-  rendered: string
-  add_date: string
-  highlighted: string
-  is_first: boolean
-  page: number
-}
-
-type HighlightedComment = CommentData & {
-  parent_id: null | number
-  blogitem: {
-    id: number
-    oid: string
-    title: string
-    pub_date: string
-  }
-}
-
-type ServerData = {
-  comments: HighlightedComment[]
-  count: number
-}
-
 export function HighlightedCommentsTable() {
-  const { data, error, isPending } = useQuery<ServerData>({
-    queryKey: highlightedCommentsQueryKey(),
-    queryFn: fetchHighlightedComments,
-  })
+  const { data, error, isPending } = useHighlightedCommentsQuery()
 
   useDocumentTitle(
     data
@@ -65,6 +30,7 @@ export function HighlightedCommentsTable() {
               {comment.name ? <b>{comment.name}</b> : <i>Anonymous</i>} on{" "}
               <b>{comment.blogitem.title}</b>{" "}
             </Text>
+            {!comment.approved && <Badge color="pink">Not approved</Badge>}
             {
               <Badge
                 variant="outline"

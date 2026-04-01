@@ -152,6 +152,10 @@ function Links({ onClicked }: { onClicked?: () => void }) {
           <Menu.Item component={Link} to="/spam/patterns">
             Spam Patterns
           </Menu.Item>
+          <Menu.Label>Comments</Menu.Label>
+          <Menu.Item component={Link} to="/plog/highlighted-comments">
+            Highlighted Comments
+          </Menu.Item>
         </Menu.Dropdown>
       </Menu>
     </div>
