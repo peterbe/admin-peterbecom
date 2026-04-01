@@ -12,7 +12,7 @@ async function main(args: string[]) {
     const first = tag[1] as string
     if (first.includes('rel="manifest"')) {
       const matched = first.match(/href="(.+?)"/)
-      if (!matched || !matched[1]) throw new Error("No href in manifest link")
+      if (!matched?.[1]) throw new Error("No href in manifest link")
       const manifestUrl = new URL(matched[1], url)
       await checkManifest(manifestUrl)
       found = true

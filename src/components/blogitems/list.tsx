@@ -58,7 +58,7 @@ export function List() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    if (!updater.data || !updater.data.count) return
+    if (!updater.data?.count) return
     const byId = new Map(updater.data.blogitems.map((b) => [b.id, b]))
     queryClient.setQueryData(
       ["blogitems-all"],

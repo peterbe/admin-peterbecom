@@ -1,46 +1,19 @@
-import { Alert, Badge, Box, LoadingOverlay, Paper, Text } from "@mantine/core"
-import { useDocumentTitle } from "@mantine/hooks"
-import { useQuery } from "@tanstack/react-query"
-import { Link } from "react-router"
 import {
-  fetchHighlightedComments,
-  highlightedCommentsQueryKey,
-} from "../api-utils"
+  Alert,
+  Badge,
+  Box,
+  Group,
+  LoadingOverlay,
+  Paper,
+  Text,
+} from "@mantine/core"
+import { useDocumentTitle } from "@mantine/hooks"
+import { Link } from "react-router"
+import { useHighlightedCommentsQuery } from "../../hooks/use-highlighted-comments-query"
 import { DisplayDate } from "../blogitems/list-table"
 
-type CommentData = {
-  id: number
-  oid: string
-  name: string
-  email: string
-  comment: string
-  rendered: string
-  add_date: string
-  highlighted: string
-  is_first: boolean
-  page: number
-}
-
-type HighlightedComment = CommentData & {
-  parent_id: null | number
-  blogitem: {
-    id: number
-    oid: string
-    title: string
-    pub_date: string
-  }
-}
-
-type ServerData = {
-  comments: HighlightedComment[]
-  count: number
-}
-
 export function HighlightedCommentsTable() {
-  const { data, error, isPending } = useQuery<ServerData>({
-    queryKey: highlightedCommentsQueryKey(),
-    queryFn: fetchHighlightedComments,
-  })
+  const { data, error, isPending } = useHighlightedCommentsQuery()
 
   useDocumentTitle(
     data
@@ -65,24 +38,27 @@ export function HighlightedCommentsTable() {
               {comment.name ? <b>{comment.name}</b> : <i>Anonymous</i>} on{" "}
               <b>{comment.blogitem.title}</b>{" "}
             </Text>
-            {
-              <Badge
-                variant="outline"
-                color={comment.page > 1 ? "red" : "blue"}
-              >
-                Page {comment.page}
-              </Badge>
-            }
-            {comment.parent_id && (
-              <Badge variant="light" color="orange">
-                A reply comment
-              </Badge>
-            )}
-            {!comment.is_first && (
-              <Badge variant="light" color="grape">
-                Not first
-              </Badge>
-            )}
+            <Group gap="sm">
+              {!comment.approved && <Badge color="pink">Not approved</Badge>}
+              {
+                <Badge
+                  variant="outline"
+                  color={comment.page > 1 ? "red" : "blue"}
+                >
+                  Page {comment.page}
+                </Badge>
+              }
+              {comment.parent_id && (
+                <Badge variant="light" color="orange">
+                  A reply comment
+                </Badge>
+              )}
+              {!comment.is_first && (
+                <Badge variant="light" color="grape">
+                  Not first
+                </Badge>
+              )}
+            </Group>
             <Text>
               <Link to={commentsUrl}>
                 <DisplayDate date={comment.add_date} />
