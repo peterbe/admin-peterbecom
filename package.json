@@ -21,7 +21,7 @@
     "@mantine/charts": "^8.3.17",
     "@mantine/code-highlight": "^8.3.17",
     "@mantine/core": "^8.3.17",
-    "@mantine/dropzone": "^8.3.17",
+    "@mantine/dropzone": "^9.0.2",
     "@mantine/form": "^8.3.17",
     "@mantine/hooks": "^8.3.17",
     "@mantine/notifications": "^8.3.17",
