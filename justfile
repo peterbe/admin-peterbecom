@@ -54,6 +54,5 @@ test-manifest:
 test: test-playwright test-manifest
 
 upgrade:
-    bun update --interactive
-    bun install
+    bun update --interactive --minimum-release-age=86400 && bun install
 
