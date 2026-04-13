@@ -22,7 +22,7 @@
     "@mantine/code-highlight": "^8.3.17",
     "@mantine/core": "^8.3.17",
     "@mantine/dropzone": "^8.3.17",
-    "@mantine/form": "^8.3.17",
+    "@mantine/form": "^9.0.2",
     "@mantine/hooks": "^8.3.17",
     "@mantine/notifications": "^8.3.17",
     "@tabler/icons-react": "^3.36.0",
