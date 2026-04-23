@@ -4,6 +4,8 @@ import {
   LoadingOverlay,
   SegmentedControl,
   Table,
+  Text,
+  Tooltip,
 } from "@mantine/core"
 import { useState } from "react"
 import {
@@ -28,19 +30,22 @@ export function Sums() {
 function SumsTable({ data }: { data: ServerData }) {
   const [value, setValue] = useState<"sum" | "month">("month")
 
-  // const estimateCost = (model: string, count: number) => {
-  //   if (model.startsWith("gpt-5")) {
-  //     return count * 0.03 // FAKE
-  //   }
-  //   if (model.startsWith("gpt-3.5")) {
-  //     return count * 0.002 // FAKE
-  //   }
-  //   return Number.NaN
-  // }
-  // const formatter = new Intl.NumberFormat("en-US", {
-  //   style: "currency",
-  //   currency: "USD",
-  // })
+  const estimateCost = (model: string, count: number) => {
+    const pricesPerM = {
+      "gpt-5": 2.5,
+      "gpt-5-mini": 0.75,
+      "gpt-5-nano": 0.75,
+    }
+    if (model in pricesPerM) {
+      const pricePerM = pricesPerM[model as keyof typeof pricesPerM]
+      return pricePerM * (count / 1_000_000)
+    }
+    return Number.NaN
+  }
+  const formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  })
 
   const monthFormatter = (d: Date) =>
     d.toLocaleString("en-US", { month: "short", year: "numeric" })
@@ -112,12 +117,12 @@ function SumsTable({ data }: { data: ServerData }) {
             <Table.Th>Count</Table.Th>
             <Table.Th>Average Time</Table.Th>
             <Table.Th>Sum Time</Table.Th>
-            {/* <Table.Th>Estimated Cost</Table.Th> */}
+            <Table.Th>Estimated Cost</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {buckets.map((row) => {
-            // const cost = estimateCost(row.model, row.count)
+            const cost = estimateCost(row.model, row.count)
             return (
               <Table.Tr key={`${row.model}${row.month}`}>
                 {row.month ? (
@@ -133,9 +138,15 @@ function SumsTable({ data }: { data: ServerData }) {
                   {"sum_took_seconds" in row &&
                     timeFormatter(row.sum_took_seconds)}
                 </Table.Td>
-                {/* <Table.Td>
-                  {Number.isNaN(cost) ? "N/A" : formatter.format(cost)}
-                </Table.Td> */}
+                <Table.Td>
+                  {Number.isNaN(cost) ? (
+                    "N/A"
+                  ) : (
+                    <Tooltip label={`${(100 * cost).toFixed(5)} cents`}>
+                      <Text>{formatter.format(cost)}</Text>
+                    </Tooltip>
+                  )}
+                </Table.Td>
               </Table.Tr>
             )
           })}
