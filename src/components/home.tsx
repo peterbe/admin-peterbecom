@@ -120,6 +120,16 @@ export function Home() {
           >
             Analytics Charts
           </Button>
+          <Button
+            size={size}
+            component={Link}
+            to="/analytics/llmcalls"
+            viewTransition
+            prefetch="intent"
+            fullWidth
+          >
+            Analytics LLM Calls
+          </Button>
         </Group>
       </ButtonBox>
     </SignedIn>

@@ -136,6 +136,9 @@ function Links({ onClicked }: { onClicked?: () => void }) {
           <Menu.Item component={Link} to="/analytics/charts">
             Analytics Charts
           </Menu.Item>
+          <Menu.Item component={Link} to="/analytics/llmcalls">
+            Analytics LLM Calls
+          </Menu.Item>
           <Menu.Divider />
           <Menu.Label>Misc</Menu.Label>
           <Menu.Item component={Link} to="/plog/categories">
@@ -144,6 +147,7 @@ function Links({ onClicked }: { onClicked?: () => void }) {
           <Menu.Item component={Link} to="/cdn">
             CDN
           </Menu.Item>
+
           <Menu.Divider />
           <Menu.Label>Spam</Menu.Label>
           <Menu.Item component={Link} to="/spam/signatures">
