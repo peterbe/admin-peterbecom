@@ -22,6 +22,7 @@ import {
   useThrottledCallback,
 } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { IconNotification } from "@tabler/icons-react"
 import { useNavigate } from "react-router"
 import {
   blogitemQueryKey,
@@ -31,6 +32,8 @@ import {
 import classes from "./edit-form.module.css"
 import { ImageThumbnails } from "./image-thumbnails"
 import { Preview } from "./preview"
+import { RenderSpellcheckResult } from "./RenderSpellcheckResults"
+import { useSpellcheck } from "./useSpellcheck"
 import { VideoThumbnails } from "./video-thumbnails"
 
 const PreviewMemoed = memo(Preview)
@@ -81,6 +84,8 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
 
   const [previewText, setPreviewText] = useState(blogitem.text)
   const [debouchedPreviewText] = useDebouncedValue(previewText, 1000)
+
+  const spellcheckMutation = useSpellcheck(blogitem)
 
   const form = useForm({
     // https://mantine.dev/form/uncontrolled/#uncontrolled-mode
@@ -305,6 +310,36 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
             }
           />
         </SimpleGrid>
+
+        <Button
+          mt={5}
+          mb={5}
+          loading={spellcheckMutation.isPending}
+          onClick={() => {
+            spellcheckMutation.mutate(form.getValues().text.trim())
+          }}
+        >
+          Spell check
+        </Button>
+        {spellcheckMutation.data && (
+          <RenderSpellcheckResult
+            data={spellcheckMutation.data}
+            onReplace={(before: string, after: string) => {
+              console.log("Replace", { before, after })
+            }}
+          />
+        )}
+
+        {spellcheckMutation.error && (
+          <Alert
+            variant="light"
+            color="red"
+            title="Spell check failed"
+            icon={<IconNotification />}
+          >
+            {spellcheckMutation.error.message}
+          </Alert>
+        )}
 
         <Textarea
           label="Summary"
