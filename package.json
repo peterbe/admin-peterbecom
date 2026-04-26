@@ -31,6 +31,7 @@
     "@tanstack/react-query-devtools": "^5.96.1",
     "@tanstack/react-query-persist-client": "^5.96.1",
     "date-fns": "^4.1.0",
+    "diff": "^9.0.0",
     "flag-icons": "^7.5.0",
     "install": "^0.13.0",
     "npm": "^11.6.0",

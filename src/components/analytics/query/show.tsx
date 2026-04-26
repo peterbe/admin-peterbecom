@@ -1,10 +1,10 @@
 import { Alert, Button, Container, SimpleGrid, Text } from "@mantine/core"
 import { IconAlertCircle } from "@tabler/icons-react"
 import { Link, useLocation, useSearchParams } from "react-router"
+import { Took } from "../../utils/took"
 import type { QueryResult } from "../types"
 import { ChartData } from "./chart-data"
 import { Rows } from "./rows"
-import { Took } from "./took"
 
 export function Show({
   data,

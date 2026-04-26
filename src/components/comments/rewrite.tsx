@@ -17,7 +17,7 @@ import { useLocalStorage } from "@mantine/hooks"
 import { IconHourglassHigh, IconReload } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 import { Fragment } from "react/jsx-runtime"
-import { Took } from "../analytics/query/took"
+import { Took } from "../utils/took"
 
 type RewriteServerData = {
   comment: string

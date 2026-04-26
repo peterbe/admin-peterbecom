@@ -8,7 +8,6 @@ type SpellcheckResult = {
   after: string
   total_time: number
   error: boolean | null
-  html_diff: string | null
 }
 
 export type SpellcheckResponse = {
@@ -22,7 +21,7 @@ export function useSpellcheck(blogitem: EditBlogitemT) {
   return useMutation<SpellcheckResponse, Error, string>({
     mutationKey: ["spellcheck", blogitem.oid],
     mutationFn: async (markdown: string) => {
-      const url = `${API_BASE}/plog/spellcheck/`
+      const url = `${API_BASE}/plog/${blogitem.oid}/spellcheck`
       const response = await fetch(url, {
         method: "POST",
         headers: {

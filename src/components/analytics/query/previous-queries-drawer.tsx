@@ -12,7 +12,7 @@ import {
 import { IconSearch } from "@tabler/icons-react"
 import { useState } from "react"
 import { formatDistanceCompact } from "../../blogitems/format-distance-compact"
-import { Took } from "./took"
+import { Took } from "../../utils/took"
 import type { PreviousQuery } from "./types"
 
 type Props = {

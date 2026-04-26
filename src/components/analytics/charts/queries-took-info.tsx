@@ -1,7 +1,7 @@
 import { Text } from "@mantine/core"
 
 import type { UseQueryResult } from "@tanstack/react-query"
-import { Took } from "../query/took"
+import { Took } from "../../utils/took"
 import type { QueryResult } from "../types"
 
 type Props = {
