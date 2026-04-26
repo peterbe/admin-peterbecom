@@ -5,6 +5,7 @@ import {
   Group,
   MultiSelect,
   SimpleGrid,
+  Text,
   Textarea,
   TextInput,
   Tooltip,
@@ -22,15 +23,19 @@ import {
   useThrottledCallback,
 } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { IconNotification } from "@tabler/icons-react"
 import { useNavigate } from "react-router"
 import {
   blogitemQueryKey,
   blogitemsQueryKey,
   blogitemsShowAllQueryKey,
 } from "../api-utils"
+import { Took } from "../utils/took"
 import classes from "./edit-form.module.css"
 import { ImageThumbnails } from "./image-thumbnails"
 import { Preview } from "./preview"
+import { RenderSpellcheckResult } from "./RenderSpellcheckResults"
+import { useSpellcheck } from "./useSpellcheck"
 import { VideoThumbnails } from "./video-thumbnails"
 
 const PreviewMemoed = memo(Preview)
@@ -81,6 +86,8 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
 
   const [previewText, setPreviewText] = useState(blogitem.text)
   const [debouchedPreviewText] = useDebouncedValue(previewText, 1000)
+
+  const spellcheckMutation = useSpellcheck(blogitem)
 
   const form = useForm({
     // https://mantine.dev/form/uncontrolled/#uncontrolled-mode
@@ -294,17 +301,96 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
             maxRows={35}
             classNames={{ input: classes.input }}
           />
-          <PreviewMemoed
-            previewText={debouchedPreviewText}
-            displayFormat={form.getValues().display_format}
-            onScroll={previewScrollHandler}
-            scrollPosition={
-              textareaScrollPosition === null
-                ? undefined
-                : textareaScrollPosition
-            }
-          />
+          {spellcheckMutation.isError || spellcheckMutation.data ? (
+            <div>
+              <Group>
+                <Button
+                  variant="light"
+                  onClick={() => {
+                    spellcheckMutation.reset()
+                  }}
+                  m={10}
+                >
+                  Close
+                </Button>
+                {spellcheckMutation.data && (
+                  <Text size="xs">
+                    Took{" "}
+                    <Took
+                      seconds={spellcheckMutation.data.metadata.took_seconds}
+                    />
+                  </Text>
+                )}
+              </Group>
+
+              {spellcheckMutation.data && (
+                <RenderSpellcheckResult
+                  data={spellcheckMutation.data}
+                  onReplace={(before: string, after: string) => {
+                    if (form.getValues().text.includes(before)) {
+                      const newText = form
+                        .getValues()
+                        .text.replace(before, after)
+                      form.setFieldValue("text", newText)
+                      return true
+                    }
+                    notifications.show({
+                      title: "Can't replace",
+                      message: `The text "${before}" was not found in the current text. It might have been already replaced or changed.`,
+                      color: "red",
+                    })
+                  }}
+                  onSelect={(text: string) => {
+                    if (textareaRef.current) {
+                      const index = form.getValues().text.indexOf(text)
+                      if (index !== -1) {
+                        textareaRef.current.setSelectionRange(
+                          index,
+                          index + text.length,
+                        )
+                        textareaRef.current.blur()
+                        textareaRef.current.focus()
+                      }
+                    }
+                  }}
+                />
+              )}
+
+              {spellcheckMutation.error && (
+                <Alert
+                  variant="light"
+                  color="red"
+                  title="Spell check failed"
+                  icon={<IconNotification />}
+                >
+                  {spellcheckMutation.error.message}
+                </Alert>
+              )}
+            </div>
+          ) : (
+            <PreviewMemoed
+              previewText={debouchedPreviewText}
+              displayFormat={form.getValues().display_format}
+              onScroll={previewScrollHandler}
+              scrollPosition={
+                textareaScrollPosition === null
+                  ? undefined
+                  : textareaScrollPosition
+              }
+            />
+          )}
         </SimpleGrid>
+
+        <Button
+          mt={5}
+          mb={5}
+          loading={spellcheckMutation.isPending}
+          onClick={() => {
+            spellcheckMutation.mutate(form.getValues().text.trim())
+          }}
+        >
+          Spell check
+        </Button>
 
         <Textarea
           label="Summary"
