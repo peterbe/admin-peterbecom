@@ -1,3 +1,4 @@
+import { LineChart } from "@mantine/charts"
 import {
   Alert,
   Box,
@@ -5,6 +6,7 @@ import {
   SegmentedControl,
   Table,
   Text,
+  Title,
   Tooltip,
 } from "@mantine/core"
 import { useState } from "react"
@@ -99,6 +101,31 @@ function SumsTable({ data }: { data: ServerData }) {
 
   const buckets = byMonth ? data.aggregates : collapseByMonth(data.aggregates)
 
+  const chartDataMap: Record<string, Record<string, number>> = {}
+  for (const agg of data.aggregates) {
+    const date = monthFormatter(new Date(agg.month))
+    if (!(date in chartDataMap)) {
+      chartDataMap[date] = {}
+    }
+    chartDataMap[date][agg.model] = agg.avg_took_seconds
+  }
+
+  const chartData = Object.entries(chartDataMap).map(([date, models]) => {
+    return { date, ...models }
+  })
+  const names = chartData
+    .map((thing) => {
+      const { date, ...rest } = thing
+      return rest
+    })
+    .flatMap(Object.keys)
+    .filter((v, i, a) => a.indexOf(v) === i)
+  const colors = ["orange.6", "indigo.6", "teal.6", "cyan.6", "blue.6"]
+  const chartSeries = names.map((name, i) => ({
+    name,
+    color: colors[i % colors.length],
+  }))
+
   return (
     <Box>
       <SegmentedControl
@@ -109,7 +136,7 @@ function SumsTable({ data }: { data: ServerData }) {
           { label: "By month", value: "month" },
         ]}
       />
-      <Table>
+      <Table mb={75}>
         <Table.Thead>
           <Table.Tr>
             {byMonth ? <Table.Th>Month</Table.Th> : null}
@@ -152,6 +179,22 @@ function SumsTable({ data }: { data: ServerData }) {
           })}
         </Table.Tbody>
       </Table>
+
+      {chartData && (
+        <Title order={2} mb="md">
+          Average Time
+        </Title>
+      )}
+      {chartData && (
+        <LineChart
+          h={500}
+          data={chartData}
+          dataKey="date"
+          series={chartSeries}
+          curveType="linear"
+          valueFormatter={(value) => `${value.toFixed(1)}s`}
+        />
+      )}
     </Box>
   )
 }
