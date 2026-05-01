@@ -54,7 +54,7 @@
     "msw": "^2.13.4",
     "serve": "^14.2.5",
     "typescript": "^6.0.3",
-    "vite": "8.0.9"
+    "vite": "8.0.10"
   },
   "msw": {
     "workerDirectory": [
