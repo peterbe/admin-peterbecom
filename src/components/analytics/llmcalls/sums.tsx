@@ -191,6 +191,7 @@ function SumsTable({ data }: { data: ServerData }) {
           data={chartData}
           dataKey="date"
           series={chartSeries}
+          withLegend
           curveType="linear"
           valueFormatter={(value) => `${value.toFixed(1)}s`}
         />
