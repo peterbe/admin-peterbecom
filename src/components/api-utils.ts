@@ -79,6 +79,14 @@ export async function fetchCategories() {
   return standardFetch(`${API_BASE}/categories`)
 }
 
+export async function fetchLLMCalls(searchParams?: URLSearchParams) {
+  let url = `${API_BASE}/llmcalls`
+  if (searchParams) {
+    url += `?${searchParams.toString()}`
+  }
+  return standardFetch(url)
+}
+
 export async function fetchWhoami() {
   return standardFetch(`${API_BASE}/whoami`)
 }

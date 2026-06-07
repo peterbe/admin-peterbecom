@@ -144,6 +144,9 @@ function Links({ onClicked }: { onClicked?: () => void }) {
           <Menu.Item component={Link} to="/plog/categories">
             Categories
           </Menu.Item>
+          <Menu.Item component={Link} to="/llmcalls">
+            LLM Calls
+          </Menu.Item>
           <Menu.Item component={Link} to="/cdn">
             CDN
           </Menu.Item>

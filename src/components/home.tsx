@@ -79,6 +79,16 @@ export function Home() {
           <Button
             size={size}
             component={Link}
+            to="/llmcalls"
+            viewTransition
+            prefetch="intent"
+            fullWidth
+          >
+            LLM Calls
+          </Button>
+          <Button
+            size={size}
+            component={Link}
             to="/plog/categories"
             viewTransition
             prefetch="intent"
