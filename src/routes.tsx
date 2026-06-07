@@ -57,6 +57,10 @@ export const router = createBrowserRouter([
             ],
           },
           {
+            path: "llmcalls",
+            lazy: () => import("./components/llmcalls"),
+          },
+          {
             path: "spam/signatures",
             lazy: () => import("./components/spam/signatures"),
           },
