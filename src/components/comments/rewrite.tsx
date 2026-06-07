@@ -31,7 +31,12 @@ type RewriteServerData = {
   }
 }
 
-const VALID_MODELS = ["gpt-5", "gpt-5-mini", "gpt-5-nano"] as const
+const VALID_MODELS = [
+  "gpt-5",
+  "gpt-5-mini",
+  "gpt-5-nano",
+  "claude-opus-4-8",
+] as const
 type ValidModel = (typeof VALID_MODELS)[number]
 
 export function RewriteComment({
@@ -88,7 +93,7 @@ export function RewriteComment({
       {data && <LLMInfo llm_call={data.llm_call} />}
 
       <Select
-        label="GPT model"
+        label="Model"
         placeholder="Pick value"
         data={VALID_MODELS}
         value={model}
