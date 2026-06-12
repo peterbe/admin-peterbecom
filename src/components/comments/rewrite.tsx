@@ -39,6 +39,8 @@ const VALID_MODELS = [
   "gpt-5-mini",
   "gpt-5-nano",
   "claude-opus-4-8",
+  "openai-gpt-5",
+  "openai-gpt-5-mini",
 ] as const
 type ValidModel = (typeof VALID_MODELS)[number]
 
