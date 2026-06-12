@@ -3,6 +3,7 @@ import {
   Badge,
   Blockquote,
   Button,
+  Code,
   Group,
   LoadingOverlay,
   Modal,
@@ -17,6 +18,7 @@ import { useLocalStorage } from "@mantine/hooks"
 import { IconHourglassHigh, IconReload } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 import { Fragment } from "react/jsx-runtime"
+import { DisplayDate } from "../blogitems/list-table"
 import { Took } from "../utils/took"
 
 type RewriteServerData = {
@@ -28,6 +30,7 @@ type RewriteServerData = {
     took_seconds: number
     error: string | null
     status: "success" | "error" | "progress"
+    created: string
   }
 }
 
@@ -176,7 +179,6 @@ export function RewriteComment({
 function LLMInfo({ llm_call }: { llm_call: RewriteServerData["llm_call"] }) {
   return (
     <Group justify="center">
-      <Text fw={700}>LLM call</Text>
       <Badge
         color={
           llm_call.status === "success"
@@ -188,12 +190,17 @@ function LLMInfo({ llm_call }: { llm_call: RewriteServerData["llm_call"] }) {
       >
         {llm_call.status}
       </Badge>
-      <Badge variant="light">Model: {llm_call.model}</Badge>
+      <Text>
+        <b>Model:</b> <Code>{llm_call.model}</Code>
+      </Text>
       {llm_call.status !== "progress" && (
-        <Badge variant="light" color="gray">
-          Took: <Took seconds={llm_call.took_seconds} />
-        </Badge>
+        <Text>
+          <b>Took:</b> <Took seconds={llm_call.took_seconds} />
+        </Text>
       )}
+      <Text>
+        <b>Created:</b> <DisplayDate date={llm_call.created} includeSeconds />
+      </Text>
     </Group>
   )
 }
