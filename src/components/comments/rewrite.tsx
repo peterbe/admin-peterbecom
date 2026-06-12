@@ -11,7 +11,11 @@ import {
   Text,
 } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
-import { commentRewriteQueryKey, fetchCommentRewrite } from "../api-utils"
+import {
+  commentRewriteQueryKey,
+  fetchCommentRewrite,
+  fetchValidLLMCallModels,
+} from "../api-utils"
 import type { Comment } from "./types"
 import "./rewrite-styles.css"
 import { useLocalStorage } from "@mantine/hooks"
@@ -34,16 +38,6 @@ type RewriteServerData = {
   }
 }
 
-const VALID_MODELS = [
-  "gpt-5",
-  "gpt-5-mini",
-  "gpt-5-nano",
-  "claude-opus-4-8",
-  "openai-gpt-5",
-  "openai-gpt-5-mini",
-] as const
-type ValidModel = (typeof VALID_MODELS)[number]
-
 export function RewriteComment({
   comment,
   onClose,
@@ -51,19 +45,53 @@ export function RewriteComment({
   comment: Comment
   onClose: (newText?: string) => void
 }) {
+  const { data, error } = useQuery<{ models: string[] }>({
+    queryKey: ["rewrite", "valid-models"],
+    // queryFn: () => fetchValidLLMCallModels(),
+    queryFn: fetchValidLLMCallModels,
+  })
+
+  if (data) {
+    return (
+      <RewriteCommentInner
+        comment={comment}
+        onClose={onClose}
+        validModels={data.models}
+      />
+    )
+  }
+
+  if (error) {
+    return (
+      <Alert color="red">Failed to load valid models: {error.message}</Alert>
+    )
+  }
+
+  return null
+}
+
+function RewriteCommentInner({
+  comment,
+  onClose,
+  validModels,
+}: {
+  comment: Comment
+  onClose: (newText?: string) => void
+  validModels: readonly string[]
+}) {
   const [manuallyLoading, setManuallyLoading] = useState(false)
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
-  const [model, setModel] = useLocalStorage<ValidModel>({
+  if (validModels.length === 0) {
+    throw new Error("No valid models available")
+  }
+  const defaultModel = validModels[0]
+
+  const [model, setModel] = useLocalStorage<string>({
     key: "rewrite:model",
-    defaultValue: VALID_MODELS[0],
+    defaultValue: defaultModel,
   })
-  useEffect(() => {
-    if (!VALID_MODELS.includes(model)) {
-      setModel(VALID_MODELS[0])
-    }
-  }, [model, setModel])
 
   const { data, error, isPending, refetch } = useQuery<RewriteServerData>({
     queryKey: commentRewriteQueryKey(comment.oid, model),
@@ -100,11 +128,11 @@ export function RewriteComment({
       <Select
         label="Model"
         placeholder="Pick value"
-        data={VALID_MODELS}
+        data={validModels}
         value={model}
         onChange={(value) => {
-          if (VALID_MODELS.includes(value as ValidModel)) {
-            setModel(value as ValidModel)
+          if (value && validModels.includes(value)) {
+            setModel(value)
           }
         }}
       />

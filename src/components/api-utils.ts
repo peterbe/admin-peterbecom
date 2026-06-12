@@ -129,6 +129,10 @@ export async function fetchCommentRewrite(oid: string, model: string) {
   return await response.json()
 }
 
+export async function fetchValidLLMCallModels() {
+  return standardFetch(`${API_BASE}/valid-llmcall-models`)
+}
+
 export async function fetchCDNProbe(url: string) {
   return standardFetch(`${API_BASE}/cdn/probe?${new URLSearchParams({ url })}`)
 }
