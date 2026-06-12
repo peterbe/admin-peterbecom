@@ -19,8 +19,6 @@ import { useSearchParams } from "react-router"
 import { fetchLLMCalls } from "../api-utils"
 import { DisplayDate } from "../blogitems/list-table"
 import { Took } from "../utils/took"
-// import { Delete } from "./delete"
-// import { Edit } from "./edit"
 import type { ServerData } from "./types"
 
 const badgeColor = (status: string) => {
@@ -42,7 +40,6 @@ export function List() {
   if (batchSize) {
     filterSearchParams.set("batch_size", batchSize)
   }
-  console.log(filterSearchParams.toString())
 
   const { data, error, isPending } = useQuery<ServerData>({
     queryKey: ["llmcalls", filterSearchParams.toString()],
@@ -60,32 +57,24 @@ export function List() {
 
   const statusAggregates = data
     ? Object.entries(data.aggregates.status).map(([status, count]) => ({
-        value: status,
-        label: `${status} (${count})`,
+        value: status || "*empty*",
+        label: `${status || "*empty*"} (${count})`,
       }))
     : []
-  if (data) {
-    statusAggregates.unshift({ value: "", label: "All" })
-  }
+
   const useCaseAggregates = data
     ? Object.entries(data.aggregates.use_case).map(([useCase, count]) => ({
-        value: useCase,
-        label: `${useCase} (${count})`,
+        value: useCase || "*empty*",
+        label: `${useCase || "*empty*"} (${count})`,
       }))
     : []
-  if (data) {
-    useCaseAggregates.unshift({ value: "", label: "All" })
-  }
 
   const modelAggregates = data
     ? Object.entries(data.aggregates.model).map(([model, count]) => ({
-        value: model,
-        label: `${model} (${count})`,
+        value: model || "*empty*",
+        label: `${model || "*empty*"} (${count})`,
       }))
     : []
-  if (data) {
-    modelAggregates.unshift({ value: "", label: "All" })
-  }
 
   return (
     <Box mb={50} pos="relative">
