@@ -5,6 +5,7 @@ import {
   Group,
   MultiSelect,
   SimpleGrid,
+  Switch,
   Text,
   Textarea,
   TextInput,
@@ -82,6 +83,7 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     keywords: list2string(blogitem.keywords),
     categories: blogitem.categories.map((category) => `${category.id}`),
     display_format: blogitem.display_format,
+    is_photo: blogitem.is_photo,
   }
 
   const [previewText, setPreviewText] = useState(blogitem.text)
@@ -97,7 +99,10 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
     validate: {
       oid: required,
       title: required,
-      text: required,
+      text: (value: string, values) => {
+        if (values.is_photo) return null
+        return value.trim() ? null : "Required"
+      },
       url: (v) => {
         if (!v || validUrl(v)) return null
         return "Invalid URL"
@@ -270,6 +275,14 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           }
         })}
       >
+        <Switch
+          label="Is Photo Entry"
+          {...form.getInputProps("is_photo")}
+          defaultChecked={!!blogitem.is_photo}
+          size="md"
+        />
+        {/* <Checkbox label="Is Photo Entry" {...form.getInputProps("is_photo")} /> */}
+
         <TextInput
           withAsterisk
           label="Title"
@@ -284,9 +297,10 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
           key={form.key("oid")}
           {...form.getInputProps("oid")}
         />
+
         <SimpleGrid cols={{ base: 1, lg: 2 }}>
           <Textarea
-            withAsterisk
+            withAsterisk={!form.getValues().is_photo}
             label="Text"
             className="markdown-textarea"
             key={form.key("text")}
