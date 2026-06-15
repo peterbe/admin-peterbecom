@@ -21,6 +21,7 @@ import { Dropzone, type FileWithPath, IMAGE_MIME_TYPE } from "@mantine/dropzone"
 import { useForm } from "@mantine/form"
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
+import { useBlogitem } from "../../hooks/use-blogitem"
 import { useImages } from "../../hooks/use-images"
 import { useUserData } from "../../whoami/use-userdata"
 import { imagesQueryKey, openGraphImagesQueryKey } from "../api-utils"
@@ -62,6 +63,8 @@ export function Component() {
 }
 
 function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
+  const { data: blogitemData } = useBlogitem(oid)
+
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationKey: ["images", oid],
@@ -121,6 +124,7 @@ function Upload({ oid, csrfToken }: { oid: string; csrfToken: string }) {
           onSubmitTitle={(title: string) => {
             mutation.mutate({ file: uploadedFile, title })
           }}
+          initialTitle={blogitemData?.blogitem?.title || ""}
         />
       )}
 
@@ -218,13 +222,15 @@ function PreviewUploadedFile({ file }: { file: FileWithPath }) {
 
 function TitleForm({
   onSubmitTitle,
+  initialTitle = "",
 }: {
   onSubmitTitle: (title: string) => void
+  initialTitle?: string
 }) {
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
-      title: "",
+      title: initialTitle || "",
     },
     validate: {
       title: (value: string) => (value.trim() ? null : "Required"),

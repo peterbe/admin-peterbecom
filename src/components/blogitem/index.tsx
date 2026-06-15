@@ -1,9 +1,9 @@
 import { Alert, Box, LoadingOverlay, Text } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
-import { useIsMutating, useQuery } from "@tanstack/react-query"
+import { useIsMutating } from "@tanstack/react-query"
 import { useParams } from "react-router"
+import { useBlogitem } from "../../hooks/use-blogitem"
 import type { EditBlogitemT } from "../../types"
-import { blogitemQueryKey, fetchBlogitem } from "../api-utils"
 import { DisplayDate } from "../blogitems/list-table"
 import { SignedIn } from "../signed-in"
 import { DangerZone } from "./danger-zone"
@@ -24,20 +24,8 @@ export default function Blogitem() {
   return <SignedIn>{oid ? <Edit oid={oid} /> : <Add />}</SignedIn>
 }
 
-type ServerData = {
-  blogitem?: EditBlogitemT
-  notFound?: boolean
-}
-
 function Edit({ oid }: { oid: string | null }) {
-  const { data, error, isPending, isFetching } = useQuery<ServerData>({
-    queryKey: blogitemQueryKey(oid),
-    queryFn: async () => {
-      if (!oid) return null
-      return fetchBlogitem(oid)
-    },
-    enabled: !!oid,
-  })
+  const { data, error, isPending, isFetching } = useBlogitem(oid)
 
   const isSavingMutation = useIsMutating({
     mutationKey: ["edit", data?.blogitem?.oid],
@@ -102,6 +90,7 @@ function Add() {
     disallow_comments: true,
     open_graph_image: "",
     archived: null,
+    is_photo: false,
   }
 
   return <Form blogitem={blogitem} />

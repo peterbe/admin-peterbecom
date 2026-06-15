@@ -17,6 +17,8 @@ export function SearchTips({ append }: Props) {
       'category:"web performance"',
       "Those that belong to category 'Web Performance'",
     ],
+    ["is:photo", "Those that are photos"],
+    ["not:photo", "Those that are not photos"],
   ]
   return (
     <Table>

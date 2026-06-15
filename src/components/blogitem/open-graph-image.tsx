@@ -15,6 +15,7 @@ import {
   type OpenGraphImageT,
   useOpenGraphImages,
 } from "../../hooks/use-open-graph-images"
+import { blogitemQueryKey } from "../api-utils"
 import { SignedIn } from "../signed-in"
 import { AbsoluteImage } from "./absolute-image"
 import { BlogitemLinks } from "./links"
@@ -75,9 +76,10 @@ function ImageChoice({ image, oid }: { image: OpenGraphImageT; oid: string }) {
       return response.json()
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["open-graph-image", oid],
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["open-graph-image", oid] }),
+        queryClient.invalidateQueries({ queryKey: blogitemQueryKey(oid) }),
+      ])
     },
   })
 

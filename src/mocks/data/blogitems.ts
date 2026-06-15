@@ -72,6 +72,7 @@ export function addBlogItem({ body }: { body: AddBlogitemRequestBody }) {
     disallow_comments: false,
     hide_comments: false,
     open_graph_image: null,
+    is_photo: false,
   }
   addBlogitemFull(blogitem)
 

@@ -18,6 +18,8 @@ export type BlogitemT = {
   has_split: boolean
   hide_comments: boolean
   disallow_comments: boolean
+  is_photo: boolean
+  open_graph_image: string | null
 }
 
 export type EditBlogitemT = {
@@ -39,6 +41,7 @@ export type EditBlogitemT = {
   open_graph_image: string | null
   _absolute_url: string
   archived: null | string
+  is_photo: boolean
 }
 
 export type BlogitemsServerData = {

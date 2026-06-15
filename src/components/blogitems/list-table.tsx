@@ -97,6 +97,13 @@ export function ListTable({
     freeFormSearch = freeFormSearch.replace(/\b(is|not):future\b/i, "").trim()
   }
 
+  let isPhoto: null | boolean = null
+  const photoRegex = search.match(/\b(is|not):photo\b/i)
+  if (photoRegex) {
+    isPhoto = (photoRegex[1] as string).toLowerCase() === "is"
+    freeFormSearch = freeFormSearch.replace(/\b(is|not):photo\b/i, "").trim()
+  }
+
   let requirePublished: null | boolean = null
   const publishedRegex = search.match(/\b(is|not):published\b/i)
   if (publishedRegex) {
@@ -151,6 +158,11 @@ export function ListTable({
         const now = new Date()
         if (isFuture && pubDate <= now) return false
         if (!isFuture && pubDate > now) return false
+      }
+
+      if (isPhoto !== null) {
+        if (isPhoto && !item.is_photo) return false
+        if (!isPhoto && item.is_photo) return false
       }
 
       if (searchRegex) {
@@ -244,6 +256,16 @@ export function ListTable({
             {filteredBlogitems.slice(0, paginationSize).map((item) => (
               <Table.Tr key={item.id}>
                 <Table.Td>
+                  {item.is_photo && (
+                    <Badge color="cyan" variant="light" mr={5}>
+                      Photo
+                    </Badge>
+                  )}
+                  {item.is_photo && !item.open_graph_image && (
+                    <Badge color="orange" variant="light" mr={5}>
+                      No OpenGraph Image
+                    </Badge>
+                  )}
                   <Link
                     to={`/plog/${item.oid}`}
                     onMouseOver={() => prefetchBlogitemSoon(item.oid)}
@@ -273,7 +295,7 @@ export function ListTable({
                     </Badge>
                   ))}
 
-                  {!item.summary && (
+                  {!item.summary && !item.is_photo && (
                     <CustomBadge
                       variant="default"
                       ml={15}
