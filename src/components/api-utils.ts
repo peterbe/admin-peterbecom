@@ -44,6 +44,10 @@ export function commentRewriteQueryKey(...keys: string[]) {
   return ["rewrite", ...keys]
 }
 
+export function commentAISuggestQueryKey(...keys: string[]) {
+  return ["ai-suggest-comment", ...keys]
+}
+
 export function commentsCountQueryKey() {
   return ["count-unapproved-comments"]
 }
@@ -129,8 +133,24 @@ export async function fetchCommentRewrite(oid: string, model: string) {
   return await response.json()
 }
 
-export async function fetchValidLLMCallModels() {
-  return standardFetch(`${API_BASE}/valid-llmcall-models`)
+export async function fetchCommentAISuggest(
+  oid: string,
+  model: string,
+  comment: string,
+) {
+  const response = await fetch(`${API_BASE}/plog/comments/${oid}/ai-comment/`, {
+    method: "POST",
+    body: JSON.stringify({ model, comment }),
+  })
+  if (!response.ok) {
+    throw new Error(`${response.status} on ${response.url}`)
+  }
+  return await response.json()
+}
+
+export function fetchValidLLMCallModels(useCase?: string) {
+  return () =>
+    standardFetch(`${API_BASE}/valid-llmcall-models?usecase=${useCase}`)
 }
 
 export async function fetchCDNProbe(url: string) {

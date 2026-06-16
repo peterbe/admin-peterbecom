@@ -21,6 +21,7 @@ import {
   fetchCommentClassification,
 } from "../api-utils"
 import { DisplayDate } from "../blogitems/list-table"
+import { AISuggestComment } from "./ai-suggest-comment"
 import { fixAllCaps, isAllCaps } from "./all-caps"
 import { ApprovalForm } from "./approval-form"
 import { ClassifyComment } from "./classify"
@@ -147,6 +148,7 @@ function InnerComment({
   const [classifyMode, setClassifyMode] = useState(false)
   const [spamSignatureMode, setSpamSignatureMode] = useState(false)
   const [rewriteMode, setRewriteMode] = useState(false)
+  const [aiSuggestMode, setAISuggestMode] = useState(false)
 
   const form = useForm({
     mode: "uncontrolled",
@@ -222,6 +224,8 @@ function InnerComment({
 
   const matches = useMediaQuery("(max-width: 56.25em)")
   const leftMargin = matches ? 0 : 54
+
+  const showAISuggestMode = comment.blogitem.oid === "blogitem-040601-1"
 
   return (
     <Box>
@@ -380,6 +384,19 @@ function InnerComment({
           />
         )}
 
+        {aiSuggestMode && (
+          <AISuggestComment
+            comment={comment}
+            onClose={() => {
+              setAISuggestMode(false)
+              // if (newComment) {
+              //   form.setFieldValue("comment", newComment)
+              //   setEditMode(true)
+              // }
+            }}
+          />
+        )}
+
         {spamSignatureMode && (
           <SpamSignatureComment
             comment={comment}
@@ -447,6 +464,18 @@ function InnerComment({
           >
             {rewriteMode ? "Close" : "Rewrite"}
           </Button>
+
+          {showAISuggestMode && (
+            <Button
+              variant="light"
+              onClick={() => {
+                setAISuggestMode((p) => !p)
+              }}
+              disabled={disabled}
+            >
+              {aiSuggestMode ? "Close" : "AI Comment"}
+            </Button>
+          )}
 
           {isDeleted ? (
             <Badge
