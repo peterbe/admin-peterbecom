@@ -6,6 +6,7 @@ import {
   Button,
   Code,
   Group,
+  Loader,
   LoadingOverlay,
   Modal,
   Select,
@@ -23,6 +24,7 @@ import { useLocalStorage } from "@mantine/hooks"
 import { IconHourglassHigh, IconReload } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 import { Fragment } from "react/jsx-runtime"
+import { PUBLIC_API_BASE } from "../../config"
 import { DisplayDate } from "../blogitems/list-table"
 import { Took } from "../utils/took"
 
@@ -96,7 +98,6 @@ function AISuggestCommentInner({
     queryFn: () => fetchCommentAISuggest(comment.oid, model, comment.comment),
     refetchInterval,
   })
-  console.log({ data })
 
   useEffect(() => {
     if (data?.llm_call.status === "progress") {
@@ -121,6 +122,7 @@ function AISuggestCommentInner({
       {data && <LLMInfo llm_call={data.llm_call} />}
 
       <Select
+        mb={10}
         label="Model"
         placeholder="Pick value"
         data={validModels}
@@ -204,6 +206,10 @@ function AISuggestCommentInner({
               </Blockquote>
             </Box>
           )}
+
+          {data?.comment !== null && (
+            <ExtractSongSearchLinks comment={data.comment} />
+          )}
         </>
       )}
     </Modal>
@@ -248,4 +254,87 @@ function Lines({ text }: { text: string }) {
       </Fragment>
     )
   })
+}
+
+function ExtractSongSearchLinks({ comment }: { comment: string }) {
+  const re = /\*\*"([^"]*)"/g
+  const matches = [...comment.matchAll(re)].map((match) => match[1])
+
+  if (matches.length > 0) {
+    return (
+      <Box>
+        <Text fw={700}>Extracted Song Search Links</Text>
+        <ul>
+          {matches.map((match) => {
+            return (
+              <li key={match}>
+                <SongSearchLink match={match} />
+              </li>
+            )
+          })}
+        </ul>
+      </Box>
+    )
+  }
+  return null
+}
+
+type LyricsSearchResult = {
+  name: string
+  year: number | null
+  artist: {
+    name: string
+  }
+  albums: {
+    name: string
+    year: number | null
+  }[]
+
+  score: number
+  id: number
+  _url: string
+  fragments: string[]
+  image: {
+    url: string
+    name: string
+    thumbnail100: string
+  }
+}
+type LyricsSearchResults = {
+  results: LyricsSearchResult[]
+  metadata: {
+    limit: number
+    desperate: boolean
+    total: number
+    search: string
+  }
+}
+function SongSearchLink({ match }: { match: string }) {
+  const { data, error, isPending } = useQuery<LyricsSearchResults>({
+    queryKey: ["lyrics-search", match],
+    queryFn: async () => {
+      const sp = new URLSearchParams({ q: match })
+      const url = `${PUBLIC_API_BASE}/lyrics/search?${sp.toString()}`
+      const res = await fetch(url)
+      if (!res.ok) {
+        throw new Error(`Failed to search lyrics: ${res.statusText}`)
+      }
+      return res.json()
+    },
+  })
+
+  const link = `https://www.peterbe.com/plog/blogitem-040601-1/q/${encodeURIComponent(match)}`
+
+  return (
+    <Box>
+      <Group>
+        <a href={link} target="_blank" rel="noopener noreferrer">
+          "{match}"
+        </a>
+        {isPending && <Loader color="gray" size="xs" />}
+        {error && <Alert color="red">Failed to load: {error.message}</Alert>}
+        {data && <Text color="green">Found {data.metadata.total} results</Text>}
+      </Group>
+    </Box>
+  )
 }

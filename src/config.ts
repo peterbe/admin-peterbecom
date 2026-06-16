@@ -1,4 +1,5 @@
 export const API_BASE = "/api/v0"
+export const PUBLIC_API_BASE = "/api/v1"
 export const PUBLIC_BASE_URL =
   process.env.NODE_ENV === "development"
     ? "http://localhost:3000"
