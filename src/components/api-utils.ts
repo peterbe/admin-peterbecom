@@ -91,6 +91,14 @@ export async function fetchLLMCalls(searchParams?: URLSearchParams) {
   return standardFetch(url)
 }
 
+export async function fetchLyricsSearch(searchParams?: URLSearchParams) {
+  let url = `${API_BASE}/lyrics/search`
+  if (searchParams) {
+    url += `?${searchParams.toString()}`
+  }
+  return standardFetch(url)
+}
+
 export async function fetchWhoami() {
   return standardFetch(`${API_BASE}/whoami`)
 }
