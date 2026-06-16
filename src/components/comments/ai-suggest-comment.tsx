@@ -25,6 +25,7 @@ import { IconHourglassHigh, IconReload } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 import { Fragment } from "react/jsx-runtime"
 import { PUBLIC_API_BASE } from "../../config"
+import { thousands } from "../../number-formatter"
 import { DisplayDate } from "../blogitems/list-table"
 import { Took } from "../utils/took"
 
@@ -134,9 +135,16 @@ function AISuggestCommentInner({
         }}
       />
 
-      {/* <Blockquote color="gray" cite="Before" mt="xl" mb={20}>
-        <Lines text={comment.comment.trim()} />
-      </Blockquote> */}
+      <Box>
+        <Blockquote
+          color="gray"
+          cite={`Original comment by ${comment.name || "*no name*"} ${comment.email || "*no email*"}`}
+          mt="xl"
+          mb={20}
+        >
+          <Lines text={comment.comment.trim()} />
+        </Blockquote>
+      </Box>
 
       {data?.llm_call.status === "progress" && (
         <Alert
@@ -175,27 +183,9 @@ function AISuggestCommentInner({
             <Alert color="red">{data.llm_call.error}</Alert>
           )}
 
-          {/* {data?.rewritten && (
-            <Blockquote color="blue" cite="After" mt="xl" mb={20}>
-              <Lines text={data.rewritten.trim()} />
-            </Blockquote>
-          )} */}
-
-          {/* {data?.rewritten && (
-            <Button
-              mb={20}
-              fullWidth
-              onClick={() => {
-                onClose(data.rewritten as string)
-              }}
-            >
-              Start edit
-            </Button>
-          )} */}
-
           {data?.comment !== null && (
             <Box mt={20}>
-              <Text fw={700}>AI Suggestion Preview</Text>
+              <Text fw={500}>AI Suggestion Preview</Text>
               <Blockquote
                 color="gray"
                 cite="AI Assisted Comment"
@@ -263,7 +253,7 @@ function ExtractSongSearchLinks({ comment }: { comment: string }) {
   if (matches.length > 0) {
     return (
       <Box>
-        <Text fw={700}>Extracted Song Search Links</Text>
+        <Text fw={500}>Extracted Song Search Links</Text>
         <ul>
           {matches.map((match) => {
             return (
@@ -289,7 +279,6 @@ type LyricsSearchResult = {
     name: string
     year: number | null
   }[]
-
   score: number
   id: number
   _url: string
@@ -300,6 +289,7 @@ type LyricsSearchResult = {
     thumbnail100: string
   }
 }
+
 type LyricsSearchResults = {
   results: LyricsSearchResult[]
   metadata: {
@@ -328,12 +318,18 @@ function SongSearchLink({ match }: { match: string }) {
   return (
     <Box>
       <Group>
-        <a href={link} target="_blank" rel="noopener noreferrer">
-          "{match}"
-        </a>
+        <Text>
+          <a href={link} target="_blank" rel="noopener noreferrer">
+            {match}
+          </a>
+        </Text>
         {isPending && <Loader color="gray" size="xs" />}
         {error && <Alert color="red">Failed to load: {error.message}</Alert>}
-        {data && <Text color="green">Found {data.metadata.total} results</Text>}
+        {data && (
+          <Text color="green" size="sm">
+            Found {thousands(data.metadata.total)} results
+          </Text>
+        )}
       </Group>
     </Box>
   )
