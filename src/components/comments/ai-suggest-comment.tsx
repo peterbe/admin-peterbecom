@@ -2,6 +2,7 @@ import {
   Alert,
   Badge,
   Blockquote,
+  Box,
   Button,
   Code,
   Group,
@@ -12,8 +13,8 @@ import {
 } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 import {
-  commentRewriteQueryKey,
-  fetchCommentRewrite,
+  commentAISuggestQueryKey,
+  fetchCommentAISuggest,
   fetchValidLLMCallModels,
 } from "../api-utils"
 import type { Comment } from "./types"
@@ -26,9 +27,7 @@ import { DisplayDate } from "../blogitems/list-table"
 import { Took } from "../utils/took"
 
 type RewriteServerData = {
-  comment: string
-  rewritten: string | null
-  html_diff: string | null
+  comment: string | null
   llm_call: {
     model: string
     took_seconds: number
@@ -38,7 +37,7 @@ type RewriteServerData = {
   }
 }
 
-export function RewriteComment({
+export function AISuggestComment({
   comment,
   onClose,
 }: {
@@ -46,13 +45,13 @@ export function RewriteComment({
   onClose: (newText?: string) => void
 }) {
   const { data, error } = useQuery<{ models: string[] }>({
-    queryKey: ["rewrite", "valid-models"],
-    queryFn: fetchValidLLMCallModels("rewrite-comment"),
+    queryKey: ["valid-models", "ai-suggest-comment"],
+    queryFn: fetchValidLLMCallModels("ai-suggest-comment"),
   })
 
   if (data) {
     return (
-      <RewriteCommentInner
+      <AISuggestCommentInner
         comment={comment}
         onClose={onClose}
         validModels={data.models}
@@ -69,7 +68,7 @@ export function RewriteComment({
   return null
 }
 
-function RewriteCommentInner({
+function AISuggestCommentInner({
   comment,
   onClose,
   validModels,
@@ -93,10 +92,11 @@ function RewriteCommentInner({
   })
 
   const { data, error, isPending, refetch } = useQuery<RewriteServerData>({
-    queryKey: commentRewriteQueryKey(comment.oid, model),
-    queryFn: () => fetchCommentRewrite(comment.oid, model),
+    queryKey: commentAISuggestQueryKey(comment.oid, model, comment.comment),
+    queryFn: () => fetchCommentAISuggest(comment.oid, model, comment.comment),
     refetchInterval,
   })
+  console.log({ data })
 
   useEffect(() => {
     if (data?.llm_call.status === "progress") {
@@ -113,14 +113,10 @@ function RewriteCommentInner({
       onClose={() => {
         onClose()
       }}
-      title={isPending ? "Rewrite (loading)" : "Rewrite"}
+      title={isPending ? "AI Suggest Comment (loading)" : "AI Suggest Comment"}
     >
       <LoadingOverlay visible={isPending} />
-      {error && (
-        <Alert color="red">
-          Failed to load classification: {error.message}
-        </Alert>
-      )}
+      {error && <Alert color="red">Failed to load: {error.message}</Alert>}
 
       {data && <LLMInfo llm_call={data.llm_call} />}
 
@@ -136,18 +132,19 @@ function RewriteCommentInner({
         }}
       />
 
-      <Blockquote color="gray" cite="Before" mt="xl" mb={20}>
+      {/* <Blockquote color="gray" cite="Before" mt="xl" mb={20}>
         <Lines text={comment.comment.trim()} />
-      </Blockquote>
+      </Blockquote> */}
 
       {data?.llm_call.status === "progress" && (
         <Alert
           color="yellow"
-          title="Rewrite in progress"
+          title="AI Suggest Comment in progress"
           icon={<IconHourglassHigh />}
           mb={20}
         >
-          The rewrite is still in progress. Please wait a moment and try again.
+          The AI suggestion is still in progress. Please wait a moment and try
+          again.
         </Alert>
       )}
 
@@ -176,13 +173,13 @@ function RewriteCommentInner({
             <Alert color="red">{data.llm_call.error}</Alert>
           )}
 
-          {data?.rewritten && (
+          {/* {data?.rewritten && (
             <Blockquote color="blue" cite="After" mt="xl" mb={20}>
               <Lines text={data.rewritten.trim()} />
             </Blockquote>
-          )}
+          )} */}
 
-          {data?.rewritten && (
+          {/* {data?.rewritten && (
             <Button
               mb={20}
               fullWidth
@@ -192,12 +189,20 @@ function RewriteCommentInner({
             >
               Start edit
             </Button>
-          )}
+          )} */}
 
-          {data?.html_diff && (
-            <Blockquote color="cyan" cite="Diff" mb={10}>
-              <LinesHtml text={data.html_diff.trim()} />
-            </Blockquote>
+          {data?.comment !== null && (
+            <Box mt={20}>
+              <Text fw={700}>AI Suggestion Preview</Text>
+              <Blockquote
+                color="gray"
+                cite="AI Assisted Comment"
+                mt={0}
+                mb={40}
+              >
+                <Lines text={data.comment.trim()} />
+              </Blockquote>
+            </Box>
           )}
         </>
       )}
@@ -239,21 +244,6 @@ function Lines({ text }: { text: string }) {
     return (
       <Fragment key={`${line}${i}`}>
         <span>{line}</span>
-        {i < arr.length - 1 && <br />}
-      </Fragment>
-    )
-  })
-}
-
-function LinesHtml({ text }: { text: string }) {
-  return text.split("\n").map((line, i, arr) => {
-    return (
-      <Fragment key={`${line}${i}`}>
-        <span
-          dangerouslySetInnerHTML={{
-            __html: line,
-          }}
-        />
         {i < arr.length - 1 && <br />}
       </Fragment>
     )
