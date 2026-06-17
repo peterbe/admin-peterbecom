@@ -1,4 +1,5 @@
 import { Box, Container, Group, Text } from "@mantine/core"
+import { useBlogitem } from "../../hooks/use-blogitem"
 import { useImages } from "../../hooks/use-images"
 import { useOpenGraphImages } from "../../hooks/use-open-graph-images"
 import { useVideos } from "../../hooks/use-videos"
@@ -9,6 +10,9 @@ export function BlogitemLinks({ oid }: { oid: string }) {
   const images = useImages(oid)
   const videos = useVideos(oid)
   const openGraphImages = useOpenGraphImages(oid)
+
+  const { data } = useBlogitem(oid)
+  const viewPath = data?.blogitem?.is_photo ? `/photos/${oid}` : `/plog/${oid}`
   return (
     <Container>
       <Box mt={10} mb={20}>
@@ -28,7 +32,7 @@ export function BlogitemLinks({ oid }: { oid: string }) {
               </Text>
             )}
           </SmartAnchor>
-          <PublicURL path={`/plog/${oid}`}>View</PublicURL>
+          <PublicURL path={viewPath}>View</PublicURL>
         </Group>
       </Box>
     </Container>
