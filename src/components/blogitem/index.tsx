@@ -49,12 +49,7 @@ function Edit({ oid }: { oid: string | null }) {
         </Alert>
       )}
 
-      {data?.blogitem?.id && (
-        <BlogitemLinks
-          oid={data.blogitem.oid}
-          isPhoto={data.blogitem.is_photo}
-        />
-      )}
+      {data?.blogitem?.id && <BlogitemLinks oid={data.blogitem.oid} />}
 
       {data?.blogitem?.id && (
         <Text size="xs" ta="right">

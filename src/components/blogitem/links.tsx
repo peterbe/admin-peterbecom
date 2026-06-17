@@ -6,20 +6,13 @@ import { useVideos } from "../../hooks/use-videos"
 import { PublicURL } from "../public-url-link"
 import { SmartAnchor } from "../smart-anchor"
 
-export function BlogitemLinks({
-  oid,
-  isPhoto,
-}: {
-  oid: string
-  isPhoto?: boolean
-}) {
+export function BlogitemLinks({ oid }: { oid: string }) {
   const images = useImages(oid)
   const videos = useVideos(oid)
   const openGraphImages = useOpenGraphImages(oid)
 
   const { data } = useBlogitem(oid)
-  const _isPhoto = isPhoto !== undefined ? isPhoto : data?.blogitem?.is_photo
-  const viewPath = _isPhoto ? `/photos/${oid}` : `/plog/${oid}`
+  const viewPath = data?.blogitem?.is_photo ? `/photos/${oid}` : `/plog/${oid}`
   return (
     <Container>
       <Box mt={10} mb={20}>
