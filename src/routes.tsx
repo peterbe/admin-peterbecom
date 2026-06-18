@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router"
 import Blogitem from "./components/blogitem"
 import Blogitems from "./components/blogitems"
+import AddByPhoto from "./components/blogitems/add-by-photo"
 import Comments from "./components/comments"
 import HighlightedComments from "./components/comments/highlighted-comments"
 import ErrorPage from "./components/error-page"
@@ -45,6 +46,7 @@ export const router = createBrowserRouter([
               },
               { index: true, element: <Blogitems /> },
               { path: "add", element: <Blogitem /> },
+              { path: "add-by-photo", element: <AddByPhoto /> },
               { path: "comments", element: <Comments /> },
               {
                 path: "highlighted-comments",
