@@ -36,6 +36,7 @@ import classes from "./edit-form.module.css"
 import { ImageThumbnails } from "./image-thumbnails"
 import { Preview } from "./preview"
 import { RenderSpellcheckResult } from "./RenderSpellcheckResults"
+import { slugify } from "./slugify"
 import { useSpellcheck } from "./useSpellcheck"
 import { VideoThumbnails } from "./video-thumbnails"
 
@@ -490,15 +491,6 @@ export function Form({ blogitem }: { blogitem: EditBlogitemT }) {
       </form>
     </div>
   )
-}
-
-function slugify(s: string) {
-  return s
-    .trim()
-    .replace(/[#\s]+/g, "-")
-    .replace(/[@/'?<>!]/g, "")
-    .replaceAll("%", "")
-    .toLowerCase()
 }
 
 const Thumbnails = memo(function Thumbnails({ oid }: { oid: string }) {

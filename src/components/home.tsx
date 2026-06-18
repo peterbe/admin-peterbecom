@@ -39,6 +39,15 @@ export function Home() {
           >
             Add blogitem
           </Button>
+          <Button
+            size={size}
+            component={Link}
+            to="/plog/add-by-photo"
+            viewTransition
+            fullWidth
+          >
+            Add by photo
+          </Button>
           <CommentsButton count={data?.count} size={size} />
           <Button
             size={size}
