@@ -71,12 +71,17 @@ export function CommentsTree({
           pb={10}
         >
           <Anchor
-            href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}`}
+            href={`${PUBLIC_BASE_URL}/${comment.blogitem.is_photo ? "photo" : "plog"}/${comment.blogitem.oid}`}
             fw={700}
             size="xl"
           >
             {comment.blogitem.title}
-          </Anchor>
+          </Anchor>{" "}
+          {comment.blogitem.is_photo && (
+            <Badge color="cyan" variant="light" mr={5}>
+              Photo
+            </Badge>
+          )}
         </Box>
       ) : null
 
@@ -293,7 +298,7 @@ function InnerComment({
             {!editMode && (
               <Text size="xs">
                 <Anchor
-                  href={`${PUBLIC_BASE_URL}/plog/${comment.blogitem.oid}/comment/${comment.oid}`}
+                  href={`${PUBLIC_BASE_URL}/${comment.blogitem.is_photo ? "photos" : "plog"}/${comment.blogitem.oid}/comment/${comment.oid}`}
                 >
                   <DisplayDate date={comment.add_date} />
                   {!equalDates(comment.add_date, comment.modify_date) && (

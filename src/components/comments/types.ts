@@ -2,6 +2,7 @@ type CommentBlogitem = {
   id: number
   oid: string
   title: string
+  is_photo: boolean
   _absolute_url: string
 }
 
