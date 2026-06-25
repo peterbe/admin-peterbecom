@@ -4,5 +4,6 @@ export function slugify(s: string) {
     .replace(/[#\s]+/g, "-")
     .replace(/[@/'?<>!]/g, "")
     .replaceAll("%", "")
+    .replaceAll(",", "")
     .toLowerCase()
 }
