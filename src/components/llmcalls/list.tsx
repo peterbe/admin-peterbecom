@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Alert,
   Badge,
   Box,
@@ -6,6 +7,7 @@ import {
   Code,
   Container,
   Group,
+  Loader,
   LoadingOverlay,
   Modal,
   Select,
@@ -13,6 +15,7 @@ import {
   Title,
 } from "@mantine/core"
 import { useLocalStorage, useMediaQuery } from "@mantine/hooks"
+import { IconReload } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
 import { useSearchParams } from "react-router"
@@ -41,13 +44,14 @@ export function List() {
     filterSearchParams.set("batch_size", batchSize)
   }
 
-  const { data, error, isPending } = useQuery<ServerData>({
-    queryKey: ["llmcalls", filterSearchParams.toString()],
-    queryFn: async () => {
-      return fetchLLMCalls(filterSearchParams)
-    },
-    refetchOnWindowFocus: true,
-  })
+  const { data, error, isPending, refetch, isRefetching } =
+    useQuery<ServerData>({
+      queryKey: ["llmcalls", filterSearchParams.toString()],
+      queryFn: async () => {
+        return fetchLLMCalls(filterSearchParams)
+      },
+      refetchOnWindowFocus: true,
+    })
 
   const matchesMobile = useMediaQuery("(max-width: 500px)")
   const [messages, setMessages] = useState<object[] | null>(null)
@@ -78,7 +82,20 @@ export function List() {
 
   return (
     <Box mb={50} pos="relative">
-      <Title>LLM Calls {data ? `(${data.count})` : ""}</Title>
+      <Group justify="space-between">
+        <Title>LLM Calls {data ? `(${data.count})` : ""}</Title>
+        {/* <Button onClick={() => refetch()}>Refetch</Button> */}
+        {isRefetching && <Loader size={26} />}
+        {data && !isRefetching && (
+          <ActionIcon
+            variant="filled"
+            aria-label="Refetch"
+            onClick={() => refetch()}
+          >
+            <IconReload style={{ width: "70%", height: "70%" }} />
+          </ActionIcon>
+        )}
+      </Group>
       <LoadingOverlay visible={isPending} />
 
       {error && <Alert color="red">Error: {error.message}</Alert>}
@@ -232,7 +249,11 @@ export function List() {
                   </Group>
                 </Table.Td>
                 <Table.Td>
-                  <Took seconds={llmcall.took_seconds} />
+                  {llmcall.status === "progress" ? (
+                    "n/a"
+                  ) : (
+                    <Took seconds={llmcall.took_seconds} />
+                  )}
                 </Table.Td>
                 <Table.Td>
                   <DisplayDate date={llmcall.created} compact={matchesMobile} />
