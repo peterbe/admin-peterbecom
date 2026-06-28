@@ -2,10 +2,11 @@ import { useQuery } from "@tanstack/react-query"
 import { openGraphImagesQueryKey } from "../components/api-utils"
 
 export type OpenGraphImageT = {
+  id: number
   label: string
   src: string
   size: [number, number]
-  current: null | boolean
+  is_open_graph_image: null | boolean
   used_in_text: boolean
 }
 

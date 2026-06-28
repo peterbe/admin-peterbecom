@@ -68,7 +68,7 @@ function ImageChoice({ image, oid }: { image: OpenGraphImageT; oid: string }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ src: image.src }),
+        body: JSON.stringify({ id: image.id }),
       })
       if (!response.ok) {
         throw new Error(`${response.status} on ${response.url}`)
@@ -78,6 +78,7 @@ function ImageChoice({ image, oid }: { image: OpenGraphImageT; oid: string }) {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["open-graph-image", oid] }),
+        queryClient.invalidateQueries({ queryKey: ["images", oid] }),
         queryClient.invalidateQueries({ queryKey: blogitemQueryKey(oid) }),
       ])
     },
@@ -96,7 +97,7 @@ function ImageChoice({ image, oid }: { image: OpenGraphImageT; oid: string }) {
       {mutation.error && <Alert title="Error">{mutation.error.message}</Alert>}
 
       <Button
-        disabled={!!image.current || mutation.isPending}
+        disabled={!!image.is_open_graph_image || mutation.isPending}
         onClick={() => {
           mutation.mutate()
         }}
