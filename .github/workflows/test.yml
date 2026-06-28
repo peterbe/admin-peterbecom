@@ -22,11 +22,12 @@ jobs:
         run: |
           git diff --exit-code
 
-      - name: Lint
-        run: bun run lint
+      - parallel:
+          - name: Lint
+            run: bun run lint
 
-      - name: Types
-        run: bun run tsc
+          - name: Types
+            run: bun run tsc
 
       - name: Build
         env:
