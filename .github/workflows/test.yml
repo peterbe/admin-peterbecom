@@ -18,21 +18,21 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install
 
-      - name: Was it locked?
-        run: |
-          git diff --exit-code
-
       - parallel:
+          - name: Was it locked?
+            run: |
+              git diff --exit-code
+
           - name: Lint
             run: bun run lint
 
           - name: Types
             run: bun run tsc
 
-      - name: Build
-        env:
-          NODE_ENV: test
-        run: bun run build
+          - name: Build
+            env:
+              NODE_ENV: test
+            run: bun run build
 
       - name: Serve app
         env:
