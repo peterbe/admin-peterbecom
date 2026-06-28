@@ -26,7 +26,9 @@ export function BlogitemLinks({ oid }: { oid: string }) {
           </SmartAnchor>
           <SmartAnchor href={`/plog/${oid}/open-graph-image`}>
             Open Graph Image{" "}
-            {openGraphImages?.data?.images.some((img) => img.current) && (
+            {openGraphImages?.data?.images.some(
+              (img) => img.is_open_graph_image,
+            ) && (
               <Text size="xs" span>
                 (picked)
               </Text>

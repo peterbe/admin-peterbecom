@@ -155,6 +155,12 @@ function UploadedImage({
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
+      {image.is_open_graph_image && (
+        <Alert color="green" mb={20}>
+          Open Graph Image
+        </Alert>
+      )}
+
       <Card.Section>
         <Anchor href={imageBaseUrl + image.full_url} target="_blank">
           <AbsoluteImage src={image[size].url} />

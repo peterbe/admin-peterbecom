@@ -3,6 +3,7 @@ import { imagesQueryKey } from "../components/api-utils"
 
 export type ImageT = {
   id: number
+  is_open_graph_image: boolean | null
   full_url: string
   full_size: number[]
   small: {

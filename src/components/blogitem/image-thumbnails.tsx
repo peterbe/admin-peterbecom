@@ -36,7 +36,6 @@ export function ImageThumbnails({ oid }: { oid: string }) {
               {images.data.images.map((image) => (
                 <ImageThumbnail key={image.full_url} image={image} />
               ))}
-              {/* <ImageFullThumbnail image={image} /> */}
             </Group>
           </Group>
         </Container>
@@ -108,8 +107,9 @@ function ImageThumbnail({ image }: { image: ImageT }) {
   })
 
   let alt = ""
-  for (const value of Object.values(image)) {
-    if (typeof value === "object" && "alt" in value && value.alt) {
+  for (const size of sizes) {
+    const value = image[size]
+    if (value?.alt) {
       alt = value.alt
       break
     }
