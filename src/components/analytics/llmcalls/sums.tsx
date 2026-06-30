@@ -1,9 +1,11 @@
-import { LineChart } from "@mantine/charts"
+import { BarChart, LineChart } from "@mantine/charts"
 import {
   Alert,
   Box,
   LoadingOverlay,
+  MultiSelect,
   SegmentedControl,
+  Select,
   Table,
   Text,
   Title,
@@ -28,6 +30,9 @@ export function Sums() {
     </Box>
   )
 }
+
+type ChartData = Record<string, number | string>[]
+type ChartSeries = { name: string; color: string }[]
 
 function SumsTable({ data }: { data: ServerData }) {
   const [value, setValue] = useState<"sum" | "month">("month")
@@ -110,9 +115,11 @@ function SumsTable({ data }: { data: ServerData }) {
     chartDataMap[date][agg.model] = agg.avg_took_seconds
   }
 
-  const chartData = Object.entries(chartDataMap).map(([date, models]) => {
-    return { date, ...models }
-  })
+  const chartData: ChartData = Object.entries(chartDataMap).map(
+    ([date, models]) => {
+      return { date, ...models }
+    },
+  )
   const names = chartData
     .map((thing) => {
       const { date, ...rest } = thing
@@ -120,8 +127,17 @@ function SumsTable({ data }: { data: ServerData }) {
     })
     .flatMap(Object.keys)
     .filter((v, i, a) => a.indexOf(v) === i)
-  const colors = ["orange.6", "indigo.6", "teal.6", "cyan.6", "blue.6"]
-  const chartSeries = names.map((name, i) => ({
+  const colors = [
+    "violet.6",
+    "blue.6",
+    "teal.6",
+    "green.6",
+    "yellow.6",
+    "orange.6",
+    "red.6",
+    "pink.6",
+  ]
+  const chartSeries: ChartSeries = names.map((name, i) => ({
     name,
     color: colors[i % colors.length],
   }))
@@ -181,21 +197,126 @@ function SumsTable({ data }: { data: ServerData }) {
       </Table>
 
       {chartData && (
-        <Title order={2} mb="md">
-          Average Time
-        </Title>
+        <>
+          <Title order={2} mb="md">
+            Average Time
+          </Title>
+
+          <LineChart
+            h={500}
+            data={chartData}
+            dataKey="date"
+            series={chartSeries}
+            withLegend
+            curveType="linear"
+            valueFormatter={(value) => `${value.toFixed(1)}s`}
+          />
+
+          <Title order={3} mb="xs" mt={60}>
+            In the last month
+          </Title>
+          <Title order={4} mb="md">
+            Average times (smaller the better)
+          </Title>
+
+          <BarChartWrapper chartData={chartData} chartSeries={chartSeries} />
+        </>
       )}
-      {chartData && (
-        <LineChart
-          h={500}
-          data={chartData}
-          dataKey="date"
-          series={chartSeries}
-          withLegend
-          curveType="linear"
-          valueFormatter={(value) => `${value.toFixed(1)}s`}
-        />
-      )}
+    </Box>
+  )
+}
+
+function BarChartWrapper({
+  chartData,
+  chartSeries,
+}: {
+  chartData: ChartData
+  chartSeries: ChartSeries
+}) {
+  const [sortBy, setSortBy] = useState<"name" | "-name" | "value" | "-value">(
+    "value",
+  )
+
+  const months = chartData.map((thing) => thing.date)
+  const monthOptions = months.map((month, i) => ({
+    label: String(month),
+    value: String(i),
+  }))
+  const [index, setIndex] = useState(chartData.length - 1)
+  const [excludedModels, setExcludedModels] = useState<string[]>([])
+  const lastMonth = Object.fromEntries(
+    Object.entries(chartData[index]).filter(
+      ([key, _]) => key === "date" || !excludedModels.includes(key),
+    ),
+  )
+
+  const filteredChartSeries = chartSeries
+    .filter((s) => !excludedModels.includes(s.name))
+    .sort((a, b) => {
+      if (sortBy === "name") return a.name.localeCompare(b.name)
+      if (sortBy === "-name") return b.name.localeCompare(a.name)
+      const x = lastMonth[a.name]
+      const y = lastMonth[b.name]
+      if (Number.isNaN(x) || Number.isNaN(y)) return 0
+      const m = sortBy === "value" ? 1 : -1
+      if (x < y) return -1 * m
+      if (x > y) return 1 * m
+      return 0
+    })
+
+  const excludedModelsOptions = chartSeries.map((s) => ({
+    label: s.name,
+    value: s.name,
+  }))
+
+  return (
+    <Box>
+      <BarChart
+        h={400}
+        data={[lastMonth]}
+        dataKey="date"
+        series={filteredChartSeries}
+        tickLine="x"
+        gridAxis="y"
+        valueFormatter={(value) => `${value.toFixed(1)}s`}
+        orientation="vertical"
+        withBarValueLabel
+      />
+
+      <Select
+        mt={20}
+        label="Select month"
+        value={String(index)}
+        onChange={(value: string | null) => {
+          if (value === null) return
+          setIndex(Number(value))
+        }}
+        data={monthOptions}
+      />
+      <MultiSelect
+        label="Exclude models"
+        data={excludedModelsOptions}
+        value={excludedModels}
+        onChange={(value: string[]) => {
+          setExcludedModels(value)
+        }}
+        clearable
+      />
+
+      <Select
+        label="Sort by"
+        value={sortBy}
+        onChange={(value: string | null) => {
+          if (value === null) return
+          setSortBy(value as "name" | "-name" | "value" | "-value")
+        }}
+        data={[
+          { label: "Name", value: "name" },
+          { label: "Name (Descending)", value: "-name" },
+          { label: "Value", value: "value" },
+          { label: "Value (Descending)", value: "-value" },
+        ]}
+      />
     </Box>
   )
 }
