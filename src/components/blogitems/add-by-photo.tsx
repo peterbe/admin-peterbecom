@@ -2,7 +2,12 @@ import { Button, Container, Group, rem, TextInput } from "@mantine/core"
 import "@mantine/dropzone/styles.css"
 
 import { Alert, Box, Image, Text } from "@mantine/core"
-import { Dropzone, type FileWithPath, IMAGE_MIME_TYPE } from "@mantine/dropzone"
+import {
+  Dropzone,
+  type FileRejection,
+  type FileWithPath,
+  IMAGE_MIME_TYPE,
+} from "@mantine/dropzone"
 import { useForm } from "@mantine/form"
 import { useDocumentTitle } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
@@ -32,6 +37,9 @@ export default function AddByPhoto() {
 
 function Add({ csrfToken }: { csrfToken: string }) {
   const [uploadedFile, setUploadedFile] = useState<FileWithPath | null>(null)
+  const [rejectedFiles, setRejectedFiles] = useState<FileRejection[] | null>(
+    null,
+  )
   const navigate = useNavigate()
 
   const mutation = useMutation({
@@ -112,9 +120,22 @@ function Add({ csrfToken }: { csrfToken: string }) {
 
       {uploadedFile && <PreviewUploadedFile file={uploadedFile} />}
 
+      {rejectedFiles && rejectedFiles.length > 0 && (
+        <Alert title="Rejected files" color="red">
+          {rejectedFiles.map((file) => (
+            <div key={file.file.name}>
+              {file.file.name} - {file.errors.map((e) => e.message).join(", ")}
+            </div>
+          ))}
+        </Alert>
+      )}
+
       <Dropzone
-        onDrop={(files) => uploadFiles(files)}
-        onReject={(files) => console.log("rejected files", files)}
+        onDrop={(files) => {
+          uploadFiles(files)
+          setRejectedFiles(null)
+        }}
+        onReject={(files) => setRejectedFiles(files)}
         maxSize={5 * 1024 ** 2}
         accept={IMAGE_MIME_TYPE}
         loading={mutation.isPending}
