@@ -16,7 +16,8 @@
         "noForEach": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noControlCharactersInRegex": "off"
       },
       "a11y": {
         "useSemanticElements": "error",
