@@ -136,7 +136,7 @@ function Add({ csrfToken }: { csrfToken: string }) {
           setRejectedFiles(null)
         }}
         onReject={(files) => setRejectedFiles(files)}
-        maxSize={5 * 1024 ** 2}
+        maxSize={15 * 1024 ** 2}
         accept={IMAGE_MIME_TYPE}
         loading={mutation.isPending}
         multiple={false}
