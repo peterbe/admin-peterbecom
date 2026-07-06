@@ -71,16 +71,33 @@ function SumsTable({ data }: { data: ServerData }) {
     const map: Record<string, Aggregate[]> = {}
 
     for (const aggregate of aggregates) {
-      const { model, count, avg_took_seconds, sum_took_seconds } = aggregate
+      const {
+        model,
+        count,
+        avg_took_seconds,
+        sum_took_seconds,
+        p50_took_seconds,
+        p90_took_seconds,
+      } = aggregate
       if (!(model in map)) {
         map[model] = [
-          { count, avg_took_seconds, sum_took_seconds, model, month: "" },
+          {
+            count,
+            avg_took_seconds,
+            sum_took_seconds,
+            p50_took_seconds,
+            p90_took_seconds,
+            model,
+            month: "",
+          },
         ]
       } else {
         map[model].push({
           count,
           avg_took_seconds,
           sum_took_seconds,
+          p50_took_seconds,
+          p90_took_seconds,
           model,
           month: "",
         })
@@ -98,6 +115,12 @@ function SumsTable({ data }: { data: ServerData }) {
           (acc, a) => acc + a.sum_took_seconds,
           0,
         ),
+        p50_took_seconds:
+          aggregates.reduce((acc, a) => acc + a.p50_took_seconds, 0) /
+          aggregates.length,
+        p90_took_seconds:
+          aggregates.reduce((acc, a) => acc + a.p90_took_seconds, 0) /
+          aggregates.length,
         month: "",
       }
     }
@@ -112,7 +135,7 @@ function SumsTable({ data }: { data: ServerData }) {
     if (!(date in chartDataMap)) {
       chartDataMap[date] = {}
     }
-    chartDataMap[date][agg.model] = agg.avg_took_seconds
+    chartDataMap[date][agg.model] = agg.p50_took_seconds
   }
 
   const chartData: ChartData = Object.entries(chartDataMap).map(
@@ -158,7 +181,7 @@ function SumsTable({ data }: { data: ServerData }) {
             {byMonth ? <Table.Th>Month</Table.Th> : null}
             <Table.Th>Model</Table.Th>
             <Table.Th>Count</Table.Th>
-            <Table.Th>Average Time</Table.Th>
+            <Table.Th>P50 Time</Table.Th>
             <Table.Th>Sum Time</Table.Th>
             <Table.Th>Estimated Cost</Table.Th>
           </Table.Tr>
@@ -174,8 +197,15 @@ function SumsTable({ data }: { data: ServerData }) {
                 <Table.Td>{row.model}</Table.Td>
                 <Table.Td>{row.count}</Table.Td>
                 <Table.Td>
-                  {"avg_took_seconds" in row &&
-                    timeFormatter(row.avg_took_seconds)}
+                  {"p50_took_seconds" in row && (
+                    <>
+                      <Tooltip
+                        label={`Avg: ${timeFormatter(row.avg_took_seconds)}\nP90: ${timeFormatter(row.p90_took_seconds)}`}
+                      >
+                        <Text>{timeFormatter(row.p50_took_seconds)}</Text>
+                      </Tooltip>
+                    </>
+                  )}
                 </Table.Td>
                 <Table.Td>
                   {"sum_took_seconds" in row &&
@@ -199,7 +229,7 @@ function SumsTable({ data }: { data: ServerData }) {
       {chartData && (
         <>
           <Title order={2} mb="md">
-            Average Time
+            Median Time
           </Title>
 
           <LineChart
@@ -216,7 +246,7 @@ function SumsTable({ data }: { data: ServerData }) {
             In the last month
           </Title>
           <Title order={4} mb="md">
-            Average times (smaller the better)
+            Median times (smaller the better)
           </Title>
 
           <BarChartWrapper chartData={chartData} chartSeries={chartSeries} />
