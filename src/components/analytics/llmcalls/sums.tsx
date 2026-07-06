@@ -198,13 +198,11 @@ function SumsTable({ data }: { data: ServerData }) {
                 <Table.Td>{row.count}</Table.Td>
                 <Table.Td>
                   {"p50_took_seconds" in row && (
-                    <>
-                      <Tooltip
-                        label={`Avg: ${timeFormatter(row.avg_took_seconds)}\nP90: ${timeFormatter(row.p90_took_seconds)}`}
-                      >
-                        <Text>{timeFormatter(row.p50_took_seconds)}</Text>
-                      </Tooltip>
-                    </>
+                    <Tooltip
+                      label={`Avg: ${timeFormatter(row.avg_took_seconds)}\nP90: ${timeFormatter(row.p90_took_seconds)}`}
+                    >
+                      <Text>{timeFormatter(row.p50_took_seconds)}</Text>
+                    </Tooltip>
                   )}
                 </Table.Td>
                 <Table.Td>
