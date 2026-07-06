@@ -6,6 +6,8 @@ export type Aggregate = {
   count: number
   avg_took_seconds: number
   sum_took_seconds: number
+  p50_took_seconds: number
+  p90_took_seconds: number
 }
 
 export type ServerData = {
