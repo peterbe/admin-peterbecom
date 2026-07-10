@@ -160,6 +160,17 @@ export function fetchValidLLMCallModels(useCase?: string) {
   return () =>
     standardFetch(`${API_BASE}/valid-llmcall-models?usecase=${useCase}`)
 }
+export function fetchValidLLMCallUseCases() {
+  return () => standardFetch(`${API_BASE}/valid-llmcall-use-cases`)
+}
+
+export function fetchAnalyticsLLMCalls(useCases?: string[]) {
+  const sp = new URLSearchParams()
+  for (const useCase of useCases || []) {
+    sp.append("use_cases", useCase)
+  }
+  return () => standardFetch(`${API_BASE}/analytics/llmcalls?${sp}`)
+}
 
 export async function fetchCDNProbe(url: string) {
   return standardFetch(`${API_BASE}/cdn/probe?${new URLSearchParams({ url })}`)

@@ -12,6 +12,7 @@ import {
   Tooltip,
 } from "@mantine/core"
 import { useState } from "react"
+import { useLLMCallValidUseCases } from "../../../hooks/useLLMCallValidUseCases"
 import {
   type Aggregate,
   type ServerData,
@@ -19,12 +20,36 @@ import {
 } from "./use-analytics-llmcalls"
 
 export function Sums() {
-  const { data, error, isPending } = useAnalyticsLLMCalls()
+  const [useCases, setUseCases] = useState<string[]>([])
+  const { data: validLLMCallUseCases, error: validLLMCallUseCasesError } =
+    useLLMCallValidUseCases()
+  const { data, error, isPending } = useAnalyticsLLMCalls({
+    useCases,
+  })
+
+  const useCaseOptions = validLLMCallUseCases?.use_cases.map((uc) => ({
+    value: uc.use_case,
+    label: `${uc.use_case} (${uc.count})`,
+  }))
 
   return (
     <Box mb={50} pos="relative">
       <LoadingOverlay visible={isPending} />
       {error && <Alert color="red">Error: {error.message}</Alert>}
+      {validLLMCallUseCasesError && (
+        <Alert color="red">Error: {validLLMCallUseCasesError.message}</Alert>
+      )}
+
+      <MultiSelect
+        mb={40}
+        label="Use case filter"
+        data={useCaseOptions}
+        value={useCases}
+        onChange={(value: string[]) => {
+          setUseCases(value)
+        }}
+        clearable
+      />
 
       {data && <SumsTable data={data} />}
     </Box>
