@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { fetchAnalyticsLLMCalls } from "../../api-utils"
 
 export type Aggregate = {
   month: string
@@ -14,15 +15,10 @@ export type ServerData = {
   aggregates: Aggregate[]
 }
 
-export function useAnalyticsLLMCalls() {
+export function useAnalyticsLLMCalls({ useCases }: { useCases?: string[] }) {
   return useQuery<ServerData>({
-    queryKey: ["analytics", "llmcalls"],
-    queryFn: async () => {
-      const response = await fetch("/api/v0/analytics/llmcalls")
-      if (!response.ok) {
-        throw new Error(`${response.status} on ${response.url}`)
-      }
-      return response.json()
-    },
+    queryKey: ["analytics", "llmcalls", useCases],
+    queryFn: fetchAnalyticsLLMCalls(useCases),
+    enabled: !!useCases,
   })
 }
