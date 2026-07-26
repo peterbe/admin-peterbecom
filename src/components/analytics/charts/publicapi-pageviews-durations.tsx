@@ -33,7 +33,9 @@ SELECT
     ${primaryKey === "url" ? "url AS url" : "meta->>'path' AS path"},
     count(*) AS count,
     SUM((data->>'duration')::real) AS sum,
-    avg((data->>'duration')::real) AS avg
+    avg((data->>'duration')::real) AS avg,
+    percentile_cont(0.5) WITHIN GROUP (ORDER BY (data->>'duration')::real) AS p50,
+    percentile_cont(0.9) WITHIN GROUP (ORDER BY (data->>'duration')::real) AS p90
 FROM
     analytics
 WHERE
@@ -72,9 +74,14 @@ function Inner({ id }: { id: string }) {
   } else if (sortBy === "sum" || sortBy === "-sum") {
     orderBy = 3
     reverse = sortBy.startsWith("-")
-  }
-  if (sortBy === "avg" || sortBy === "-avg") {
+  } else if (sortBy === "avg" || sortBy === "-avg") {
     orderBy = 4
+    reverse = sortBy.startsWith("-")
+  } else if (sortBy === "p50" || sortBy === "-p50") {
+    orderBy = 5
+    reverse = sortBy.startsWith("-")
+  } else if (sortBy === "p90" || sortBy === "-p90") {
+    orderBy = 6
     reverse = sortBy.startsWith("-")
   }
   const current = useQuery(
@@ -146,7 +153,7 @@ function EventsTable({ id, data }: { id: string; data: QueryResultRow[] }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const sortKey = `${id}:sort`
   const sortBy = searchParams.get(sortKey) || "sum"
-  type Sorts = "count" | "sum" | "avg"
+  type Sorts = "count" | "sum" | "avg" | "p50" | "p90"
 
   function changeSort(sort: Sorts) {
     const sp = new URLSearchParams(searchParams)
@@ -180,6 +187,18 @@ function EventsTable({ id, data }: { id: string; data: QueryResultRow[] }) {
           >
             Avg
           </Table.Th>
+          <Table.Th
+            onClick={() => changeSort("p50")}
+            style={{ cursor: "pointer" }}
+          >
+            P50
+          </Table.Th>
+          <Table.Th
+            onClick={() => changeSort("p90")}
+            style={{ cursor: "pointer" }}
+          >
+            P90
+          </Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
@@ -191,7 +210,9 @@ function EventsTable({ id, data }: { id: string; data: QueryResultRow[] }) {
               </Table.Td>
               <Table.Td>{formatter.format(row.count as number)}</Table.Td>
               <Table.Td>{(row.sum as number).toFixed(2)}</Table.Td>
-              <Table.Td>{(row.avg as number).toFixed(4)}</Table.Td>
+              <Table.Td>{(row.avg as number).toFixed(3)}</Table.Td>
+              <Table.Td>{(row.p50 as number).toFixed(3)}</Table.Td>
+              <Table.Td>{(row.p90 as number).toFixed(3)}</Table.Td>
             </Table.Tr>
           )
         })}
