@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router"
+import { createBrowserRouter, redirect } from "react-router"
 import Blogitem from "./components/blogitem"
 import Blogitems from "./components/blogitems"
 import AddByPhoto from "./components/blogitems/add-by-photo"
@@ -19,6 +19,17 @@ export const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
           { index: true, element: <Home /> },
+          {
+            path: "photos",
+            children: [
+              {
+                path: ":oid",
+                loader: ({ params }) => {
+                  return redirect(`/plog/${params.oid}`)
+                },
+              },
+            ],
+          },
           {
             path: "plog",
             children: [
