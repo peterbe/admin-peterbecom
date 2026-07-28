@@ -34,7 +34,7 @@ export function UploadedImages({
   const [imageBaseUrl, setImageBaseUrl] = useState("")
   useEffect(() => {
     if (window.location.hostname === "localhost") {
-      setImageBaseUrl("http://localhost:8000")
+      setImageBaseUrl("http://localhost:8888")
     } else {
       setImageBaseUrl("https://www.peterbe.com")
     }

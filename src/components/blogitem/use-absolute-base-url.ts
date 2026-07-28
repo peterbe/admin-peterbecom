@@ -4,7 +4,7 @@ export function useAbsoluteBaseUrl() {
 
   useEffect(() => {
     if (window.location.hostname === "localhost") {
-      setBaseUrl("http://localhost:8000")
+      setBaseUrl("http://localhost:8888")
     } else {
       setBaseUrl("https://www.peterbe.com")
     }
