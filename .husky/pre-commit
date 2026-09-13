@@ -1,10 +1,11 @@
+#!/bin/bash
 
 set -e
 
 # Validate
-npm run --silent tsc
+bun run --silent tsc
 
 # Validate *and* fix
-npm run --silent lint:fix
+bun run --silent lint:fix
 
 git update-index -g
