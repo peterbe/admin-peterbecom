@@ -15,6 +15,7 @@ import { MinimizeContext } from "./minimize-context"
 import { PageviewEvents } from "./pageview-events"
 import { PageviewNumbers } from "./pageview-numbers"
 import { Pageviews } from "./pageviews"
+import { PopularPhotos } from "./popular-photos"
 import { PublicAPIPageviews } from "./publicapi-pageviews"
 import { PublicAPIPageviewsDurations } from "./publicapi-pageviews-durations"
 import { Querystrings } from "./querystrings"
@@ -45,6 +46,7 @@ export function Component() {
             <Pageviews />
             <PublicAPIPageviews />
             <PublicAPIPageviewsDurations />
+            <PopularPhotos />
             <LogoEvents />
             <UserAgents />
             <CommentsByReferral />
