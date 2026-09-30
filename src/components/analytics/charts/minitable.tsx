@@ -1,5 +1,5 @@
 import { Loader, Paper, SimpleGrid, Table, Text } from "@mantine/core"
-import type { QueryResultRow } from "../types"
+import type { QueryResultRow, QueryResultRowValue } from "../types"
 import { formatNumber } from "./number-format"
 
 export function MiniTable({
@@ -8,12 +8,14 @@ export function MiniTable({
   note,
   isFetching,
   withTotal,
+  fieldRender,
 }: {
   rows: QueryResultRow[]
   fieldTitle: string
   note?: string
   isFetching?: boolean
   withTotal?: boolean
+  fieldRender?: (field: QueryResultRowValue) => React.ReactNode
 }) {
   const totalCount = rows.reduce((sum, row) => sum + (row.count as number), 0)
   return (
@@ -30,7 +32,9 @@ export function MiniTable({
         <Table.Tbody>
           {rows.map((row) => (
             <Table.Tr key={row.field}>
-              <Table.Td>{row.field}</Table.Td>
+              <Table.Td>
+                {fieldRender ? fieldRender(row.field) : row.field}
+              </Table.Td>
               <Table.Td style={{ textAlign: "right" }}>
                 <Text span c="dimmed" size="sm">
                   {(((row.count as number) / totalCount) * 100).toFixed(1)}%
