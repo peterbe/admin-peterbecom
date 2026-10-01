@@ -106,9 +106,9 @@ function formatAge(pubDate: string) {
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
   if (days === 0) return "Today"
   if (days === 1) return "Yesterday"
-  if (days < 28) return `${days} days ago`
+  if (days < 28) return `${days} day${days !== 1 ? "s" : ""} ago`
   const weeks = Math.floor(days / 7)
-  if (weeks < 4) return `${weeks} weeks ago`
+  if (weeks < 8) return `${weeks} week${weeks !== 1 ? "s" : ""} ago`
   const months = Math.floor(days / 30)
-  return `${months} months ago`
+  return `${months} month${months !== 1 ? "s" : ""} ago`
 }
