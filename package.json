@@ -44,16 +44,16 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
-    "@playwright/test": "^1.62.0",
+    "@playwright/test": "^1.63.0",
     "@types/bun": "1.4.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.0.4",
+    "@vitejs/plugin-react": "^6.1.1",
     "husky": "^9.1.7",
     "msw": "^2.13.4",
     "serve": "^14.2.5",
     "typescript": "^6.0.3",
-    "vite": "8.1.5"
+    "vite": "8.3.1"
   },
   "msw": {
     "workerDirectory": [
