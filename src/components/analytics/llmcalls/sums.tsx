@@ -74,7 +74,7 @@ function SumsTable({ data }: { data: ServerData }) {
     }
     return Number.NaN
   }
-  const formatter = new Intl.NumberFormat("en-US", {
+  const _formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
   })
@@ -213,7 +213,7 @@ function SumsTable({ data }: { data: ServerData }) {
         </Table.Thead>
         <Table.Tbody>
           {buckets.map((row) => {
-            const cost = estimateCost(row.model, row.count)
+            const _cost = estimateCost(row.model, row.count)
             return (
               <Table.Tr key={`${row.model}${row.month}`}>
                 {row.month ? (
@@ -235,13 +235,14 @@ function SumsTable({ data }: { data: ServerData }) {
                     timeFormatter(row.sum_took_seconds)}
                 </Table.Td>
                 <Table.Td>
-                  {Number.isNaN(cost) ? (
+                  n/a
+                  {/* {Number.isNaN(cost) ? (
                     "N/A"
                   ) : (
                     <Tooltip label={`${(100 * cost).toFixed(5)} cents`}>
                       <Text>{formatter.format(cost)}</Text>
                     </Tooltip>
-                  )}
+                  )} */}
                 </Table.Td>
               </Table.Tr>
             )
