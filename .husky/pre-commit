@@ -3,7 +3,7 @@
 set -e
 
 # Validate
-bun run --silent tsc
+bun check
 
 # Validate *and* fix
 bun run --silent lint:fix

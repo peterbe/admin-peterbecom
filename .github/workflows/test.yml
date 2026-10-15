@@ -26,7 +26,7 @@ jobs:
         run: bun run lint
 
       - name: Types
-        run: bun run tsc
+        run: bun check
 
       - name: Build
         env:
