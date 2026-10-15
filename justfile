@@ -23,12 +23,9 @@ start-for-testing:
     NODE_ENV=test bun run build
     NODE_ENV=test bun run preview -- --port 3000
 
-tsc:
-    bun run tsc
-
 lint:
+    bun check
     bun run lint
-    bun run tsc
 
 lintfix:
     bun run lint:fix
