@@ -45,6 +45,5 @@ export function addBlogItemImage({
   slug: string
   body: EditBlogitemImagesRequestBody
 }) {
-  console.log({ slug, body })
   return HttpResponse.json({ images: [] })
 }

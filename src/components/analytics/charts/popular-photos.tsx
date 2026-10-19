@@ -79,7 +79,6 @@ function Inner() {
           withTotal
           fieldRender={(field) => {
             const oid = (field as string).split(/\//).pop()
-            console.log({ field, oid })
             const photo = mapping?.[oid as string]
             if (!photo) return field
             return (
