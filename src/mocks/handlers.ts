@@ -75,10 +75,8 @@ export const handlers = [
 
   http.post<SlugParams, EditBlogitemImagesRequestBody>(
     "/api/v0/plog/:slug/images",
-    async ({ params, request }) => {
-      const slug = params.slug
-      const body = await request.json()
-      return addBlogItemImage({ slug, body })
+    async () => {
+      return addBlogItemImage()
     },
   ),
 

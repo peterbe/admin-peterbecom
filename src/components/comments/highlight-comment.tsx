@@ -53,7 +53,6 @@ export function HighlightComment({ comment, refetchComments }: Props) {
       })
     },
     onSuccess: (data) => {
-      console.log(data)
       notifications.show({
         title: "Highlight status changed",
         message: data.highlighted

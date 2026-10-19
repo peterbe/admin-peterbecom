@@ -119,8 +119,6 @@ function ImageThumbnail({ image }: { image: ImageT }) {
     <a href="${image.full_url}"><img src="${image.full_url}" class="fullsize"></a>
     `.trim()
 
-  console.log(image.full_size)
-
   bySizes.push(
     <Card key="full" shadow="sm" padding="lg" radius="md" withBorder>
       <Card.Section>

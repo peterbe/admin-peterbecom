@@ -39,10 +39,6 @@ import "prism-react-editor/themes/vs-code-light.css" // default
 
 import { loadTheme } from "prism-react-editor/themes"
 
-// loadTheme("github-light").then((theme) => {
-//   console.log(theme)
-// })
-
 // Required by the basic setup
 // import "prism-react-editor/search.css"
 
@@ -90,7 +86,6 @@ export function Component() {
     if (savedQueries && !hasMigrated.current && !previousQueries.length) {
       const split = savedQueries.split("\n\n").filter((x) => x.trim())
       if (split.length) {
-        console.log(split.length)
         const date = new Date()
         const migrated: PreviousQuery[] = []
         for (const q of split) {

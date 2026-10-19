@@ -23,9 +23,6 @@ export function Nav() {
     useDisclosure(false)
   const { userData } = useUserData()
 
-  // const isShort = useMediaQuery(`(max-height: 300px)`)
-  // console.log({ isShort })
-
   if (!userData?.user) {
     return null
   }

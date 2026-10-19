@@ -24,7 +24,7 @@ WHERE
 GROUP BY
     day
 ORDER BY
-    day;
+    day DESC;
 `
 
 const sqlQuery = (type: string, days = 0, back = 0) => `
@@ -61,16 +61,14 @@ export function CountByDay({
   const [urlFilter, setURLField] = useURLFilter(id, "")
 
   const days = Number(intervalDays)
-  const current = useQuery(
-    urlFilter
-      ? sqlQueryFiltered(type, days + 1, 1, urlFilter)
-      : sqlQuery(type, days + 1, 1),
-  )
-  const previous = useQuery(
-    urlFilter
-      ? sqlQueryFiltered(type, days * 2 + 1, days + 1, urlFilter)
-      : sqlQuery(type, days * 2 + 1, days + 1),
-  )
+  const currentSQL = urlFilter
+    ? sqlQueryFiltered(type, days + 1, 1, urlFilter)
+    : sqlQuery(type, days + 1, 1)
+  const current = useQuery(currentSQL)
+  const previousSQL = urlFilter
+    ? sqlQueryFiltered(type, days * 2 + 1, days + 1, urlFilter)
+    : sqlQuery(type, days * 2 + 1, days + 1)
+  const previous = useQuery(previousSQL)
   const dataX: DataRow[] = []
   const series: DataSerie[] = [{ name: "count", label: "Number" }]
   const dataO: Record<string, number> = {}
