@@ -38,12 +38,6 @@ export type EditBlogitemImagesRequestBody = {
   file: Buffer
   title: string
 }
-export function addBlogItemImage({
-  slug,
-  body,
-}: {
-  slug: string
-  body: EditBlogitemImagesRequestBody
-}) {
+export function addBlogItemImage() {
   return HttpResponse.json({ images: [] })
 }
