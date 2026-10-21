@@ -10,7 +10,6 @@ export function SmartAnchor({
   return (
     <Anchor
       {...rest}
-      viewTransition
       component={Link}
       to={href}
       underline={pathname === href ? "never" : "always"}

@@ -21,29 +21,16 @@ export function Home() {
     <SignedIn>
       <ButtonBox>
         <Group justify="center">
-          <Button
-            size={size}
-            component={Link}
-            to="/plog"
-            viewTransition
-            fullWidth
-          >
+          <Button size={size} component={Link} to="/plog" fullWidth>
             Blogitems
           </Button>
-          <Button
-            size={size}
-            component={Link}
-            to="/plog/add"
-            viewTransition
-            fullWidth
-          >
+          <Button size={size} component={Link} to="/plog/add" fullWidth>
             Add blogitem
           </Button>
           <Button
             size={size}
             component={Link}
             to="/plog/add-by-photo"
-            viewTransition
             fullWidth
           >
             Add by photo
@@ -53,7 +40,6 @@ export function Home() {
             size={size}
             component={Link}
             to="/plog/highlighted-comments"
-            viewTransition
             fullWidth
           >
             Highlighted Comments
@@ -66,19 +52,12 @@ export function Home() {
             size={size}
             component={Link}
             to="/spam/signatures"
-            viewTransition
             prefetch="intent"
             fullWidth
           >
             Spam Comment Signatures
           </Button>
-          <Button
-            size={size}
-            component={Link}
-            to="/spam/patterns"
-            viewTransition
-            fullWidth
-          >
+          <Button size={size} component={Link} to="/spam/patterns" fullWidth>
             Spam Comment Patterns
           </Button>
         </Group>
@@ -89,7 +68,6 @@ export function Home() {
             size={size}
             component={Link}
             to="/llmcalls"
-            viewTransition
             prefetch="intent"
             fullWidth
           >
@@ -99,7 +77,6 @@ export function Home() {
             size={size}
             component={Link}
             to="/plog/categories"
-            viewTransition
             prefetch="intent"
             fullWidth
           >
@@ -109,7 +86,6 @@ export function Home() {
             size={size}
             component={Link}
             to="/cdn"
-            viewTransition
             prefetch="intent"
             fullWidth
           >
@@ -123,7 +99,6 @@ export function Home() {
             size={size}
             component={Link}
             to="/analytics/query"
-            viewTransition
             prefetch="intent"
             fullWidth
           >
@@ -133,7 +108,6 @@ export function Home() {
             size={size}
             component={Link}
             to="/analytics/charts"
-            viewTransition
             prefetch="intent"
             fullWidth
           >
@@ -143,7 +117,6 @@ export function Home() {
             size={size}
             component={Link}
             to="/analytics/llmcalls"
-            viewTransition
             prefetch="intent"
             fullWidth
           >
@@ -166,7 +139,6 @@ function CommentsButton({
     <Button
       size={size}
       component={Link}
-      viewTransition
       to={count ? "/plog/comments?only=unapproved" : "/plog/comments"}
       fullWidth
     >
