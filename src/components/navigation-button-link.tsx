@@ -15,7 +15,6 @@ export function NavigationButtonLink({
       to={to}
       variant="subtle"
       color={pathname === to ? "gray" : undefined}
-      viewTransition
       prefetch="intent"
     >
       {children}
