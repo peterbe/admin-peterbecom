@@ -115,7 +115,12 @@ export function CountByDay({
         <Loading visible={current.isLoading} />
 
         {!current.error && (
-          <BasicLineChart data={dataX} series={series} dataKey="date" />
+          <BasicLineChart
+            data={dataX}
+            series={series}
+            dataKey="date"
+            curveType="monotone"
+          />
         )}
       </Box>
 
