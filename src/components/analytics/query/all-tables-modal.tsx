@@ -15,6 +15,7 @@ const KNOWN_TABLES = [
   "analytics_geo",
   "analyticsrollupsdaily",
   "analyticsrollupspathnamedaily",
+  "analyticsrollupspathnamebybotdaily",
   "requestlog",
   "requestlogrollupsbotagentstatuscodedaily",
 ]
