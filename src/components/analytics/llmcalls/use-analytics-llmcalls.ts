@@ -9,6 +9,8 @@ export type Aggregate = {
   sum_took_seconds: number
   p50_took_seconds: number
   p90_took_seconds: number
+  sum_input_tokens: null | number
+  sum_output_tokens: null | number
 }
 
 export type ServerData = {
