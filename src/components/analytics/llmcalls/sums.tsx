@@ -59,22 +59,53 @@ export function Sums() {
 type ChartData = Record<string, number | string>[]
 type ChartSeries = { name: string; color: string }[]
 
+const estimateCost = (row: Aggregate) => {
+  const pricesPerM = {
+    "openai-gpt-5": {
+      input: 2.5,
+      output: 20,
+      units: 1_000_000,
+    },
+    "openai-gpt-5-mini": {
+      input: 0.45,
+      output: 3.6,
+      units: 1_000_000,
+    },
+    "claude-opus-4-8": {
+      input: 5,
+      output: 25,
+      units: 1_000_000,
+    },
+    "claude-opus-5": {
+      input: 5,
+      output: 25,
+      units: 1_000_000,
+    },
+    "claude-haiku-5-5": {
+      // These are actually only for the first 100,000 tokens
+      input: 0.1,
+      output: 0.5,
+      units: 1_000_000,
+    },
+  }
+  const { model } = row
+  const prices = pricesPerM[model as keyof typeof pricesPerM]
+  if (
+    prices &&
+    row.sum_input_tokens !== null &&
+    row.sum_output_tokens !== null
+  ) {
+    const input = (row.sum_input_tokens * prices.input) / prices.units
+    const output = (row.sum_output_tokens * prices.output) / prices.units
+    return input + output
+  }
+  return Number.NaN
+}
+
 function SumsTable({ data }: { data: ServerData }) {
   const [value, setValue] = useState<"sum" | "month">("month")
 
-  const estimateCost = (model: string, count: number) => {
-    const pricesPerM = {
-      "gpt-5": 2.5,
-      "gpt-5-mini": 0.75,
-      "gpt-5-nano": 0.75,
-    }
-    if (model in pricesPerM) {
-      const pricePerM = pricesPerM[model as keyof typeof pricesPerM]
-      return pricePerM * (count / 1_000_000)
-    }
-    return Number.NaN
-  }
-  const _formatter = new Intl.NumberFormat("en-US", {
+  const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
   })
@@ -103,6 +134,8 @@ function SumsTable({ data }: { data: ServerData }) {
         sum_took_seconds,
         p50_took_seconds,
         p90_took_seconds,
+        sum_input_tokens,
+        sum_output_tokens,
       } = aggregate
       if (!(model in map)) {
         map[model] = [
@@ -112,6 +145,8 @@ function SumsTable({ data }: { data: ServerData }) {
             sum_took_seconds,
             p50_took_seconds,
             p90_took_seconds,
+            sum_input_tokens,
+            sum_output_tokens,
             model,
             month: "",
           },
@@ -123,6 +158,8 @@ function SumsTable({ data }: { data: ServerData }) {
           sum_took_seconds,
           p50_took_seconds,
           p90_took_seconds,
+          sum_input_tokens,
+          sum_output_tokens,
           model,
           month: "",
         })
@@ -146,10 +183,18 @@ function SumsTable({ data }: { data: ServerData }) {
         p90_took_seconds:
           aggregates.reduce((acc, a) => acc + a.p90_took_seconds, 0) /
           aggregates.length,
+        sum_input_tokens: aggregates.reduce(
+          (acc, a) => acc + (a.sum_input_tokens ?? 0),
+          0,
+        ),
+        sum_output_tokens: aggregates.reduce(
+          (acc, a) => acc + (a.sum_output_tokens ?? 0),
+          0,
+        ),
         month: "",
       }
     }
-    return Object.values(combined)
+    return Object.values(combined) as Aggregate[]
   }
 
   const buckets = byMonth ? data.aggregates : collapseByMonth(data.aggregates)
@@ -213,7 +258,8 @@ function SumsTable({ data }: { data: ServerData }) {
         </Table.Thead>
         <Table.Tbody>
           {buckets.map((row) => {
-            const _cost = estimateCost(row.model, row.count)
+            const cost = estimateCost(row)
+            console.log({ cost })
             return (
               <Table.Tr key={`${row.model}${row.month}`}>
                 {row.month ? (
@@ -235,14 +281,13 @@ function SumsTable({ data }: { data: ServerData }) {
                     timeFormatter(row.sum_took_seconds)}
                 </Table.Td>
                 <Table.Td>
-                  n/a
-                  {/* {Number.isNaN(cost) ? (
+                  {Number.isNaN(cost) ? (
                     "N/A"
                   ) : (
                     <Tooltip label={`${(100 * cost).toFixed(5)} cents`}>
                       <Text>{formatter.format(cost)}</Text>
                     </Tooltip>
-                  )} */}
+                  )}
                 </Table.Td>
               </Table.Tr>
             )
