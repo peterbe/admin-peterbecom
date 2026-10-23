@@ -44,10 +44,10 @@ ORDER BY 2 DESC
 LIMIT ${Number(limit)}
 `
 
-function Inner() {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: "pageview-events", ...options })
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: "pageview-events", ...options })
 
+function Inner() {
   const [intervalDays, setIntervalDays] = useInterval("pageview-events")
   const [rows, setRows] = useRows("pageview-events", 10)
   const [urlFilter, setURLField] = useURLFilter("pageview-events", "")

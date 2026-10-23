@@ -24,4 +24,3 @@ Start codegen:
 ```bash
 bunx playwright codegen
 ```
-

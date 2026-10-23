@@ -42,10 +42,10 @@ ORDER BY 2 DESC
 LIMIT ${Number(limit)}
 `
 
-function Inner() {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: "geo-locations", ...options })
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: "geo-locations", ...options })
 
+function Inner() {
   const [intervalDays, setIntervalDays] = useInterval("geo-locations")
   const [rows, setRows] = useRows("geo-locations", 10)
 

@@ -86,12 +86,12 @@ export function Querystrings() {
   )
 }
 
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: ID, ...options })
+
 function Inner() {
   const [includeManifest, setIncludeManifest] = useState(false)
   const [select, setSelect] = useState<"querystring" | "path">("path")
-
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: ID, ...options })
 
   const [intervalDays, setIntervalDays] = useInterval(ID)
   const [rows, setRows] = useRows(ID, 10)

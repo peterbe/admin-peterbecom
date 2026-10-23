@@ -62,14 +62,15 @@ export function RequestsPerDay() {
     </ChartContainer>
   )
 }
+
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: ID, ...options })
+
 function Inner() {
   const [searchParams, setSearchParams] = useSearchParams()
   const splitByStatus = searchParams.get("splitByStatus") === "1"
   const excludePosts = searchParams.get("excludePosts") === "1"
   const exclude200 = searchParams.get("exclude200") === "1"
-
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: ID, ...options })
 
   const [intervalDays, setIntervalDays] = useInterval(ID)
   const [rows, setRows] = useRows(ID, 10)

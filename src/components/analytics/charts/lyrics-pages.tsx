@@ -78,10 +78,10 @@ export function LyricsPages() {
 
 const TREND_MONTHS = 4
 
-function Inner() {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: ID, ...options })
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: ID, ...options })
 
+function Inner() {
   const trend = useQuery(sqlQueryTrend({ months: TREND_MONTHS }))
 
   const current = useQuery(sqlQuery({ days: Number(30) }))

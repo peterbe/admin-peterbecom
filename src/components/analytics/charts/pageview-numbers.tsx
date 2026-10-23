@@ -87,10 +87,10 @@ WHERE
 ORDER BY sort
 `.trim()
 
-function Inner() {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: ID, ...options })
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: ID, ...options })
 
+function Inner() {
   const oldestPageviewCreated = useQuery(`
     select min(created) from analytics where type='pageview' `)
   const oldestCreated = oldestPageviewCreated.data?.rows[0]?.min || new Date()

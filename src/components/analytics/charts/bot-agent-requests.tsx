@@ -72,10 +72,10 @@ export function BotAgentRequests() {
     </ChartContainer>
   )
 }
-function Inner() {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: ID, ...options })
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: ID, ...options })
 
+function Inner() {
   const [intervalDays, setIntervalDays] = useInterval(ID)
   const [rows, setRows] = useRows(ID, 10)
 

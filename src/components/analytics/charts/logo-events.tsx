@@ -34,10 +34,10 @@ ORDER BY 2 DESC
 LIMIT ${limit}
 `
 
-function Inner() {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: ID, ...options })
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: ID, ...options })
 
+function Inner() {
   const byRefWeek = useQuery(sqlQueryRequests("data->>'ref'", 7))
   const byRefMonth = useQuery(sqlQueryRequests("data->>'ref'", 30))
 

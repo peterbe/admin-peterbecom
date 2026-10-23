@@ -34,10 +34,10 @@ GROUP BY
 ORDER BY day
 `
 
-function Inner() {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: "lyrics-featureflag", ...options })
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: "lyrics-featureflag", ...options })
 
+function Inner() {
   const [intervalDays, setIntervalDays] = useInterval("lyrics-featureflag")
   const [percentMode, setPercentMode] = useState("")
 

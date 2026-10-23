@@ -49,10 +49,10 @@ ORDER BY
 LIMIT ${limit};
 `
 
-function Inner({ id }: { id: string }) {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: id, ...options })
+const useQuery = (id: string, sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: id, ...options })
 
+function Inner({ id }: { id: string }) {
   const [rows, setRows] = useRows(id, 25)
   const [intervalDays, setIntervalDays] = useInterval(id)
   const [primaryKey, setPrimaryKey] = useLocalStorage({
@@ -85,6 +85,7 @@ function Inner({ id }: { id: string }) {
     reverse = sortBy.startsWith("-")
   }
   const current = useQuery(
+    id,
     sqlQuery(
       primaryKey,
       Number(intervalDays),
