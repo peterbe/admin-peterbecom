@@ -30,11 +30,10 @@ export function CommentsByReferral() {
     </ChartContainer>
   )
 }
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: ID, ...options })
 
 function Inner() {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: ID, ...options })
-
   const current = useQuery(sqlQuery({ days: Number(30) }))
 
   return (

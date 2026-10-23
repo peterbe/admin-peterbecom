@@ -47,6 +47,8 @@ function dStringToDate(day: string): Date {
   return new Date(`${day}T00:00:00`)
 }
 
+const useQuery = (id: string, sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: id, ...options })
 export function CountByDay({
   id,
   type,
@@ -54,9 +56,6 @@ export function CountByDay({
   id: string
   type: "pageview" | "publicapi-pageview"
 }) {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: id, ...options })
-
   const [intervalDays, setIntervalDays] = useInterval(id)
   const [urlFilter, setURLField] = useURLFilter(id, "")
 
@@ -64,11 +63,11 @@ export function CountByDay({
   const currentSQL = urlFilter
     ? sqlQueryFiltered(type, days + 1, 1, urlFilter)
     : sqlQuery(type, days + 1, 1)
-  const current = useQuery(currentSQL)
+  const current = useQuery(id, currentSQL)
   const previousSQL = urlFilter
     ? sqlQueryFiltered(type, days * 2 + 1, days + 1, urlFilter)
     : sqlQuery(type, days * 2 + 1, days + 1)
-  const previous = useQuery(previousSQL)
+  const previous = useQuery(id, previousSQL)
   const dataX: DataRow[] = []
   const series: DataSerie[] = [{ name: "count", label: "Number" }]
   const dataO: Record<string, number> = {}

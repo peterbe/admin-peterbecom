@@ -36,10 +36,9 @@ export function CommentsByPost() {
   )
 }
 
+const useQuery = (sql: string, options?: QueryOptions) =>
+  useSQLQuery(sql, { prefix: ID, ...options })
 function Inner() {
-  const useQuery = (sql: string, options?: QueryOptions) =>
-    useSQLQuery(sql, { prefix: ID, ...options })
-
   const [rows, setRows] = useRows(ID, 25)
   const [intervalDays, setIntervalDays] = useInterval(ID)
 
