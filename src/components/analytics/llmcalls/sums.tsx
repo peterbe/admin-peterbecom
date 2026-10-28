@@ -213,13 +213,18 @@ function SumsTable({ data }: { data: ServerData }) {
       return { date, ...models }
     },
   )
-  const names = chartData
-    .map((thing) => {
-      const { date, ...rest } = thing
-      return rest
-    })
-    .flatMap(Object.keys)
-    .filter((v, i, a) => a.indexOf(v) === i)
+
+  const names = [
+    ...new Set(
+      chartData
+        .map((thing) => {
+          const { date, ...rest } = thing
+          return rest
+        })
+        .flatMap(Object.keys),
+    ),
+  ]
+
   const colors = [
     "violet.6",
     "blue.6",
@@ -259,7 +264,6 @@ function SumsTable({ data }: { data: ServerData }) {
         <Table.Tbody>
           {buckets.map((row) => {
             const cost = estimateCost(row)
-            console.log({ cost })
             return (
               <Table.Tr key={`${row.model}${row.month}`}>
                 {row.month ? (
