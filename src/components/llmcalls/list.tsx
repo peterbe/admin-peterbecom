@@ -32,12 +32,26 @@ const badgeColor = (status: string) => {
 }
 
 export function List() {
-  const [searchParams, setSearchParams] = useSearchParams()
-
+  // TODO: this causes 2 renders because batchSize is initially
+  // whatever the 'defaultValue' is, until the first render.
   const [batchSize, setBatchSize] = useLocalStorage({
     key: "llmcalls-table-page-size",
     defaultValue: "100",
   })
+
+  const actualBatchsize = `${batchSize === "Default" ? 100 : Number(batchSize)}`
+
+  return <InnerList batchSize={actualBatchsize} setBatchSize={setBatchSize} />
+}
+
+function InnerList({
+  batchSize,
+  setBatchSize,
+}: {
+  batchSize: string
+  setBatchSize: (value: string) => void
+}) {
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const filterSearchParams = new URLSearchParams(searchParams)
   if (batchSize) {
@@ -54,10 +68,22 @@ export function List() {
     })
 
   const matchesMobile = useMediaQuery("(max-width: 500px)")
-  const [messages, setMessages] = useState<object[] | null>(null)
-  const [response, setResponse] = useState<object | null>(null)
+  const [messages, setMessages] = useState<number | null>(null)
+  const [response, setResponse] = useState<number | null>(null)
   const [metadata, setMetadata] = useState<object | null>(null)
   const [responseError, setResponseError] = useState<object | null>(null)
+
+  const lookup = useQuery<ServerData>({
+    queryKey: ["llmcall", messages || response],
+    queryFn: async () => {
+      if (messages)
+        return fetchLLMCalls(new URLSearchParams({ id: messages.toString() }))
+      if (response)
+        return fetchLLMCalls(new URLSearchParams({ id: response.toString() }))
+      if (!messages && !response) throw new Error("No message ID provided")
+    },
+    enabled: Boolean(messages || response),
+  })
 
   const statusAggregates = data
     ? Object.entries(data.aggregates.status).map(([status, count]) => ({
@@ -106,7 +132,10 @@ export function List() {
         onClose={() => setMessages(null)}
         title="Messages"
       >
-        {messages && <pre>{JSON.stringify(messages, null, 2)}</pre>}
+        {lookup.isLoading && <Loader size={26} />}
+        {lookup.data?.calls[0] && (
+          <pre>{JSON.stringify(lookup.data.calls[0].messages, null, 2)}</pre>
+        )}
       </Modal>
       <Modal
         size="auto"
@@ -114,7 +143,10 @@ export function List() {
         onClose={() => setResponse(null)}
         title="Response"
       >
-        {response && <pre>{JSON.stringify(response, null, 2)}</pre>}
+        {lookup.isLoading && <Loader size={26} />}
+        {lookup.data?.calls[0] && (
+          <pre>{JSON.stringify(lookup.data.calls[0].response, null, 2)}</pre>
+        )}
       </Modal>
       <Modal
         size="auto"
@@ -216,14 +248,14 @@ export function List() {
                 <Table.Td>
                   <Group>
                     <Button
-                      onClick={() => setMessages(llmcall.messages)}
+                      onClick={() => setMessages(llmcall.id)}
                       variant="light"
                       size="xs"
                     >
                       Messages
                     </Button>
                     <Button
-                      onClick={() => setResponse(llmcall.response)}
+                      onClick={() => setResponse(llmcall.id)}
                       variant="light"
                       size="xs"
                     >
