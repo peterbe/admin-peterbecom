@@ -5,8 +5,8 @@ export type Call = {
   model: string
   took_seconds: number
   created: string
-  messages: object[]
-  response: object
+  messages?: object[]
+  response?: object
   metadata: object
   error: object | null
 }
