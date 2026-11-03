@@ -1,3 +1,10 @@
+type ResponseObject = object & {
+  usage?: {
+    input_tokens?: number
+    output_tokens?: number
+  }
+}
+
 export type Call = {
   id: number
   status: string
@@ -6,7 +13,7 @@ export type Call = {
   took_seconds: number
   created: string
   messages?: object[]
-  response?: object
+  response?: ResponseObject
   metadata: object
   error: object | null
 }
