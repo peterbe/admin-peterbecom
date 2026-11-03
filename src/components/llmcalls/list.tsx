@@ -10,6 +10,7 @@ import {
   Loader,
   LoadingOverlay,
   Modal,
+  Pill,
   Select,
   Table,
   Title,
@@ -277,6 +278,16 @@ function InnerList({
                       >
                         Error
                       </Button>
+                    )}
+                    {llmcall.response?.usage && (
+                      <Pill size="sm">
+                        →{llmcall.response.usage?.input_tokens}
+                      </Pill>
+                    )}
+                    {llmcall.response?.usage && (
+                      <Pill size="sm">
+                        {llmcall.response.usage?.output_tokens}→
+                      </Pill>
                     )}
                   </Group>
                 </Table.Td>
