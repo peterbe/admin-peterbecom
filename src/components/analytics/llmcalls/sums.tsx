@@ -266,8 +266,14 @@ function SumsTable({ data }: { data: ServerData }) {
             const cost = estimateCost(row)
             return (
               <Table.Tr key={`${row.model}${row.month}`}>
+                {/* Add one day otherwise the midnight, in UTC, becomes
+                the previous day in some time zones.
+                For example 2026-07-01T00:00:00Z becomes 'Jun 2026'
+                 */}
                 {row.month ? (
-                  <Table.Td>{monthFormatter(new Date(row.month))}</Table.Td>
+                  <Table.Td>
+                    {monthFormatter(addOneDay(new Date(row.month)))}
+                  </Table.Td>
                 ) : null}
                 <Table.Td>{row.model}</Table.Td>
                 <Table.Td>{row.count}</Table.Td>
@@ -327,6 +333,12 @@ function SumsTable({ data }: { data: ServerData }) {
       )}
     </Box>
   )
+}
+
+function addOneDay(date: Date) {
+  const newDate = new Date(date)
+  newDate.setDate(newDate.getDate() + 1)
+  return newDate
 }
 
 function BarChartWrapper({
