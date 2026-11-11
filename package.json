@@ -17,18 +17,18 @@
     "postinstall": "bunx @biomejs/biome migrate --write"
   },
   "dependencies": {
-    "@mantine/charts": "^9.7.4",
-    "@mantine/code-highlight": "^9.7.4",
-    "@mantine/core": "^9.7.4",
-    "@mantine/dropzone": "^9.7.4",
-    "@mantine/form": "^9.7.4",
-    "@mantine/hooks": "^9.7.4",
-    "@mantine/notifications": "^9.7.4",
-    "@tabler/icons-react": "^3.50.0",
-    "@tanstack/query-async-storage-persister": "^5.105.3",
-    "@tanstack/react-query": "^5.105.3",
-    "@tanstack/react-query-devtools": "^5.105.3",
-    "@tanstack/react-query-persist-client": "^5.105.3",
+    "@mantine/charts": "^9.8.0",
+    "@mantine/code-highlight": "^9.8.0",
+    "@mantine/core": "^9.8.0",
+    "@mantine/dropzone": "^9.8.0",
+    "@mantine/form": "^9.8.0",
+    "@mantine/hooks": "^9.8.0",
+    "@mantine/notifications": "^9.8.0",
+    "@tabler/icons-react": "^3.51.0",
+    "@tanstack/query-async-storage-persister": "^5.107.1",
+    "@tanstack/react-query": "^5.107.1",
+    "@tanstack/react-query-devtools": "^5.107.1",
+    "@tanstack/react-query-persist-client": "^5.107.1",
     "date-fns": "^4.1.0",
     "diff": "^9.0.0",
     "flag-icons": "^7.6.0",
@@ -42,7 +42,7 @@
     "valibot": "^1.1.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.4",
+    "@biomejs/biome": "2.6.6",
     "@playwright/test": "^1.64.1",
     "@types/bun": "1.4.4",
     "@types/react": "^19.3.0",
@@ -52,7 +52,7 @@
     "msw": "^2.13.4",
     "serve": "^14.2.5",
     "typescript": "^7.0.2",
-    "vite": "8.3.5"
+    "vite": "8.3.7"
   },
   "msw": {
     "workerDirectory": [

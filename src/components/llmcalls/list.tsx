@@ -295,7 +295,7 @@ function InnerList({
                   {llmcall.status === "progress" ? (
                     "n/a"
                   ) : (
-                    <Took seconds={llmcall.took_seconds} />
+                    <Took seconds={llmcall.took_seconds} compact />
                   )}
                 </Table.Td>
                 <Table.Td>
