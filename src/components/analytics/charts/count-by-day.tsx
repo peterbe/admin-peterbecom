@@ -1,10 +1,12 @@
 import { Box, Grid, Table } from "@mantine/core"
+import { ByBotOptions } from "./by-bot-options"
 import { createdRange } from "./created-range"
 import { IntervalOptions } from "./interval-options"
 import { BasicLineChart, type DataRow, type DataSerie } from "./line-chart"
 import { Loading } from "./loading"
 import { UrlFilterOptions } from "./options"
 import { urlFilterToSQL } from "./url-filter-to-sql"
+import { type ByBotChoices, useByBot } from "./use-by-bot"
 import { useInterval } from "./use-interval"
 import { type QueryOptions, useSQLQuery } from "./use-query"
 import { useURLFilter } from "./use-url-filter"
@@ -27,7 +29,29 @@ ORDER BY
     day DESC;
 `
 
-const sqlQuery = (type: string, days = 0, back = 0) => `
+const sqlQuery = (
+  type: string,
+  days = 0,
+  back = 0,
+  byBot: ByBotChoices = "both",
+) => {
+  if (byBot !== "both") {
+    return `
+SELECT
+  day, count
+FROM
+  analyticsrollupsbybotdaily
+WHERE
+  type='${type}'
+  AND ${createdRange(days, back, "day")}
+  AND is_bot = ${byBot === "human" ? "false" : "true"}
+ORDER BY
+  day DESC
+LIMIT ${days - back}
+`
+  }
+
+  return `
 SELECT
   day, count
 FROM
@@ -39,6 +63,7 @@ ORDER BY
   day DESC
 LIMIT ${days - back}
 `
+}
 
 function dStringToDate(day: string): Date {
   if (day.includes("T")) {
@@ -49,6 +74,7 @@ function dStringToDate(day: string): Date {
 
 const useQuery = (id: string, sql: string, options?: QueryOptions) =>
   useSQLQuery(sql, { prefix: id, ...options })
+
 export function CountByDay({
   id,
   type,
@@ -58,15 +84,16 @@ export function CountByDay({
 }) {
   const [intervalDays, setIntervalDays] = useInterval(id)
   const [urlFilter, setURLField] = useURLFilter(id, "")
+  const [byBot, setByBot] = useByBot(id)
 
   const days = Number(intervalDays)
   const currentSQL = urlFilter
     ? sqlQueryFiltered(type, days + 1, 1, urlFilter)
-    : sqlQuery(type, days + 1, 1)
+    : sqlQuery(type, days + 1, 1, byBot)
   const current = useQuery(id, currentSQL)
   const previousSQL = urlFilter
     ? sqlQueryFiltered(type, days * 2 + 1, days + 1, urlFilter)
-    : sqlQuery(type, days * 2 + 1, days + 1)
+    : sqlQuery(type, days * 2 + 1, days + 1, byBot)
   const previous = useQuery(id, previousSQL)
   const dataX: DataRow[] = []
   const series: DataSerie[] = [{ name: "count", label: "Number" }]
@@ -126,6 +153,9 @@ export function CountByDay({
       <Grid>
         <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
           <IntervalOptions value={intervalDays} onChange={setIntervalDays} />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+          <ByBotOptions value={byBot} onChange={setByBot} />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
           <UrlFilterOptions value={urlFilter} onChange={setURLField} />
