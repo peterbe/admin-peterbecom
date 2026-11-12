@@ -1,4 +1,4 @@
-import { Button, Code, Container, Text, Title } from "@mantine/core"
+import { Box, Button, Code, Container, Text, Title } from "@mantine/core"
 import { useEffect } from "react"
 
 import {
@@ -56,6 +56,20 @@ export default function ErrorPage() {
       ) : (
         <Text ta="center">Error unknown. See console logs.</Text>
       )}
+      <Box m={50}>
+        <Button
+          component={Link}
+          to="/plog"
+          variant="default"
+          fullWidth
+          onClick={(e) => {
+            e.preventDefault()
+            window.location.reload()
+          }}
+        >
+          Reload the page
+        </Button>
+      </Box>
     </Container>
   )
 }
