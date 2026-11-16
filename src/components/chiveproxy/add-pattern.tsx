@@ -1,0 +1,126 @@
+import {
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  LoadingOverlay,
+  Stack,
+  TextInput,
+  Title,
+} from "@mantine/core"
+import { useForm } from "@mantine/form"
+import { notifications } from "@mantine/notifications"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { API_URL, QUERY_KEY } from "./constants"
+
+type PostedError = {
+  errors: Record<string, string | string[]>
+}
+
+export function AddPattern() {
+  const queryClient = useQueryClient()
+  const { mutate, isPending, error } = useMutation({
+    mutationKey: QUERY_KEY,
+    mutationFn: async (data: typeof form.values) => {
+      const url = API_URL
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (response.status === 400) {
+        const json = (await response.json()) as PostedError
+        notifications.show({
+          title: "Validation errors",
+          message: "Look for red",
+          color: "red",
+        })
+        for (const [field, errors] of Object.entries(json.errors)) {
+          form.setFieldError(
+            field,
+            Array.isArray(errors) ? errors.join(", ") : errors,
+          )
+        }
+      } else if (!response.ok) {
+        throw new Error(`${response.status} on ${response.url}`)
+      }
+    },
+    onSuccess: async () => {
+      notifications.show({
+        message: "Pattern added",
+        color: "green",
+      })
+
+      form.reset()
+      form.setValues(initialValues)
+
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY,
+      })
+    },
+  })
+
+  const initialValues = {
+    pattern: "",
+    is_regex: false,
+    case_insensitive: false,
+  }
+
+  const form = useForm({
+    mode: "uncontrolled",
+    initialValues,
+  })
+
+  return (
+    <Box mb={10} pos="relative">
+      <Title order={4}>Add New Pattern</Title>
+      <LoadingOverlay visible={isPending} />
+
+      {error && <Alert color="red">Error: {error.message}</Alert>}
+
+      <form
+        onSubmit={form.onSubmit((data) => {
+          if (data !== null) {
+            mutate(data)
+          }
+        })}
+      >
+        <Stack>
+          <TextInput
+            label="Pattern"
+            placeholder="Pattern"
+            key={form.key("pattern")}
+            {...form.getInputProps("pattern")}
+          />
+
+          <Checkbox
+            label="Is Regex"
+            key={form.key("is_regex")}
+            {...form.getInputProps("is_regex")}
+          />
+
+          <Checkbox
+            label="Case Insensitive"
+            key={form.key("case_insensitive")}
+            {...form.getInputProps("case_insensitive")}
+          />
+
+          <Box mt={10}>
+            <Button
+              type="submit"
+              fullWidth
+              disabled={isPending}
+              loading={isPending}
+            >
+              Save
+            </Button>
+          </Box>
+        </Stack>
+      </form>
+    </Box>
+  )
+}

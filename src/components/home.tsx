@@ -60,6 +60,14 @@ export function Home() {
           <Button size={size} component={Link} to="/spam/patterns" fullWidth>
             Spam Comment Patterns
           </Button>
+          <Button
+            size={size}
+            component={Link}
+            to="/chiveproxy/banned-url-patterns"
+            fullWidth
+          >
+            Chiveproxy Banned URL Patterns
+          </Button>
         </Group>
       </ButtonBox>
       <ButtonBox>

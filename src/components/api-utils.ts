@@ -194,7 +194,7 @@ export async function fetchCDNPurge(urls: string[]) {
   return response.json()
 }
 
-async function standardFetch(url: string) {
+export async function standardFetch(url: string) {
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`${response.status} on ${response.url}`)
