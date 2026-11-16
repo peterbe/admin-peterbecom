@@ -82,6 +82,10 @@ export const router = createBrowserRouter([
             lazy: () => import("./components/spam/patterns"),
           },
           {
+            path: "chiveproxy/banned-url-patterns",
+            lazy: () => import("./components/chiveproxy/banned-url-patterns"),
+          },
+          {
             path: "cdn",
             lazy: () => import("./components/cdn"),
           },
