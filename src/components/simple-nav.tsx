@@ -147,6 +147,9 @@ function Links({ onClicked }: { onClicked?: () => void }) {
           <Menu.Item component={Link} to="/cdn">
             CDN
           </Menu.Item>
+          <Menu.Item component={Link} to="/chiveproxy/banned-url-patterns">
+            Chiveproxy Banned URL Patterns
+          </Menu.Item>
 
           <Menu.Divider />
           <Menu.Label>Spam</Menu.Label>
