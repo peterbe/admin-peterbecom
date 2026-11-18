@@ -75,6 +75,8 @@ export function AddPattern() {
     initialValues,
   })
 
+  const formPattern = form.getValues().pattern
+
   return (
     <Box mb={10} pos="relative">
       <Title order={4}>Add New Pattern</Title>
@@ -96,6 +98,17 @@ export function AddPattern() {
             key={form.key("pattern")}
             {...form.getInputProps("pattern")}
           />
+
+          {formPattern && isGuessable(formPattern) && (
+            <Button
+              onClick={() => {
+                form.setFieldValue("pattern", fixPattern(formPattern))
+                form.setFieldValue("is_regex", true)
+              }}
+            >
+              Fix?
+            </Button>
+          )}
 
           <Checkbox
             label="Is Regex"
@@ -123,4 +136,46 @@ export function AddPattern() {
       </form>
     </Box>
   )
+}
+
+function fix(pattern: string): string | false {
+  if (!isUrl(pattern)) {
+    return false
+  }
+
+  const url = new URL(pattern)
+  const { search } = url
+  if (!search) return false
+
+  const qs = new URLSearchParams(search)
+
+  const innerUrl = qs.get("url")
+  if (!innerUrl) return false
+  if (!isUrl(innerUrl)) return false
+
+  const innerUrlObj = new URL(innerUrl)
+  const pathname = innerUrlObj.pathname
+  const base = pathname.split("/")[pathname.split("/").length - 1]
+  return base.replace(/\d{2,6}/g, "\\d+").replace(/\./g, "\\.")
+}
+
+function isGuessable(pattern: string) {
+  return fix(pattern) !== false
+}
+
+function fixPattern(pattern: string): string {
+  const fixed = fix(pattern)
+  if (fixed === false) {
+    throw new Error("Pattern is not fixable")
+  }
+  return fixed
+}
+
+function isUrl(pattern: string) {
+  try {
+    new URL(pattern)
+    return true
+  } catch {
+    return false
+  }
 }
