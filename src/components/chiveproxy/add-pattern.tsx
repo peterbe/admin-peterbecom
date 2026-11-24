@@ -156,7 +156,10 @@ function fix(pattern: string): string | false {
   const innerUrlObj = new URL(innerUrl)
   const pathname = innerUrlObj.pathname
   const base = pathname.split("/")[pathname.split("/").length - 1]
-  return base.replace(/\d{2,6}/g, "\\d+").replace(/\./g, "\\.")
+  return base
+    .replace(/[a-f0-9]{6}/g, "[a-f0-9]{6}")
+    .replace(/\d{2,6}/g, "\\d+")
+    .replace(/\./g, "\\.")
 }
 
 function isGuessable(pattern: string) {
